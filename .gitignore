@@ -2,8 +2,10 @@
 cube3D
 a.out
 *.o
+*.a
 /obj/
 /libs/libft/*.o
+/libs/libft/*.a
 
 # IDE configs
 .vscode/
