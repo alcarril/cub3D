@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 03:15:05 by alejandro         #+#    #+#             */
-/*   Updated: 2025/12/15 17:36:18 by alejandro        ###   ########.fr       */
+/*   Updated: 2025/12/27 02:54:31 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,11 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <sys/time.h>
 #include <math.h>
-//MiniLibx APIS
+//MiniLibx APIs
 # include "../libs/minilibx-linux/mlx.h"
 # include "../libs/minilibx-linux/mlx_int.h"
 

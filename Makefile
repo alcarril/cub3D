@@ -25,7 +25,10 @@ SRC_DIR = src/
 OBJ_DIR = obj/
 MKDIR = mkdir -p
 
-SRC_FILES = mlx_init_close/prueba.c
+SRC_FILES = mlx_init_close/init_close.c \
+			events/keys.c \
+			render/render.c \
+			mains/main.c
 
 SRCS = $(addprefix $(SRC_DIR), $(SRC_FILES))
 
