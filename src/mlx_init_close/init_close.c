@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/21 19:53:10 by alejandro         #+#    #+#             */
-/*   Updated: 2025/12/28 11:34:44 by alejandro        ###   ########.fr       */
+/*   Updated: 2025/12/28 14:06:51 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ void setup_player(t_mlx *mlx)
 	mlx->player->raydir_x = 0;//
 	mlx->player->raydir_y = 0;//
 	mlx->player->angle = 90.0f;//
-	mlx->player->speed = 0.04f;//
+	mlx->player->speed = 0.08f;//
 	mlx->player->move_down = false;
 	mlx->player->move_up = false;
 	mlx->player->move_right = false;

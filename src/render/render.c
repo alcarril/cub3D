@@ -6,16 +6,20 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/22 21:34:21 by alejandro         #+#    #+#             */
-/*   Updated: 2025/12/28 12:32:26 by alejandro        ###   ########.fr       */
+/*   Updated: 2025/12/29 12:41:05 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cube3D.h"
 
-void	draw_ray2D(t_mlx *mlx, float scale_x, float scale_y);
+void	draw_ray2D(t_mlx *mlx);
+void	draw_minimap2D(t_mlx *mlx, int *win);
+void	get_minimapscale(t_mlx *mlx, float *scale);
 bool	touch_wall(t_mlx *mlx, float x, float y, float epsilon);
+void	is_person2D(t_mlx *mlx, int *window, float *map);
+// void	update_minimap_view(t_mlx *mlx, float zoom_level, int *minimap_limits);
 
-
+//se puede optimizar pasando por refencia las variables
 void	buffering_pixel(int x, int y, t_mlx *mlx, int color)
 {
 	unsigned int	offset;
@@ -26,60 +30,74 @@ void	buffering_pixel(int x, int y, t_mlx *mlx, int color)
 	*(unsigned int *)(mlx->bit_map_address + offset) = color;
 }
 
-
 // //renderizado de conjunto de puntos de la ventana B -> a conjunto pares del mapa A
-int render_frame2D(t_mlx *mlx)
+int	render_frame2D(t_mlx *mlx)
 {
-	//todos los calores del mapa en float para poder hacer que l personaje se mmueva
-	//de manera fluida dentro del minimapa, no de celda en celda (mov continuio vs mov discontinuo)
-	int	window_x;
-	int	window_y;
-	float	map_x; 
-	float	map_y; 
-	float	scale_x;
-	float	scale_y;
+	int		win[2];
 
 	move_player(mlx);
-	// Calcular la escala de las celdas en función del tamaño del minimapa
-	scale_x = (float)(WIDTH / MINI_WIDTH) / mlx->map->max_columns;
-	scale_y = (float)(HEIGHT / MINI_HEIGHT) / mlx->map->max_rows;
-	// Iterar sobre cada píxel de la ventana
-	window_y = 0;
-	while (window_y < HEIGHT / MINI_HEIGHT)
+	win[Y] = 0;
+	while (win[Y] <= HEIGHT / MINI_HEIGHT)
 	{
-		window_x = 0;
-		while (window_x < WIDTH / MINI_WIDTH)
+		win[X] = 0;
+		while (win[X] <= WIDTH / MINI_WIDTH)
 		{
-			// Calcular la celda del mapa correspondiente al píxel actual
-			map_x = (float)window_x / scale_x;
-			map_y = (float)window_y / scale_y;
-			// Verificar que las coordenadas del mapa sean válidas
-			if ((unsigned int)map_x < mlx->map->max_rows && (unsigned int)map_y < mlx->map->max_columns)
-			{
-				// Dibujar el píxel según el contenido de la celda del mapa
-				if (mlx->map->map_grids[(unsigned int)map_y][(unsigned int)map_x] == WALL)
-					buffering_pixel(window_x, window_y, mlx, 0x00FF0000); // Color para paredes
-				else
-					buffering_pixel(window_x, window_y, mlx, 0x00000000); // Color para el suelo
-				//epsilon sirve para determinar el tamaño del persona y qu eno entre dentro de las
-				//paredes en el minimapa
-				if (fabs(mlx->player->pos_x - map_x) < EPSILON &&
-					fabs(mlx->player->pos_y - map_y) < EPSILON)
-				{
-					buffering_pixel(window_x, window_y, mlx, 0x0000FFFF);
-				}
-
-			}
-			window_x++;
+			draw_minimap2D(mlx, win);
+			win[X]++;
 		}
-		window_y++;
+		win[Y]++;
 	}
-	draw_ray(mlx, scale_x, scale_y);
+	draw_ray2D(mlx);
 	mlx_put_image_to_window(mlx->mlx_var, mlx->mlx_window, mlx->mlx_img, 0, 0);
 	return (1);
 }
 
+/* Dibujo del jugador */
+//epsilon sirve para determinar el tamaño del persona y qu eno entre dentro de las
+//paredes en el minimapa
+void	is_person2D(t_mlx *mlx, int *window, float *map)
+{
+	if (fabs(mlx->player->pos_x - map[X]) < EPSILON &&
+			fabs(mlx->player->pos_y - map[Y]) < EPSILON)
+	{
+		buffering_pixel(window[X], window[Y], mlx, 0x0000FFFF);
+	}
+}
 
+//se puede meter una optimizacion para que solo se calculen los pixeles cunado el pixel x e y
+//pertenecesn al conjunto de pixeles de la zona de la vental adestianda al minimapa-> is_mimap
+void	draw_minimap2D(t_mlx *mlx, int *win)
+{
+	//todos los calores del mapa en float para poder hacer que l personaje se mmueva
+	//de manera fluida dentro del minimapa, no de celda en celda (mov continuio vs mov discontinuo)
+	float			map[2];
+	static float	scale[2];
+	static int		control;//optimizacion de calculos
+
+	/* Escala del minimapa */
+	// Calcular la escala de las celdas en función del tamaño del minimapa
+	if (control == 0)
+	{
+		get_minimapscale(mlx, scale);
+		control++;
+	}
+	/* De ventana → mapa */
+	// Calcular la celda del mapa correspondiente al píxel actual
+	map[X] = (float)win[X] / scale[X];
+	map[Y] = (float)win[Y] / scale[Y];
+
+	/* Comprobación correcta de límites */
+	// Verificar que las coordenadas del mapa sean válidas
+	if ((unsigned int)map[Y] < mlx->map->max_rows &&
+			(unsigned int)map[X] < mlx->map->max_columns)
+	{
+		if (mlx->map->map_grids[(unsigned int)map[Y]][(unsigned int)map[X]] == WALL)
+			buffering_pixel(win[X], win[Y], mlx, 0x00FF0000);
+		else
+			buffering_pixel(win[X], win[Y], mlx, 0x00000000);
+		is_person2D(mlx, win, map);
+	}
+}
 
 //Fucnion para calculo de colisiones sin algoritmo de dda, entra esquinas y menos rapido
 bool	touch_wall(t_mlx *mlx, float x, float y, float epsilon)
@@ -92,13 +110,16 @@ bool	touch_wall(t_mlx *mlx, float x, float y, float epsilon)
 	return (0);
 }
 
-
-void draw_ray2D(t_mlx *mlx, float scale_x, float scale_y)
+//calcul indeoendiente para no hacer los calculos de todos elos punto del la ventaja
+//mejor que la interseccion de conjuntos, sobreescribimos meemrai de la imageb draw_ray > is_ray
+void draw_ray2D(t_mlx *mlx)
 {
 	float rad_angle;
 	float dx, dy;
 	int window_x, window_y;
-
+	float scale[2];
+	
+	get_minimapscale(mlx, scale);
 	rad_angle = (mlx->player->angle - 30.0f) * (PI / 180.0f);
 	while (rad_angle <= (mlx->player->angle + 30.0f) * (PI / 180.0f))
 	{
@@ -110,15 +131,44 @@ void draw_ray2D(t_mlx *mlx, float scale_x, float scale_y)
 		{
 			dx += 0.01 * cos(rad_angle);
 			dy += 0.01 * -sin(rad_angle);//ajuste de norte sur 
-			window_x = dx * scale_x;
-			window_y = dy * scale_y;
+			window_x = dx * scale[X];
+			window_y = dy * scale[Y];
 			if (window_x >= 0 && window_x < WIDTH && window_y >= 0 && window_y < HEIGHT)
-				buffering_pixel(window_x, window_y, mlx, 0xFF00FF00);
+				buffering_pixel(window_x, window_y, mlx, 0x000000FF);
 		}
 		rad_angle += 0.3 * (PI / 180.0f);
 	}
 }
 
+void	get_minimapscale(t_mlx *mlx, float *scale)
+{
+	scale[X] = (float)(WIDTH / MINI_WIDTH) / mlx->map->max_columns;
+	scale[Y] = (float)(HEIGHT / MINI_HEIGHT) / mlx->map->max_rows;
+}
+
+bool is_minimapzone(int win_x, int win_y)
+{
+	// Definir los límites del minimapa en la ventana
+	int minimap_start_x = 0; // Coordenada X inicial del minimapa
+	int minimap_start_y = 0; // Coordenada Y inicial del minimapa
+	int minimap_end_x = WIDTH / MINI_WIDTH; // Coordenada X final del minimapa
+	int minimap_end_y = HEIGHT / MINI_HEIGHT; // Coordenada Y final del minimapa
+
+	// Comprobar si el píxel está dentro de los límites del minimapa
+	if (win_x >= minimap_start_x && win_x <= minimap_end_x &&
+		win_y >= minimap_start_y && win_y <= minimap_end_y)
+			return (true);
+
+	return (false);
+}
+
+//minmapa traslaciones 
+//minimapa zoom
+//minimap activar rayos o desactivar ->con putpixel o render del fram completo o rednder de parte del minimapa solo
+//minimapa eater eggs
+//rayos para matar personajes
+
+/////////////////////////////FUNCIONES DE REDERIZADO DE B->A//////////////////////////////////////////
 
 // void render_cell2D(t_mlx *mlx, unsigned int map_x, unsigned int map_y, int *scale)
 // {
