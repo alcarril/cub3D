@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/22 21:34:21 by alejandro         #+#    #+#             */
-/*   Updated: 2025/12/30 13:11:59 by alejandro        ###   ########.fr       */
+/*   Updated: 2025/12/30 15:41:00 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -365,7 +365,6 @@ void	draw_wall_column(t_mlx *mlx, int column, int wall_height)
 		buffering_pixel(column, i, mlx, 0x00FFF00000); // Color blanco para la pared
 		i++;
 	}
-	// write(1, "lolo", 4);
 }
 
 
