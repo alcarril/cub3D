@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 13:06:24 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/09 22:46:50 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/11 13:29:26 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,30 +15,31 @@
 /*
 	Funcion que maneja la presion de teclas para el movimiento del jugador
 */
-void	player_keypress(t_mlx *mlx, int keysym)
+bool	player_keypress(t_mlx *mlx, int keysym)
 {
 	if (keysym == XK_w)
-		mlx->player->move_up = true;
-	if (keysym == XK_s)
-		mlx->player->move_down = true;
-	if (keysym == XK_a)
-		mlx->player->move_left = true;
-	if (keysym == XK_d)
-		mlx->player->move_right = true;
-	if (keysym == XK_Left)
-		mlx->player->r_counterclockwise = true;
-	if (keysym == XK_Right)
-		mlx->player->r_clockwise = true;
-	if (keysym == XK_Shift_L)
+		mlx->player->keys.move_up = true;
+	else if (keysym == XK_s)
+		mlx->player->keys.move_down = true;
+	else if (keysym == XK_a)
+		mlx->player->keys.move_left = true;
+	else if (keysym == XK_d)
+		mlx->player->keys.move_right = true;
+	else if (keysym == XK_Left)
+		mlx->player->keys.r_counterclockwise = true;
+	else if (keysym == XK_Right)
+		mlx->player->keys.r_clockwise = true;
+	else if (keysym == XK_Shift_L && mlx->player->keys.sprint == false)
 	{
-		if (mlx->player->sprint == false)
-		{
-			mlx->player->speed += 0.05;
-			mlx->player->sprint = true;
-		}
+		mlx->player->speed += 0.05;
+		mlx->player->keys.sprint = true;
+		printf("SPRINT ON\n");
 	}
-	if (keysym == XK_v)
+	else if (keysym == XK_v)
 		change_fov(mlx);
+	else
+		return (false);
+	return (true);
 }
 /*
 	Funcion para cambiar el fov del jugador
@@ -49,11 +50,13 @@ void	change_fov(t_mlx *mlx)
 	{
 		mlx->player->fov = 90.0f;
 		mlx->player->rad_fov = 90.0f * (PI / 180.0f);
+		printf("FOV 90\n");
 	}
 	else
 	{
 		mlx->player->fov = 60.0f;
 		mlx->player->rad_fov = 60.0f * (PI / 180.0f);
+		printf("FOV 60\n");
 	}
 }
 
@@ -65,9 +68,15 @@ void	toggle_minimap(t_mlx *mlx)
 	if (mlx == NULL || mlx->frame == NULL)
 		return ;
 	if (mlx->frame->minimap_onoff == true)
+	{
 		mlx->frame->minimap_onoff = false;
+		printf("MINIMAP OFF\n");
+	}
 	else
+	{
 		mlx->frame->minimap_onoff = true;
+		printf("MINIMAP ON\n");
+	}
 }
 
 /*
@@ -76,9 +85,15 @@ void	toggle_minimap(t_mlx *mlx)
 void	toggle_rays(t_mlx *mlx)
 {
 	if (mlx->frame->minimap_showrays == true)
+	{
 		mlx->frame->minimap_showrays = false;
+		printf("MINIMAP RAYS OFF\n");
+	}
 	else
+	{
 		mlx->frame->minimap_showrays = true;
+		printf("MINIMAP RAYS ON\n");
+	}
 }
 
 /*
@@ -89,11 +104,17 @@ void	toggle_fish_eye(t_mlx *mlx)
 	if (mlx->frame->draw_walls == draw_wall_column)
 	{
 		if (mlx->frame->fish_eye == true)
+		{
 			mlx->frame->fish_eye = false;
+			printf("FISH EYE CORRECTION OFF\n");
+		}
 		else
+		{
 			mlx->frame->fish_eye = true;
+			printf("FISH EYE CORRECTION ON\n");
+		}
 	}
 	else
-		perror("Textures must be off to toggle fish eye effect\n");
+		printf("WARNING!!: Textures must be off to toggle fish eye effect\n");
 }
 

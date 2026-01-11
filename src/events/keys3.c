@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 22:59:20 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/09 23:00:30 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/11 02:59:42 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,34 @@ void	toogle_dist_calc(t_mlx *mlx)
 	if (mlx->frame->draw_walls == draw_wall_column)
 	{
 		if (mlx->frame->euclidean == false)
+		{
 			mlx->frame->euclidean = true;
+			printf("EUCLIDEAN DISTANCE ENABLED\n");
+		}
 		else
+		{
 			mlx->frame->euclidean = false;
+			printf("PERPENDICULAR DISTANCE ENABLED\n");
+		}
 	}
 	else
-		perror("Cannot toggle distance calculation method when textures are enabled\n");
+		printf(" WARINIG: Cannot toggle distance calculation method when textures are enabled\n");
+}
+
+void	toogle_mouse(t_mlx *mlx)
+{
+	if (mlx->player->mouse.onoff == ON)
+	{
+		mlx->player->mouse.onoff = OFF;
+		mlx_mouse_show(mlx->mlx_var, mlx->mlx_window);
+		printf("MOUSE OFF\n");
+	}
+	else
+	{
+		mlx->player->mouse.onoff = ON;
+		mlx_mouse_hide(mlx->mlx_var, mlx->mlx_window);
+		printf("MOUSE ON\n");
+	}
 }
 
 void	print_controls(void)

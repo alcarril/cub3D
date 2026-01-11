@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/21 19:53:10 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/09 22:05:50 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/11 13:42:38 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,9 +69,12 @@ void	free_loaded_textures(t_mlx *mlx, int loaded_count)
 	- Libera la estrcutura mlx_var que es donde se almacenan todos los componentes
 	  de la mlx
 	- Sale del programa con exit(1)
+	- Se la llama desde los eventos del juego cunado ya esta en el loop de renderizado
+	para abortar y salir limpiamente del mismo
 */
-int	close_handler(t_mlx *mlx)
+int	close_game_manager(t_mlx *mlx)
 {
+	mlx_mouse_show(mlx->mlx_var, mlx->mlx_window);
 	free_loaded_textures(mlx, 4);
 	mlx_destroy_image(mlx->mlx_var,
 		mlx->mlx_img);
@@ -79,7 +82,48 @@ int	close_handler(t_mlx *mlx)
 		mlx->mlx_window);
 	mlx_destroy_display(mlx->mlx_var);
 	free(mlx->mlx_var);
+	if (mlx->frame->fov_distances != NULL)
+		free(mlx->frame->fov_distances);
+	close(mlx->log_fd);
 	exit(1);
+}
+
+/*
+	Para cerrar y liberar los componentes de la api de mlx y los componentes del
+	juego es como la funcion anterior pero sale con exit.
+*/
+void	free_game(t_mlx *mlx)
+{
+	mlx_mouse_show(mlx->mlx_var, mlx->mlx_window);
+	free_loaded_textures(mlx, 4);
+	mlx_destroy_image(mlx->mlx_var,
+		mlx->mlx_img);
+	mlx_destroy_window(mlx->mlx_var,
+		mlx->mlx_window);
+	mlx_destroy_display(mlx->mlx_var);
+	free(mlx->mlx_var);
+	if (mlx->frame->fov_distances != NULL)
+		free(mlx->frame->fov_distances);
+	close(mlx->log_fd);
+}
+
+/*
+	Create log file: Este archivo esta creado para registrar
+	los fps por segundo que mantiene el juego y Como cambian
+	los modos de que se pueden activar con las teclas a esto.
+*/
+int	create_fps_logfile(void)
+{
+	int	log_fd;
+
+	log_fd = open("log/cub3d_log.txt", O_CREAT | O_TRUNC | O_WRONLY, 0644);
+	if (log_fd < 0)
+	{
+		perror("File error ");
+		return (-1);
+	}
+	else
+		return (log_fd);
 }
 
 
@@ -107,3 +151,5 @@ void	setup_window_wh(t_mlx *mlx)
 	mlx->win_height = mlx->map->max_rows * WIN_SCALE * 4;
 	mlx->win_width = mlx->map->max_columns * WIN_SCALE * 3;
 }
+
+

@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/06 12:30:42 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/08 14:33:18 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/11 02:21:13 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,27 +27,27 @@
 		la relacion de signos de la matriz de rotacion
 		
 */
-void	vectorization(t_mlx *mlx, t_player *player, float *diferencial)
+void	vectorization(t_player *player, float *diferencial)
 {
 	float	angle_rad;
 
-	angle_rad = mlx->player->rad_angle;
-	if (mlx->player->move_up)
+	angle_rad = player->rad_angle;
+	if (player->keys.move_up)
 	{
 		diferencial[X] += cos(angle_rad) * player->speed;
 		diferencial[Y] -= sin(angle_rad) * player->speed;
 	}
-	if (mlx->player->move_down)
+	if (player->keys.move_down)
 	{
 		diferencial[X] -= cos(angle_rad) * player->speed;
 		diferencial[Y] += sin(angle_rad) * player->speed;
 	}
-	if (mlx->player->move_left)
+	if (player->keys.move_left)
 	{
 		diferencial[X] += cos(angle_rad + (PI / 2)) * player->speed;
 		diferencial[Y] += sin(angle_rad - (PI / 2)) * player->speed;
 	}
-	if (mlx->player->move_right)
+	if (player->keys.move_right)
 	{
 		diferencial[X] += cos(angle_rad - (PI / 2)) * player->speed;
 		diferencial[Y] += sin(angle_rad + (PI / 2)) * player->speed;
@@ -63,17 +63,17 @@ void	vectorization(t_mlx *mlx, t_player *player, float *diferencial)
 	esto no sea relevante porque no acambian pero evitamos que el float llegue a los limites y 
 	se haga overflow.
 */
-void	rotate_player(t_mlx *mlx, float delta_grados)
+void	rotate_player(t_player *player, float delta_grades)
 {
-	if (mlx->player->r_clockwise == true)
-		mlx->player->angle -= delta_grados;
-	else if (mlx->player->r_counterclockwise == true)
-		mlx->player->angle += delta_grados;
-	if (mlx->player->angle >= 360.0f)
-		mlx->player->angle -= 360.0f;
-	else if (mlx->player->angle < 0.0f)
-		mlx->player->angle += 360.0f;
-	mlx->player->rad_angle = mlx->player->angle * (PI / 180.0f);
+	if (player->keys.r_clockwise == true)
+		player->angle -= delta_grades;
+	else if (player->keys.r_counterclockwise == true)
+		player->angle += delta_grades;
+	if (player->angle >= 360.0f)
+		player->angle -= 360.0f;
+	else if (player->angle < 0.0f)
+		player->angle += 360.0f;
+	player->rad_angle = player->angle * (PI / 180.0f);
 }
 
 /*
@@ -89,7 +89,6 @@ bool	is_collision(float x, float y, t_mlx *mlx, float e)
 
 	if (mx < 0 || my < 0 || mx >= (int)mlx->map->max_columns || my >= (int)mlx->map->max_rows)
 		return (true);
-
 	return (
 		mlx->map->map_grids[(int)(y + e)][(int)(x + e)] == WALL ||
 		mlx->map->map_grids[(int)(y - e)][(int)(x + e)] == WALL ||
@@ -115,8 +114,8 @@ void	move_player(t_mlx *mlx)
 	bool		colision[2];
 	
 	player = mlx->player;
-	rotate_player(mlx, 1.1f);
-	vectorization(mlx, player, diferencial);
+	rotate_player(player, 1.1f);
+	vectorization(player, diferencial);
 	new_pos[X] = player->pos_x + diferencial[X];
 	new_pos[Y] = player->pos_y + diferencial[Y];
 	colision[X] = is_collision(new_pos[X], player->pos_y, mlx, player->volume);
@@ -133,43 +132,4 @@ void	move_player(t_mlx *mlx)
 		if (!colision[Y])
 			player->pos_y += diferencial[Y] * FRICTION;
 	}
-}
-
-//esta va a tener que salir de aqui
-int mouse_move(int x, int y, t_mlx *mlx)
-{
-	(void)mlx;
-	static int prev_x;
-	// static int prev_y;
-	static int control;
-	float grados_por_pixel_x;
-	float ret;
-
-	
-	if (control == 0)
-	{
-		prev_x = WIDTH / 2;
-		// prev_y = y;
-		control = 1;
-	}
-	printf("Mouse en: (%d, %d)\n", x, y);
-
-	int delta_pixels_x = x - prev_x;
-	// int delta_pixels_y = y - prev_y;
-	grados_por_pixel_x = 0.01f;
-	ret = delta_pixels_x / grados_por_pixel_x;
-	mlx->player->angle -= ret;
-	prev_x = WIDTH / 2;
-
-	if (mlx->player->angle >= 360.0f)
-		mlx->player->angle -= 360.0f;
-	else if (mlx->player->angle < 0.0f)
-		mlx->player->angle += 360.0f;
-	
-	// // Guardar las coordenadas del mouse en la estructura mlx
-	// // Depuración: Imprimir las coordenadas del mouse
-	// printf("Mouse en: (%d, %d)\n", x, y);
-
-	// // Puedes usar las coordenadas para realizar acciones, como rotar la cámara
-	return (0);
 }

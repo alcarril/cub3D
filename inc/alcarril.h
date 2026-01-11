@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 03:14:57 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/09 23:14:39 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/11 13:51:20 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 
 
 # include <stdbool.h>
+# include <limits.h>
 
 /*
 	DEFINES:
@@ -54,6 +55,15 @@
 #define E 2
 #define W 3
 
+#define CONTROLS_INFO "Press \"z\" on your keyboard to show \
+player controls and engine config Keys\n"
+
+#define MOUSE_SENS 0.17f
+#define MOUSE_DEADZONE 2
+#define MOUSE_MAX_MOV 40
+#define ON true
+#define OFF false
+
 /*
 	STRUCTS:
 */
@@ -63,7 +73,9 @@
 */
 typedef struct s_mlx_api_components t_mlx;
 typedef struct s_texture_img t_texture;
-typedef struct s_wall t_wall;
+typedef struct s_wall	t_wall;
+typedef struct	s_mouse		t_mouse;
+typedef struct	s_player_controls	t_controls;
 typedef struct s_player_data t_player;
 typedef struct s_map t_map;
 typedef struct s_frame_data t_frame;
@@ -93,6 +105,39 @@ typedef struct s_wall
 	t_texture *texture;       // Puntero a la textura seleccionada
 }	t_wall;
 
+typedef struct	s_ray
+{
+	float			raydir[2];
+	float			delta[2];
+	float			sidedist[2];
+	int				map[2];
+	unsigned int	step[2];
+	bool			side_hit;
+	float			wall_dist;
+	float			proyected_wall_dist;
+}	t_ray;
+
+typedef struct	s_mouse
+{
+	int		pos_x; // posiicon x en matrxi de pixeles (pantalla)
+	int		pos_y; // posicion y en matriz de pixeles (pantalla)
+	int		axis_x; //posicion x de referncia matriz de pixeles (pantalla)
+	int		axis_y; // posicion x de referncia matriz de pixeles (pantalla)
+	float	spin_pix; // grados de rotacion por pixel
+	bool	onoff; //activar y desactivar mouse
+}	t_mouse;
+
+typedef struct	s_player_controls
+{
+	bool	move_up;
+	bool	move_down;
+	bool	move_left;
+	bool	move_right;
+	bool	r_counterclockwise;
+	bool	r_clockwise;
+	bool	sprint;
+}	t_controls;
+
 typedef struct	s_player_data
 {
 	float	pos_x;
@@ -102,19 +147,10 @@ typedef struct	s_player_data
 	float	speed;
 	float	r_speed;
 	float	volume;
-
-	// on/off keys
-	bool	move_up;
-	bool	move_down;
-	bool	move_left;
-	bool	move_right;
-	bool	r_counterclockwise;
-	bool	r_clockwise;
-	bool	sprint;
-
-	//cvision data
 	float	fov;
 	float	rad_fov;
+	t_controls	keys;
+	t_mouse		mouse;
 }	t_player;
 
 typedef struct	s_map
@@ -159,13 +195,10 @@ typedef struct	s_frame_data
 	void (*draw_walls)(t_mlx *mlx, int column, t_wall *wall, t_ray *ray);
 	//renderiza suelo y techo speed vs low speed
 	void (*floor_celling)(t_mlx *mlx);
-	
 	float	*fov_distances; // Array de distancias hasta las paredes quizas osbre
-
-	
 }	t_frame;
 
-
+//esta se tendria ue llamar game y tener dentro mlx
 typedef struct	s_mlx_api_components
 {
 	//mlx components
@@ -185,26 +218,14 @@ typedef struct	s_mlx_api_components
 	int		line_length;
 	int		endian;
 
-	
 	//game components
 	t_player	*player;
 	t_map		*map;
 	t_frame		*frame;
+	
+	//log file
+	int		log_fd;
 }	t_mlx;
-
-
-typedef struct	s_ray
-{
-	float			raydir[2];
-	float			delta[2];
-	float			sidedist[2];
-	int				map[2];
-	unsigned int	step[2];
-	bool			side_hit;
-	float			wall_dist;
-	float			proyected_wall_dist;
-}	t_ray;
-
 
 /*
 	FUNCTION PROTOTIPES:
@@ -219,15 +240,17 @@ void	start_hooks_and_game(t_mlx *mlx);
 
 //setup game
 bool	setup_game(t_mlx *mlx, t_player *player, t_map *map, t_frame *frame);
-void	setup_player(t_mlx *mlx);
+void	setup_player_mouse(t_mlx *mlx);
 void	init_player_orientation_pos(t_player *pl, char cardinal, int pos[2]);
-void	init_frame_data( t_mlx *mlx);
+bool	init_frame_data( t_mlx *mlx);
 void	get_minimapscale(t_mlx *mlx, float *scale);
+int		create_fps_logfile(void);
 
 //Close and free
 void	destroy_mlx_componets(int (*f)(), int (*g)(), int (*t)(), t_mlx *mlx);
 void	free_loaded_textures(t_mlx *mlx, int loaded_count);
-int		close_handler(t_mlx *mlx);
+void	free_game(t_mlx *mlx);
+int		close_game_manager(t_mlx *mlx);
 
 //quizas desaparezcan
 void	init_floor_and_ceiling_colors(t_map *map);
@@ -237,7 +260,7 @@ int		rgb_to_hex(int r, int g, int b);
 //hooks and events
 int		key_press(int keysym, t_mlx *mlx);
 int		key_release(int keysym, t_mlx *mlx);
-void	player_keypress(t_mlx *mlx, int keysym);
+bool	player_keypress(t_mlx *mlx, int keysym);
 void	change_fov(t_mlx *mlx);
 void	toogle_raycasting(t_mlx *mlx);
 void	toggle_textures(t_mlx *mlx);
@@ -250,10 +273,15 @@ void	print_controls(void);
 
 //player move
 bool	is_collision(float x, float y, t_mlx *mlx, float e);
-void	rotate_player(t_mlx *mlx, float grados);
-void	vectorization(t_mlx *mlx, t_player *player, float *diferencial);
+void	rotate_player(t_player *player, float delta_grades);
+void	vectorization(t_player *player, float *diferencial);
 void	move_player(t_mlx *mlx);
-int		mouse_move(int x, int y, t_mlx *mlx);
+
+//mouse move
+void	get_mouse_pos_and_rotate(t_mlx *mlx);
+int		mouse_move_manager(int x, int y, t_mlx *mlx);
+void	spin_by_pixels(t_player *player, int pix_dif);
+bool	is_mouse_in_window(t_mlx *mlx, int mouse_x, int mouse_y);
 
 //render
 int		game_engine(t_mlx *mlx);
@@ -264,7 +292,7 @@ void	buffering_pixel(int x, int y, t_mlx *mlx, int color);
 
 //raycasting
 void	throw_rays(t_mlx *mlx);
-void	cast_ray(t_mlx *mlx, int n_ray, float ray_angle);
+void	cast_ray(t_mlx *mlx, unsigned int n_ray, float ray_angle);
 void	set_ray(t_mlx *mlx, t_ray *ray, float ray_angle);
 void	scale_wall(t_wall *wall, float perpendicular_distance, int win_height);
 void	draw_wall_column(t_mlx *mlx, int column, t_wall *wall, t_ray *ray);
@@ -282,6 +310,12 @@ t_texture		*select_texture(t_mlx *mlx, t_ray *ray);
 double			calculate_wall_x(t_mlx *mlx, t_ray *ray);
 void			calculate_tex(t_wall *wall, t_texture *texture, int win_height);
 unsigned int	extract_color(t_texture *texture, int tex_x, int tex_y);
+
+//fog blur shaders
+
+unsigned int apply_fog_pixel(unsigned int color, unsigned int fog_color, float distance, float max_distance);
+unsigned int apply_blur(t_mlx *mlx, int column, int row);
+void apply_fog(t_mlx *mlx, unsigned int fog_color, float max_distance);
 
 //floor and ceiling
 void	render_floor_and_ceiling(t_mlx *mlx);

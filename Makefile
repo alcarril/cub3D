@@ -23,6 +23,7 @@ LIB_DIR = libs/
 INC_DIR = inc/
 SRC_DIR = src/
 OBJ_DIR = obj/
+LOG_DIR = log/
 MKDIR = mkdir -p
 
 SRC_FILES = mlx_init_close/init_mlx_game.c \
@@ -33,6 +34,7 @@ SRC_FILES = mlx_init_close/init_mlx_game.c \
 			events/keys2.c \
 			events/keys3.c \
 			events/move_player.c \
+			events/mouse.c \
 			render/render.c \
 			render/raycasting.c \
 			render/dda_algorith.c \
@@ -50,7 +52,7 @@ OBJS = $(addprefix $(OBJ_DIR), $(OBJ_FILES))
 LIBFT = $(LIB_DIR)/libft/libft.a
 MINI_LIBX = $(LIB_DIR)/minilibx-linux/libmlx.a
 
-all: $(LIBFT) $(MINI_LIBX) $(OBJ_DIR) $(NAME)
+all: $(LIBFT) $(MINI_LIBX) $(OBJ_DIR) $(LOG_DIR) $(NAME)
 
 $(LIBFT): 
 	make all -C libs/libft
@@ -60,6 +62,9 @@ $(MINI_LIBX):
 
 $(OBJ_DIR):
 	@$(MKDIR) $(OBJ_DIR)
+
+$(LOG_DIR):
+	@$(MKDIR) $(LOG_DIR)
 
 $(NAME): $(OBJS) $(LIBFT) $(MINI_LIBX)
 	$(CC) $(CC_FLAGS) $(OBJS) $(LIBFT_FLAGS) $(MLX_FLAGS) -o $(NAME)
@@ -76,6 +81,7 @@ clean:
 fclean: clean
 	make fclean -C $(LIB_DIR)/libft
 	rm -rf $(NAME)
+	rm -rf $(LOG_DIR)
 
 re: fclean all
 

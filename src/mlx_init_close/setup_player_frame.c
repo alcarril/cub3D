@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 11:42:33 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/09 23:18:16 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/11 13:37:58 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,29 +15,39 @@
 /*
 	NOTA:Falta meter los valores del mapa que lo hace carbon
 	Inicializamos los componentes del juego:
+	- Ponemso todos las variables de ca da elemento del array de texturas
+	  a cero, no es estrcitamente necesario sumneta complejidad pero por 
+	  robustez
 	- Cargamos las texturas del mapa en caso de error liberamos los componentes
 	  de la mlx y devolvemos false
 	- Inicializamos los colores del suelo y el techo en formato hexadecimal
 	  a partir de los valores RGB almacenados en el mapa
 	- Inicializamos los datos del jugador llamando a la funcion setup_player
 	- Inicializamos los datos del frame llamando a la funcion init_frame_data
+	- Crear le fichero de log
 */
 bool	setup_game(t_mlx *mlx, t_player *player, t_map *map, t_frame *frame)
 {
 	mlx->map = map;//quizas se quite
+	ft_bzero((void *)mlx->map->textures, sizeof(mlx->map->textures));
 	if (load_textures(mlx) == false)
 	{
 		destroy_mlx_componets(mlx_destroy_image, mlx_destroy_window, 
 			mlx_destroy_display, mlx);
 		return (false);
 	}
+	// init_floor_and_ceiling_colors(&map);
 	map->floor_color_hex = rgb_to_hex(map->floor_color[0], map->floor_color[1], map->floor_color[2]);
 	map->ceiling_color_hex = rgb_to_hex(map->ceiling_color[0], map->ceiling_color[1], map->ceiling_color[2]);
-	// init_floor_and_ceiling_colors(&map);
 	mlx->player = player;
-	setup_player(mlx);
+	setup_player_mouse(mlx);
 	mlx->frame = frame;
-	init_frame_data(mlx);
+	mlx->log_fd = create_fps_logfile();
+	if (init_frame_data(mlx) == false || mlx->log_fd < 0)
+	{
+		free_game(mlx);
+		return (false);
+	}
 	return (true);
 }
 
@@ -55,7 +65,7 @@ bool	setup_game(t_mlx *mlx, t_player *player, t_map *map, t_frame *frame)
 	Iniiclaizamos los datos de los booleanos del moviento del jugador, el multiplicadpr para
 	calculñar los diferenciales de los movientos
 */
-void setup_player(t_mlx *mlx)
+void setup_player_mouse(t_mlx *mlx)
 {
 	int	middle[2];//esto se va a borrar
 	
@@ -67,14 +77,13 @@ void setup_player(t_mlx *mlx)
 	mlx->player->fov = 60.0f;
 	mlx->player->rad_fov = 60.0f * (PI / 180.0f);
 	mlx->player->volume = EPSILON;
-	mlx->player->move_down = false;
-	mlx->player->move_up = false;
-	mlx->player->move_right = false;
-	mlx->player->move_left = false;
-	mlx->player->r_clockwise = false;
-	mlx->player->r_counterclockwise = false;
-	mlx->player->sprint = false;
-	printf("Player initialized successfully.\n");
+	ft_bzero((void *)&(mlx->player->keys), sizeof(mlx->player->keys));
+	mlx->player->mouse.pos_x = mlx->win_width / 2;
+	mlx->player->mouse.pos_y = mlx->win_height / 2;
+	mlx->player->mouse.spin_pix = MOUSE_SENS;
+	mlx->player->mouse.axis_x = mlx->win_width / 2;
+	mlx->player->mouse.axis_y = mlx->win_height / 2;
+	mlx->player->mouse.onoff = ON;
 }
 
 /*
@@ -107,7 +116,7 @@ void	init_player_orientation_pos(t_player *pl, char cardinal, int pos[2])
 	- Inicializamos el efecto fish eye como apagado
 	- Inicializamos el efecto euclidean como apagado
 */
-void	init_frame_data( t_mlx *mlx)
+bool	init_frame_data( t_mlx *mlx)
 {
 	mlx->frame->minimap_onoff = false;
 	mlx->frame->minimap_showrays = false;
@@ -119,7 +128,14 @@ void	init_frame_data( t_mlx *mlx)
 	mlx->frame->draw_walls = draw_wall_column_tex;
 	mlx->frame->floor_celling = render_floor_and_ceiling;
 	get_minimapscale(mlx, mlx->frame->mm_scale);
-	printf("Minimap scale X: %f, Y: %f\n", mlx->frame->mm_scale[X], mlx->frame->mm_scale[Y]);
+	mlx->frame->fov_distances = NULL;
+	mlx->frame->fov_distances = (float *)malloc(sizeof(float) * mlx->win_width);
+	if (!mlx->frame->fov_distances)
+	{
+		perror("Error allocating memory for fov_distances\n");
+		return (false);
+	}
+	return (true);
 }
 
 /*

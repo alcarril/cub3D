@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 20:07:49 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/09 22:01:43 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/11 13:31:08 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,7 +139,12 @@ void	start_hooks_and_game(t_mlx *mlx)
 	mlx_hook(mlx->mlx_window, KeyRelease, KeyReleaseMask,
 		key_release, mlx);
 	mlx_hook(mlx->mlx_window, DestroyNotify, StructureNotifyMask,
-		close_handler, mlx);
-	// mlx_hook(mlx->mlx_window, MotionNotify, PointerMotionMask, mouse_move, mlx);
+		close_game_manager, mlx);
+	mlx_mouse_hide(mlx->mlx_var, mlx->mlx_window);//Funciona
+	//manejor  de mouse por evento es mas lento que comporbacion en renderizado
+		// mlx_hook(mlx->mlx_window, MotionNotify, PointerMotionMask, mouse_move, mlx);
+	//aqui puede ir enternotify para que el mouse se active solo cunado entra enña
+	//pnatalla en la pirmera iteracion
+	printf(CONTROLS_INFO);
 	mlx_loop_hook(mlx->mlx_var, game_engine, mlx);
 }

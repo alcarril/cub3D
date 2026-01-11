@@ -6,13 +6,14 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/22 21:34:21 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/09 22:58:38 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/11 13:47:21 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cube3D.h"
 
-void	calculate_fps(t_mlx *mlx);
+void	fps_counter_average(t_mlx *mlx);
+void	fps_counter_realtime(t_mlx *mlx);
 
 /*
 	Función principal para manejar el ciclo de renderizado del motor del juego:
@@ -25,6 +26,14 @@ void	calculate_fps(t_mlx *mlx);
 */
 int	game_engine(t_mlx *mlx)
 {
+	//Con esto controlamos que el mouse se desactive una vez dentro de la
+	//apntalla no puede salir a no ser que se desactive manualmente (con
+	// tecla o pulsacion deboton del mouse). Cunadno el progrma empiexza
+	//pos la fuinis muse in windows sale en cada iteracion pero es mas 
+	//lento porque hace la comporbacion en cada frame hasta que el mouse
+	//esta dentro y cuando esta dentro tamboen lo hace
+	if (mlx->player->mouse.onoff == ON)
+		get_mouse_pos_and_rotate(mlx);
 	move_player(mlx);
 	ft_bzero(mlx->bit_map_address, mlx->win_height * mlx->line_length);
 	mlx->frame->floor_celling(mlx);
@@ -33,7 +42,8 @@ int	game_engine(t_mlx *mlx)
 	if (mlx->frame->minimap_onoff == true)
 		render_frame2D(mlx);
 	mlx_put_image_to_window(mlx->mlx_var, mlx->mlx_window, mlx->mlx_img, 0, 0);
-	// calculate_fps(mlx);
+	fps_counter_average(mlx);
+	fps_counter_realtime(mlx);
 	return (0);
 }
 
@@ -48,38 +58,55 @@ void	buffering_pixel(int x, int y, t_mlx *mlx, int color)
 	*(unsigned int *)(mlx->bit_map_address + offset) = color;
 }
 
-
-
-void	calculate_fps(t_mlx *mlx)
+void	fps_counter_average(t_mlx *mlx)
 {
-    static struct timeval	last_time = {0, 0};
-    static int				frame_count = 0;
-    static float			fps = 0.0;
-    struct timeval			current_time;
-    float					delta_time;
-    char					fps_str[32];
+	static long long	frames;
+	static long long	init_timestamp;
+	struct timeval		timestamp;
+	long long			now_timestamp;
+	long long			delta_time;
 
-    // Incrementa el contador de frames
-    frame_count++;
+	gettimeofday(&timestamp, NULL);
+	if (init_timestamp == 0)
+	{
+		init_timestamp = (long long)timestamp.tv_sec * 1000 + (timestamp.tv_usec / 1000);
+		frames = 0;
+		return;
+	}
+	frames++;
+	now_timestamp = (long long)timestamp.tv_sec * 1000 + (timestamp.tv_usec / 1000);
+	delta_time = now_timestamp - init_timestamp;
+	if (delta_time >= 1000 && (frames % 140) == 0)
+	{
+		write(mlx->log_fd, "[Average] FPS: ", 15);
+		ft_putnbr_fd((int)(frames * 1000 / delta_time), mlx->log_fd);
+		write(mlx->log_fd, "\n", 1);
+	}
+}
 
-    // Obtén el tiempo actual
-    gettimeofday(&current_time, NULL);
+void fps_counter_realtime(t_mlx *mlx)
+{
+	static long long	frames;
+	static long			init_timestamp;
+	struct timeval		timestamp;
+	long				now_timestamp;
+	long				delta_time;
 
-    // Calcula el tiempo transcurrido desde el último frame
-    delta_time = (current_time.tv_sec - last_time.tv_sec) +
-                 ((current_time.tv_usec - last_time.tv_usec) / 1000000.0);
-
-    // Si ha pasado más de un segundo, calcula los FPS
-    if (delta_time >= 1.0)
-    {
-        fps = frame_count / delta_time;
-        frame_count = 0;
-        last_time = current_time;
-
-        // Convierte los FPS a una cadena
-        snprintf(fps_str, sizeof(fps_str), "FPS: %.2f", fps);
-
-        // Renderiza los FPS en la ventana
-        mlx_string_put(mlx->mlx_var, mlx->mlx_window, 10, 10, 0xFFF00FFF, fps_str);
-    }
+	gettimeofday(&timestamp, NULL);
+	if (init_timestamp == 0)
+	{
+		init_timestamp = timestamp.tv_sec * 1000 + (timestamp.tv_usec / 1000);
+		return;
+	}
+	frames++;
+	now_timestamp = timestamp.tv_sec * 1000 + (timestamp.tv_usec / 1000);
+	delta_time = now_timestamp - init_timestamp;
+	if (delta_time >= 500)
+	{
+		write(mlx->log_fd, "[Realtime] FPS: ", 16);
+		ft_putnbr_fd((int)(frames * 1000 / delta_time), mlx->log_fd);
+		write(mlx->log_fd, "\n", 1);
+		init_timestamp = now_timestamp;
+		frames = 0;
+	}
 }

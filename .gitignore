@@ -4,6 +4,7 @@ a.out
 *.o
 *.a
 /obj/
+/log/*
 /libs/libft/*.o
 /libs/libft/*.a
 

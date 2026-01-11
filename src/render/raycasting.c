@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 19:04:35 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/09 23:15:46 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/10 16:19:36 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,16 +23,16 @@
 */
 void	throw_rays(t_mlx *mlx)
 {
-	float	ray_angle;
-	float	rad_dif;
-	float	fov_half;
-	int		n_ray;
+	float			ray_angle;
+	float			rad_dif;
+	float			fov_half;
+	unsigned int	n_ray;
 
 	fov_half = mlx->player->rad_fov / 2;
 	rad_dif = (mlx->player->rad_fov) / mlx->win_width;
 	ray_angle = (mlx->player->rad_angle) + fov_half;
 	n_ray = 0;
-	while (n_ray < mlx->win_width)
+	while ((int)n_ray < mlx->win_width)
 	{
 		cast_ray(mlx,n_ray, ray_angle);
 		ray_angle -= rad_dif;
@@ -50,13 +50,14 @@ void	throw_rays(t_mlx *mlx)
 	  - Modo simple (color fijo)
 	  - Modo texturizado (textura aplicada)
 */
-void	cast_ray(t_mlx *mlx, int n_ray, float ray_angle)
+void	cast_ray(t_mlx *mlx, unsigned int n_ray, float ray_angle)
 {
 	t_ray	ray;
 	t_wall	wall;
 	
 	set_ray(mlx, &ray, ray_angle);
 	ray.proyected_wall_dist = get_distance_to_wall(mlx, &ray, ray_angle);
+	mlx->frame->fov_distances[mlx->win_width - n_ray] = ray.wall_dist;//
 	scale_wall(&wall, ray.proyected_wall_dist, mlx->win_height);
 	mlx->frame->draw_walls(mlx, n_ray, &wall, &ray);
 }

@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 19:07:51 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/09 23:21:43 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/10 15:09:04 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ float	get_distance_to_wall(t_mlx *mlx, t_ray *ray, float ray_angle)
 		ray->wall_dist = get_ray_distance(mlx, ray);
 	else
 		ray->wall_dist = get_ray_distance_euclidean(mlx, ray);
+
 	if (mlx->frame->fish_eye == false)
 		wall_dist_corrected = ray->wall_dist * cos(ray_angle - (mlx->player->rad_angle));
 	else
