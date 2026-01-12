@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/22 22:31:15 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/11 02:23:03 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/12 21:00:27 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,10 @@ int	key_release(int keysym, t_mlx *mlx)
 		mlx->player->keys.r_counterclockwise = false;
 	if (keysym == XK_Right)
 		mlx->player->keys.r_clockwise = false;
+	if (keysym == XK_Up)
+		mlx->player->keys.look_up = false;
+	if (keysym == XK_Down)
+		mlx->player->keys.look_down = false;
 	if (keysym == XK_Shift_L && mlx->player->keys.sprint == true)
 	{
 		mlx->player->speed -= 0.05;
@@ -71,48 +75,31 @@ int	key_release(int keysym, t_mlx *mlx)
 }
 
 /*
-	Funcion que activa o desactiva el raycasting
+	Funcion que imprime los controles del juego
 */
-void	toogle_raycasting(t_mlx *mlx)
+void	print_controls(void)
 {
-	if (mlx->frame->raycasting_onoff == true)
-	{
-		mlx->frame->raycasting_onoff = false;
-		printf("RAYCASTING OFF\n");
-	}
-	else
-	{
-		mlx->frame->raycasting_onoff = true;
-		printf("RAYCASTING ON\n");
-	}
-}
-
-void	toggle_textures(t_mlx *mlx)
-{
-	if (mlx->frame->draw_walls == draw_wall_column)
-	{
-		mlx->frame->draw_walls = draw_wall_column_tex;
-		mlx->frame->fish_eye = false;
-		mlx->frame->euclidean = false;
-		printf("TEXTURED ENABLED\n");
-	}
-	else
-	{
-		mlx->frame->draw_walls = draw_wall_column;
-		printf("TEXTURES DISABLED\n");
-	}
-}
-
-void	toogle_floor_celling(t_mlx *mlx)
-{
-	if (mlx->frame->floor_celling == render_floor_and_ceiling)
-	{
-		mlx->frame->floor_celling = render_floor_and_ceiling_speed;
-		printf("FAST floor and ceiling rendering enabled\n");
-	}
-	else
-	{
-		mlx->frame->floor_celling = render_floor_and_ceiling;
-		printf("ACURATED floor and ceiling rendering enabled\n");
-	}
+	printf("Controls:\n");
+	printf("\n[Graphics Engine Settings]\n");
+	printf("F: Toggle Fish Eye Effect\n");
+	printf("O: Toggle Raycasting On/Off\n");
+	printf("E: Toggle Distance Calculation (Euclidean/Perpendicular)\n");
+	printf("T: Toggle Textures On/Off\n");
+	printf("C: Toggle Floor and Ceiling Rendering Method\n");
+	printf("\n[Screen Display Settings]\n");
+	printf("M: Toggle Minimap\n");
+	printf("R: Toggle Rays on Minimap\n");
+	printf("\n[Player Settings]\n");
+	printf("WASD: Move Up, Down, Left, Right\n");
+	printf("Left Arrow: Rotate Counterclockwise\n");
+	printf("Right Arrow: Rotate Clockwise\n");
+	printf("Left Shift: Sprint\n");
+	printf("V: Change Field of View (FOV)\n");
+	printf("\n[Mouse Settings]\n");
+	printf("J: Toggle Mouse On/Off\n");
+	printf("Mouse Scroll Up: Increase Mouse Sensitivity\n");
+	printf("Mouse Scroll Down: Decrease Mouse Sensitivity\n");
+	printf("\n[General]\n");
+	printf("ESC: Exit Game\n");
+	printf("Z: Print Controls\n");
 }

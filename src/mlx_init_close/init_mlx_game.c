@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 20:07:49 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/11 13:31:08 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/12 22:09:20 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,9 @@ bool	load_single_texture(t_mlx *mlx, t_texture *texture, char *path)
 	  hacemos un trigger de las funciones key_press y key_release
 	- Creamos el hook para detectar el cierre de la ventana, cuando esto pasa
 	  hacemos un trigger de la funcion close_handler
+	- Creamos los hooks para detectar los eventos del raton, cuando esto pasa
+	  hacemos un trigger de las funciones mouse_button_manager y mouse_init_manager
+	- Mostramos por consola la informacion de los controles del juego
 	- Creamos el loop hook que se encarga de ejecutar el motor del juego y se
 	  ejecuta en cada iteracion del loop de la mlx o cuando se detecta un evento
 	  para el que hemos creado un hook
@@ -140,11 +143,8 @@ void	start_hooks_and_game(t_mlx *mlx)
 		key_release, mlx);
 	mlx_hook(mlx->mlx_window, DestroyNotify, StructureNotifyMask,
 		close_game_manager, mlx);
-	mlx_mouse_hide(mlx->mlx_var, mlx->mlx_window);//Funciona
-	//manejor  de mouse por evento es mas lento que comporbacion en renderizado
-		// mlx_hook(mlx->mlx_window, MotionNotify, PointerMotionMask, mouse_move, mlx);
-	//aqui puede ir enternotify para que el mouse se active solo cunado entra enña
-	//pnatalla en la pirmera iteracion
+	mlx_hook(mlx->mlx_window, ButtonPress, (1L<<2), mouse_button_manager, mlx);
+	mlx_hook(mlx->mlx_window, EnterNotify, (1L<<4), mouse_init_manager, mlx);
 	printf(CONTROLS_INFO);
 	mlx_loop_hook(mlx->mlx_var, game_engine, mlx);
 }

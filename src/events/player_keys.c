@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 13:06:24 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/11 13:29:26 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/12 21:26:18 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,12 @@
 
 /*
 	Funcion que maneja la presion de teclas para el movimiento del jugador
+	Teclas manejadas:
+		-W A S D : movimiento
+		-Left Right : rotacion
+		-Up Down : mirar arriba y abajo
+	Si entra en alguna de las teclas retorna true
+	Si no retorna false
 */
 bool	player_keypress(t_mlx *mlx, int keysym)
 {
@@ -29,7 +35,25 @@ bool	player_keypress(t_mlx *mlx, int keysym)
 		mlx->player->keys.r_counterclockwise = true;
 	else if (keysym == XK_Right)
 		mlx->player->keys.r_clockwise = true;
-	else if (keysym == XK_Shift_L && mlx->player->keys.sprint == false)
+	else if (keysym == XK_Up)
+		mlx->player->keys.look_up = true;
+	else if (keysym == XK_Down)
+		mlx->player->keys.look_down = true;
+	else if (player_keypres2(mlx, keysym) == true)
+		return (true);
+	else
+		return (false);
+	return (true);
+}
+
+/*
+	Funcion que maneja la presion de teclas adicionales para el jugador
+	Si entra en alguna de las teclas retorna true
+	Si no retorna false
+*/
+bool	player_keypres2(t_mlx *mlx, int keysym)
+{
+	if (keysym == XK_Shift_L && mlx->player->keys.sprint == false)
 	{
 		mlx->player->speed += 0.05;
 		mlx->player->keys.sprint = true;
@@ -37,10 +61,13 @@ bool	player_keypress(t_mlx *mlx, int keysym)
 	}
 	else if (keysym == XK_v)
 		change_fov(mlx);
+	else if (keysym == XK_j)
+		toogle_mouse(mlx);
 	else
 		return (false);
 	return (true);
 }
+
 /*
 	Funcion para cambiar el fov del jugador
 */
@@ -60,61 +87,6 @@ void	change_fov(t_mlx *mlx)
 	}
 }
 
-/*
-	Funcion para togglear minimapa
-*/
-void	toggle_minimap(t_mlx *mlx)
-{
-	if (mlx == NULL || mlx->frame == NULL)
-		return ;
-	if (mlx->frame->minimap_onoff == true)
-	{
-		mlx->frame->minimap_onoff = false;
-		printf("MINIMAP OFF\n");
-	}
-	else
-	{
-		mlx->frame->minimap_onoff = true;
-		printf("MINIMAP ON\n");
-	}
-}
 
-/*
-	Funcion para togglear rayos en minimapa
-*/
-void	toggle_rays(t_mlx *mlx)
-{
-	if (mlx->frame->minimap_showrays == true)
-	{
-		mlx->frame->minimap_showrays = false;
-		printf("MINIMAP RAYS OFF\n");
-	}
-	else
-	{
-		mlx->frame->minimap_showrays = true;
-		printf("MINIMAP RAYS ON\n");
-	}
-}
 
-/*
-	Funcion para togglear correccion de fish eye
-*/
-void	toggle_fish_eye(t_mlx *mlx)
-{
-	if (mlx->frame->draw_walls == draw_wall_column)
-	{
-		if (mlx->frame->fish_eye == true)
-		{
-			mlx->frame->fish_eye = false;
-			printf("FISH EYE CORRECTION OFF\n");
-		}
-		else
-		{
-			mlx->frame->fish_eye = true;
-			printf("FISH EYE CORRECTION ON\n");
-		}
-	}
-	else
-		printf("WARNING!!: Textures must be off to toggle fish eye effect\n");
-}
 

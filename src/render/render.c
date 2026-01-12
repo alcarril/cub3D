@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/22 21:34:21 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/11 13:47:21 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/12 20:45:48 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int	game_engine(t_mlx *mlx)
 	//lento porque hace la comporbacion en cada frame hasta que el mouse
 	//esta dentro y cuando esta dentro tamboen lo hace
 	if (mlx->player->mouse.onoff == ON)
-		get_mouse_pos_and_rotate(mlx);
+		get_mouse_pos_and_move(mlx);
 	move_player(mlx);
 	ft_bzero(mlx->bit_map_address, mlx->win_height * mlx->line_length);
 	mlx->frame->floor_celling(mlx);
@@ -57,6 +57,18 @@ void	buffering_pixel(int x, int y, t_mlx *mlx, int color)
 	offset = (y * mlx->line_length) + (x * (mlx->bits_per_pixel / 8));
 	*(unsigned int *)(mlx->bit_map_address + offset) = color;
 }
+
+//biferiaza una linea al completo
+void	buffering_line(int y, int color, t_mlx *mlx)
+{
+	int offset;
+
+	if (y < 0 || y >= mlx->win_height)
+		return;
+	offset = y * mlx->line_length;
+	ft_memset(mlx->bit_map_address + offset, color, mlx->win_width * (mlx->bits_per_pixel / 8));
+}
+
 
 void	fps_counter_average(t_mlx *mlx)
 {
@@ -110,3 +122,4 @@ void fps_counter_realtime(t_mlx *mlx)
 		frames = 0;
 	}
 }
+

@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/06 12:30:42 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/11 02:21:13 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/12 23:08:12 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,30 +27,31 @@
 		la relacion de signos de la matriz de rotacion
 		
 */
-void	vectorization(t_player *player, float *diferencial)
+void	vectorization(t_player *player)
 {
 	float	angle_rad;
-
+	
+	bzero(player->differencial, sizeof(player->differencial));
 	angle_rad = player->rad_angle;
 	if (player->keys.move_up)
 	{
-		diferencial[X] += cos(angle_rad) * player->speed;
-		diferencial[Y] -= sin(angle_rad) * player->speed;
+		player->differencial[X] += cos(angle_rad) * player->speed;
+		player->differencial[Y] -= sin(angle_rad) * player->speed;
 	}
 	if (player->keys.move_down)
 	{
-		diferencial[X] -= cos(angle_rad) * player->speed;
-		diferencial[Y] += sin(angle_rad) * player->speed;
+		player->differencial[X] -= cos(angle_rad) * player->speed;
+		player->differencial[Y] += sin(angle_rad) * player->speed;
 	}
 	if (player->keys.move_left)
 	{
-		diferencial[X] += cos(angle_rad + (PI / 2)) * player->speed;
-		diferencial[Y] += sin(angle_rad - (PI / 2)) * player->speed;
+		player->differencial[X] += cos(angle_rad + (PI / 2)) * player->speed;
+		player->differencial[Y] += sin(angle_rad - (PI / 2)) * player->speed;
 	}
 	if (player->keys.move_right)
 	{
-		diferencial[X] += cos(angle_rad - (PI / 2)) * player->speed;
-		diferencial[Y] += sin(angle_rad + (PI / 2)) * player->speed;
+		player->differencial[X] += cos(angle_rad - (PI / 2)) * player->speed;
+		player->differencial[Y] += sin(angle_rad + (PI / 2)) * player->speed;
 	}
 }
 
@@ -110,14 +111,14 @@ void	move_player(t_mlx *mlx)
 {
 	t_player	*player;
 	float		new_pos[2];
-	float		diferencial[2];
 	bool		colision[2];
 	
 	player = mlx->player;
 	rotate_player(player, 1.1f);
-	vectorization(player, diferencial);
-	new_pos[X] = player->pos_x + diferencial[X];
-	new_pos[Y] = player->pos_y + diferencial[Y];
+	axis_y_pitch(player);
+	vectorization(player);
+	new_pos[X] = player->pos_x + player->differencial[X];
+	new_pos[Y] = player->pos_y + player->differencial[Y];
 	colision[X] = is_collision(new_pos[X], player->pos_y, mlx, player->volume);
 	colision[Y] = is_collision(player->pos_x, new_pos[Y], mlx, player->volume);
 	if (!colision[X] && !colision[Y])
@@ -128,8 +129,24 @@ void	move_player(t_mlx *mlx)
 	else
 	{
 		if (!colision[X])
-			player->pos_x += diferencial[X] * FRICTION;
+			player->pos_x += player->differencial[X] * FRICTION;
 		if (!colision[Y])
-			player->pos_y += diferencial[Y] * FRICTION;
+			player->pos_y += player->differencial[Y] * FRICTION;
 	}
+}
+
+void	axis_y_pitch(t_player *player)
+{
+	t_player	*pl;
+	
+	pl = player;
+	if (pl->keys.look_up == true)
+		pl->pitch_pix += pl->pitch_factor * pl->max_pitch_pix;
+	if (pl->keys.look_down == true)
+		pl->pitch_pix -= pl->pitch_factor * pl->max_pitch_pix;
+	if (pl->pitch_pix > pl->max_pitch_pix)
+		pl->pitch_pix = pl->max_pitch_pix;
+	if (pl->pitch_pix < -pl->max_pitch_pix)
+		pl->pitch_pix = -pl->max_pitch_pix;
+	return ;
 }

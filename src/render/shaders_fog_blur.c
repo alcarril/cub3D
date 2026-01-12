@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/10 15:40:14 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/10 16:16:27 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/12 21:55:52 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 	- distance: Distancia del rayo a la pared.
 	- max_distance: Distancia máxima para aplicar el fog.
 */
-unsigned int apply_fog_wall(unsigned int color, unsigned int fog_color, float distance, float max_distance)
+unsigned int apply_fog_pixel(unsigned int color, unsigned int fog_color, float distance, float max_distance)
 {
 	float fog_factor;
 	unsigned char r, g, b;
@@ -109,7 +109,7 @@ void apply_fog(t_mlx *mlx, unsigned int fog_color, float max_distance)
 			color = *(unsigned int *)(mlx->bit_map_address + (row * mlx->line_length) + (column * (mlx->bits_per_pixel / 8)));
 
 			// Aplicar el fog al color
-			color = apply_fog_wall(color, fog_color, distance, max_distance);
+			color = apply_fog_pixel(color, fog_color, distance, max_distance);
 
 			// Escribir el color modificado de vuelta en el buffer
 			*(unsigned int *)(mlx->bit_map_address + (row * mlx->line_length) + (column * (mlx->bits_per_pixel / 8))) = color;

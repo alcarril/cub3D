@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/21 19:53:10 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/11 13:42:38 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/12 23:32:21 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,8 @@ void	free_loaded_textures(t_mlx *mlx, int loaded_count)
 	- Sale del programa con exit(1)
 	- Se la llama desde los eventos del juego cunado ya esta en el loop de renderizado
 	para abortar y salir limpiamente del mismo
+	Se usa ando el loop de renderizacion de la mlx ya esta en marcha y se quiere
+	cerrar el juego de manera limpia.
 */
 int	close_game_manager(t_mlx *mlx)
 {
@@ -90,7 +92,7 @@ int	close_game_manager(t_mlx *mlx)
 
 /*
 	Para cerrar y liberar los componentes de la api de mlx y los componentes del
-	juego es como la funcion anterior pero sale con exit.
+	juego es como close manager pero no sale con exit.
 */
 void	free_game(t_mlx *mlx)
 {
@@ -106,50 +108,3 @@ void	free_game(t_mlx *mlx)
 		free(mlx->frame->fov_distances);
 	close(mlx->log_fd);
 }
-
-/*
-	Create log file: Este archivo esta creado para registrar
-	los fps por segundo que mantiene el juego y Como cambian
-	los modos de que se pueden activar con las teclas a esto.
-*/
-int	create_fps_logfile(void)
-{
-	int	log_fd;
-
-	log_fd = open("log/cub3d_log.txt", O_CREAT | O_TRUNC | O_WRONLY, 0644);
-	if (log_fd < 0)
-	{
-		perror("File error ");
-		return (-1);
-	}
-	else
-		return (log_fd);
-}
-
-
-//estas dos quizas osbran
-
-/*
-	Inicializamos los colores del suelo y el techo en formato hexadecimal
-	a partir de los valores RGB almacenados en el mapa
-*/
-void	init_floor_and_ceiling_colors(t_map *map)
-{
-	map->floor_color_hex = rgb_to_hex(map->floor_color[0], map->floor_color[1], map->floor_color[2]);
-	map->ceiling_color_hex = rgb_to_hex(map->ceiling_color[0], map->ceiling_color[1], map->ceiling_color[2]);
-}
-
-/*
-	Setup de las dimensiones de la ventana en funcion del tamaño del mapa
-	- La altura de la ventana se calcula como el numero de filas del mapa
-	  por una constante de escala (WIN_SCALE) por 4
-	- La anchura de la ventana se calcula como el numero de columnas del mapa
-	  por una constante de escala (WIN_SCALE) por 3
-*/
-void	setup_window_wh(t_mlx *mlx)
-{
-	mlx->win_height = mlx->map->max_rows * WIN_SCALE * 4;
-	mlx->win_width = mlx->map->max_columns * WIN_SCALE * 3;
-}
-
-

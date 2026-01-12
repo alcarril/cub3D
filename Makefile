@@ -27,14 +27,17 @@ LOG_DIR = log/
 MKDIR = mkdir -p
 
 SRC_FILES = mlx_init_close/init_mlx_game.c \
+			mlx_init_close/setup_game.c \
+			mlx_init_close/init_setup_utils.c \
 			mlx_init_close/close_mlx_game.c \
-			mlx_init_close/setup_player_frame.c \
 			mlx_init_close/colors.c \
 			events/keys.c \
-			events/keys2.c \
-			events/keys3.c \
-			events/move_player.c \
-			events/mouse.c \
+			events/graphic_engine_keys.c \
+			events/minimap_keys.c \
+			events/player_keys.c \
+			events/mouse_keys_buttons.c \
+			moves/move_player.c \
+			moves/mouse.c \
 			render/render.c \
 			render/raycasting.c \
 			render/dda_algorith.c \

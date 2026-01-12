@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 19:04:35 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/10 16:19:36 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/12 22:05:51 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,8 +57,8 @@ void	cast_ray(t_mlx *mlx, unsigned int n_ray, float ray_angle)
 	
 	set_ray(mlx, &ray, ray_angle);
 	ray.proyected_wall_dist = get_distance_to_wall(mlx, &ray, ray_angle);
-	mlx->frame->fov_distances[mlx->win_width - n_ray] = ray.wall_dist;//
-	scale_wall(&wall, ray.proyected_wall_dist, mlx->win_height);
+	mlx->frame->fov_distances[mlx->win_width - n_ray - 1] = ray.wall_dist;
+	scale_wall(&wall, ray.proyected_wall_dist, mlx->win_height, mlx->player->pitch_pix);
 	mlx->frame->draw_walls(mlx, n_ray, &wall, &ray);
 }
 
@@ -91,14 +91,14 @@ void	set_ray(t_mlx *mlx, t_ray *ray, float ray_angle)
 	- Calcula las posiciones de inicio y fin de la pared en pixeles de la matriz de la ventana
 	- Asegura que las posiciones estén dentro de los límites de la matriz de pixeles de la ventana
 */
-void scale_wall(t_wall *wall, float perpendicular_distance, int win_height)
+void scale_wall(t_wall *wall, float perpendicular_distance, int win_height, int pitch)
 {
 	if (perpendicular_distance <= 0)
 		wall->wall_height = win_height;
 	else
 		wall->wall_height = (int)(win_height / perpendicular_distance);
-	wall->wall_start = (win_height / 2) - (wall->wall_height / 2);
-	wall->wall_end = (win_height / 2) + (wall->wall_height / 2);
+	wall->wall_start = (win_height / 2) - (wall->wall_height / 2) + pitch;
+	wall->wall_end = (win_height / 2) + (wall->wall_height / 2) + pitch;
 	if (wall->wall_start < 0)
 		wall->wall_start = 0;
 	if (wall->wall_end >= win_height)
