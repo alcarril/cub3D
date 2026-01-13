@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/30 14:45:15 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/13 15:33:11 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/13 15:49:59 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,15 @@ void	update_center_minimap_offset(t_mlx *mlx, float *escaled_zoom);
 	  seria un desperdicio de recursos, lo hacemos despues de renderizar toda la escena
 	  en 3D. Ya que en ambos casos habria que sobrescribir el buffer de la imagen.
 	  Es mas modular aunque la desventaja es que se recorre dos veces la matriz de pixeles
-	  de la zona de la ventana del minmapa.
+	  de la zona de la ventana del minmapa
+	- Calculamos el offset del jugador en el minimapa (traslacion + zoom) para centrar
+	  el minimapa en la posicion del jugador
+	- Calculamos el zoom escalado para usarlo en el dibujado de los pixeles del minimapa
+	- Luego recorremos cada pixel de la ventana del minimapa y dibujamos el pixel
+	  correspondiente del minimapa en funcion de su correspondencia con el mapa
+	- Dibujamos el fondo del minimapa en blanco para que no se vean restos de la escena 3D
+	 Lo hacemos con buffer line para optimizar al dibujar por bloques horizontales
+	- Finalmente, si la opción de mostrar rayos está activada, dibuja los rayos en el minimapa.
 */
 int	render_frame2D(t_mlx *mlx)
 {
@@ -44,7 +52,7 @@ int	render_frame2D(t_mlx *mlx)
 		win[Y]++;
 	}
 	if (mlx->frame->minimap_showrays == true)
-		draw_rays2D(mlx);
+		draw_rays2D(mlx, scaled_zoom);
 	return (1);
 }
 
@@ -56,6 +64,9 @@ int	render_frame2D(t_mlx *mlx)
 	a la posicion del jugador para centrar el minimapa en el jugador.
 	Ademas calculamos el zoom escalado para usarlo en el dibujado de los pixeles
 	del minimapa.
+	- Calculamos las traslacion del los puntos del minimapa respecto a la posicion
+	  del jugador, para eso restamos la posicon delorigen (cventro del minimapa) a
+	  la posicion del jugador
 */
 void	update_center_minimap_offset(t_mlx *mlx, float *escaled_zoom)
 {
@@ -79,11 +90,7 @@ void	update_center_minimap_offset(t_mlx *mlx, float *escaled_zoom)
 	- Dibuja un píxel del minimapa en función de su correspondencia con el mapa.
 	- Los valores del mapa en float para permitir un movimiento fluido del jugador 
 		(mov continuo) si quremos que sea celda a celda tiene que ser con ints.
-	- Calculamos las traslacion del los puntos del minimapa respecto a la posicion
-	  del jugador, para eso restamos la posicon delorigen (cventro del minimapa) a
-	  la posicion del jugador
-	- Despues escalamos los puntos de la ventana a las posiciones del mapa con mm_scale
-	- y apicamos el factor de zoom del minimapa
+	- Despues escalamos los puntos de la ventana a las posiciones del mapa con mm_scaled zoom
 	- Si la posición escalada  y trasladadas corresponde a una pared, dibuja un píxel naranja.
 	- Si es suelo, dibuja un pixel negro/gris.
 */
@@ -127,21 +134,22 @@ bool is_wall(t_mlx *mlx, float *map)
 }
 
 /*
-	Esta funcion se usa en el caso de que queramos hacer de la matriz de pixeles 
-	del mapa, poder saber si los pixeles son parte de la zona del minimapay aprovechar
-	ese recorrido para bufferizar esos pixeles de la parte del minimapa.
-	- Comprobar si el píxel está dentro de los límites del minimapa
-	
+	Con esta funcion comprobamso si el personaje esta en la region del mapa despues
+	de haberlo escalado teneindo en cuenta el volumen del mapa. La usamos para hacer
+	ls comporbacion en cada par de pixeles del minimapa.
+	Se hace la comprobacion en float para tener en cuenta el volumen (epsilon) del personaje
+	y que el personaje pueda estar en varias posiciones dentro de una celda del mapa. Si se
+	comparase con ints el moviento del persona no seria ocntinuo
+	Se comprueba en cada combinacion de punetos x,y de los pixeles escalados al minimapa (es menos
+	eficiente que hacer un draw person2D que dibujaria elpersonaje despues de renderizar
+	el minimaapa en la siguiente capa de renerizado)
 */
-bool is_minimapzone(int win_x, int win_y, t_mlx *mlx)
+void	is_person2D(t_mlx *mlx, int *window, float *map)
 {
-	int minimap_start_x = 0;
-	int minimap_start_y = 0;
-
-	if (win_x >= minimap_start_x && win_x <= mlx->frame->mm_widht &&
-		win_y >= minimap_start_y && win_y <= mlx->frame->mm_height)
-			return (true);
-	return (false);
+	if (fabs(mlx->player->pos_x - map[X]) < mlx->player->volume &&
+			fabs(mlx->player->pos_y - map[Y]) < mlx->player->volume)
+	{
+		buffering_pixel(window[X], window[Y], mlx, 0x000000);
+	}
 }
-
 

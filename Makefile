@@ -41,9 +41,10 @@ SRC_FILES = mlx_init_close/init_mlx_game.c \
 			render/render.c \
 			render/raycasting.c \
 			render/dda_algorith.c \
-			render/render_minimap.c \
-			render/render_textures.c \
 			render/floor_celling.c \
+			render/render_textures.c \
+			render/shaders_fog_blur.c \
+			render/render_minimap.c \
 			render/rays_2d.c \
 			mains/main.c
 

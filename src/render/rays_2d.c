@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/07 13:26:17 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/13 05:12:57 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/13 16:08:25 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ bool	touch_wall(t_mlx *mlx, float x, float y)
 	  que representa el minimapa
 	- Uso de variables locales para usar registros de CPU y optimizar el rendimiento.
 */
-void draw_rays2D(t_mlx *mlx)
+void draw_rays2D(t_mlx *mlx, float *scal_z)
 {
 	float	diferencial[2];
 	float	fov_half;
@@ -52,7 +52,7 @@ void draw_rays2D(t_mlx *mlx)
 	{
 		diferencial[X] = mlx->player->pos_x;
 		diferencial[Y] = mlx->player->pos_y;
-		draw_ray2D(mlx, diferencial, rad_pos);
+		draw_ray2D(mlx, diferencial, rad_pos, scal_z);
 		rad_pos += rad_dif;
 	}
 }
@@ -67,26 +67,22 @@ void draw_rays2D(t_mlx *mlx)
 	  hasta tocar una pared, se va incrementando el diferencial en cada eje.
 	- Esto es mucho mas lento que el bucle dda, puede entrar enparedes o no detectar esquinas, para darle mas
 	  precision se puede reducir el step pero a costa de rendimiento (mas calculos por rayo).
-	- Bufferización del píxel en verde (0x00FF00) para representar el rayo en el minimapa.
+	- Bufferización del píxel en verde (0x00FF00) para representar el rayo en el minimapa.(Verde)
+	- Uso de variables locales como scale para evitar accesos repetidos a memoria y optimizar rendimientos usando
+	  registros de CPU y cache.
 */
-void	draw_ray2D(t_mlx *mlx, float *differencial, float rad)
+void	draw_ray2D(t_mlx *mlx, float *differencial, float rad, float *scal_z)
 {
 	int		window[2];
-	float	mm_scale[2];
 	float	step;
 	
-	mm_scale[X] = mlx->frame->mm_scale[X];
-	mm_scale[Y] = mlx->frame->mm_scale[Y];
 	step = 0.1f;
 	while (!touch_wall(mlx, differencial[X], differencial[Y]))
 	{
 		differencial[X] += step * cos(rad);
 		differencial[Y] += step * -sin(rad);
-		// window[X] = differencial[X] * mm_scale[X];
-		// window[Y] = differencial[Y] * mm_scale[Y];
-		// Escalar las coordenadas al minimapa con zoom y traslación
-        window[X] = (differencial[X] - mlx->frame->mm_offset[X]) * mm_scale[X] * mlx->frame->mm_zoom_factor;
-        window[Y] = (differencial[Y] - mlx->frame->mm_offset[Y]) * mm_scale[Y] * mlx->frame->mm_zoom_factor;
+		window[X] = (differencial[X] - mlx->frame->mm_offset[X]) * scal_z[X];
+		window[Y] = (differencial[Y] - mlx->frame->mm_offset[Y]) * scal_z[Y];
 		if (window[X] >= 0 && window[X] < mlx->frame->mm_widht &&
 				window[Y] >= 0 && window[Y] < mlx->frame->mm_height)
 		{

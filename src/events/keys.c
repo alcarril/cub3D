@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/22 22:31:15 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/13 14:50:08 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/13 16:15:28 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@ int	key_press(int keysym, t_mlx *mlx)
 		return (close_game_manager(mlx),0);
 	if (player_keypress(mlx, keysym))
 		return (0);
-	if (keysym == XK_o)
-		toogle_raycasting(mlx);
+	if (graphics_engine_keypress(mlx, keysym))
+		return (0);
 	else if (keysym == XK_m)
 		toggle_minimap(mlx);
 	else if (keysym == XK_plus)
@@ -32,14 +32,6 @@ int	key_press(int keysym, t_mlx *mlx)
 		minimap_zoom(mlx, false);
 	else if (keysym == XK_r)
 		toggle_rays(mlx);
-	else if (keysym == XK_f)
-		toggle_fish_eye(mlx);
-	else if (keysym == XK_e)
-		toogle_dist_calc(mlx);
-	else if (keysym == XK_t)
-		toggle_textures(mlx);
-	else if (keysym == XK_c)
-		toogle_floor_celling(mlx);
 	else if (keysym == XK_z)
 		print_controls();
 	else
@@ -79,6 +71,28 @@ int	key_release(int keysym, t_mlx *mlx)
 }
 
 /*
+	Funcion que maneja la presion de teclas para ajustes del motor grafico
+	- Si entra en alguna de las teclas retorna true
+	- Si no retorna false
+*/
+bool	graphics_engine_keypress(t_mlx *mlx, int keysym)
+{
+	if (keysym == XK_o)
+		toogle_raycasting(mlx);
+	else if (keysym == XK_f)
+		toggle_fish_eye(mlx);
+	else if (keysym == XK_e)
+		toogle_dist_calc(mlx);
+	else if (keysym == XK_t)
+		toggle_textures(mlx);
+	else if (keysym == XK_c)
+		toogle_floor_celling(mlx);
+	else
+		return (false);
+	return (true);
+}
+
+/*
 	Funcion que imprime los controles del juego
 */
 void	print_controls(void)
@@ -93,6 +107,7 @@ void	print_controls(void)
 	printf("\n[Screen Display Settings]\n");
 	printf("M: Toggle Minimap\n");
 	printf("R: Toggle Rays on Minimap\n");
+	printf("+/-: Minimap zoom in/out\n");
 	printf("\n[Player Settings]\n");
 	printf("WASD: Move Up, Down, Left, Right\n");
 	printf("Left Arrow: Rotate Counterclockwise\n");

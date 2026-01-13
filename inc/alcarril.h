@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 03:14:57 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/13 15:32:45 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/13 19:22:42 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,29 @@ player controls and engine config Keys\n"
 #define MousePressMask 1L<<2//norminette
 
 
+//Factores de shade oara suelo, techo y paredes
+# define FLOR_K 4.0f
+# define WALL_K 3.0f
+# define CEILING_K 2.0f
+//Factores de densidad de shade para suelo, techo y paredes
+# define FLOR_DENS 3.0f
+# define WALL_DENS 2.0f
+# define CEILING_DENS 1.0f
+
+//factores de fog para suelo, techo y paredes
+# define FLOR_FOG_DENS 0.8f
+# define WALL_FOG_DENS 1.0f
+# define CEILING_FOG_DENS 1.2f
+
+# define MAX_DISTANCE_FACTOR 0.8f
+
+#define FOG_CLARO 0xA0A0A0
+#define FOG_MEDIO_CLARO 0xA0A0A0
+#define FOG_MEDIO_OSCURO 0x606060
+#define FOG_OSCURO 0x202020
+
+
+
 /*
 	STRUCTS: Usamos el padrón de diseño "Data Oriented Design" para optimizar el acceso a memoria y el uso del caché.
 	Asi evitamos paginar estructuras muy grandes que provoquen fallos de caché (cache missing) y lentitud en el acceso a datos.
@@ -120,6 +143,7 @@ typedef struct s_wall
 	float	tex_pos;          // Posición inicial en la textura
 	double	wall_x;           // Posición de impacto en la pared (0-1)
 	t_texture *texture;       // Puntero a la textura seleccionada
+	int		mip_level[3];       // Nivel de mipmap seleccionado
 }	t_wall;
 
 typedef struct	s_ray
@@ -191,6 +215,9 @@ typedef struct	s_map
 	int		ceiling_color[3];	// R, G, B
 	int 	floor_color_hex;	// Hexadecimal
 	int 	ceiling_color_hex;	// Hexadecimal
+
+	//Max distance for shading and for (diagonal)
+	float	max_distance;
 }	t_map;
 
 
@@ -285,6 +312,7 @@ void	print_controls(void);
 bool	player_keypress(t_mlx *mlx, int keysym);
 bool	player_keypres2(t_mlx *mlx, int keysym);
 void	change_fov(t_mlx *mlx);
+bool	graphics_engine_keypress(t_mlx *mlx, int keysym);
 void	toogle_raycasting(t_mlx *mlx);
 void	toggle_textures(t_mlx *mlx);
 void	toogle_floor_celling(t_mlx *mlx);
@@ -296,7 +324,6 @@ void	minimap_zoom(t_mlx *mlx, bool flag);
 int		mouse_init_manager(t_mlx *mlx);
 void	toogle_mouse(t_mlx *mlx);
 int		mouse_button_manager(int mouse_button, int x, int y, t_mlx *mlx);
-int		mouse_move_manager(int x, int y, t_mlx *mlx);
 
 //hooks and events phisics
 
@@ -351,8 +378,13 @@ unsigned int	extract_color(t_texture *texture, int tex_x, int tex_y);
 
 //fog blur shaders
 unsigned int apply_fog_pixel(unsigned int color, unsigned int fog_color, float distance, float max_distance);
-unsigned int apply_blur(t_mlx *mlx, int column, int row);
 void apply_fog(t_mlx *mlx, unsigned int fog_color, float max_distance);
+unsigned int apply_blur(t_mlx *mlx, int column, int row);
+
+unsigned int apply_shade(unsigned int color, float shade);
+unsigned int shade_linear(unsigned int color, float dist, float max_dist);
+unsigned int shade_inverse(unsigned int color, float dist, float k, float max_dist);
+unsigned int shade_exponential(unsigned int color, float dist, float density, float max_dist);
 
 //render minimap 2D
 int		render_frame2D(t_mlx *mlx);
@@ -362,8 +394,8 @@ bool	is_wall(t_mlx *mlx, float *map);
 void	is_person2D(t_mlx *mlx, int *window, float *map);
 
 //render rays 2D
-void	draw_rays2D(t_mlx *mlx);
-void	draw_ray2D(t_mlx *mlx, float *differencial, float rad);
+void	draw_rays2D(t_mlx *mlx, float *scal_z);
+void	draw_ray2D(t_mlx *mlx, float *differencial, float rad, float *scal_z);
 bool	touch_wall(t_mlx *mlx, float x, float y);
 
 //debug

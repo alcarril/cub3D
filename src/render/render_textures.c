@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 15:44:58 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/12 21:56:13 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/13 19:13:15 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,27 +22,31 @@
 */
 void draw_wall_column_tex(t_mlx *mlx, int column, t_wall *wall, t_ray *ray)
 {
-    int i;
-    unsigned int color;
-    // unsigned int fog_color = 0x000000; // Color del fog (negro)
-    // float max_distance = 20.0f; // Distancia máxima para aplicar el fog
+	int i;
+	unsigned int color;
+	unsigned int fog_color = FOG_MEDIO_OSCURO; // Color del fog (negro)
+	float max_distance = mlx->map->max_distance * 0.8f; // Distancia máxima para aplicar el fog
+	// int mip;
 
-    wall->texture = select_texture(mlx, ray);
-    wall->wall_x = calculate_wall_x(mlx, ray);
-    calculate_tex(wall, wall->texture, mlx->win_height, mlx->player->pitch_pix);
-    i = wall->wall_start;
-    while (i <= wall->wall_end)
-    {
-        wall->tex_y = (int)wall->tex_pos;
-        color = extract_color(wall->texture, wall->tex_x, wall->tex_y);
-
-        // Aplicar el fog al color basado en la distancia
-        // color = apply_fog_pixel(color, fog_color, ray->wall_dist, max_distance);
+	wall->texture = select_texture(mlx, ray);
+	wall->wall_x = calculate_wall_x(mlx, ray);
+	calculate_tex(wall, wall->texture, mlx->win_height, mlx->player->pitch_pix);
+	i = wall->wall_start;
+	while (i <= wall->wall_end)
+	{			
+		wall->tex_y = (int)wall->tex_pos;
+		color = extract_color(wall->texture, wall->tex_x, wall->tex_y);
 		// color = apply_blur(mlx, column, i);
-        buffering_pixel(column, i, mlx, color);
-        wall->tex_pos += wall->text_v_step;
-        i++;
-    }
+		//aplicar el shade:
+			// color = shade_linear(color, ray->wall_dist, max_distance);
+			color = shade_inverse(color, ray->wall_dist, 4.0f, max_distance);
+			// color = shade_exponential(color, ray->wall_dist, 4.0f, max_distance);
+		// Aplicar el fog al color basado en la distancia -> se puede modificar
+			color = apply_fog_pixel(color, fog_color, ray->wall_dist, max_distance);
+		buffering_pixel(column, i, mlx, color);
+		wall->tex_pos += wall->text_v_step;
+		i++;
+	}
 }
 
 /*

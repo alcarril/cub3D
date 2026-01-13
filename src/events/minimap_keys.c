@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 21:16:10 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/13 14:48:03 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/13 16:07:32 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,8 @@ void	toggle_rays(t_mlx *mlx)
 
 /*
 	Funcion para hacer zoom in o zoom out en el minimapa
+	Podri ameter opctimizcion para que no se renderizase toda la pantalla+y lo la parte del
+	minimapa (como esun accion que se hace ada poco tiempo mejor asi)
 */
 void	minimap_zoom(t_mlx *mlx, bool flag)
 {
@@ -59,6 +61,7 @@ void	minimap_zoom(t_mlx *mlx, bool flag)
 		if (mlx->frame->mm_zoom_factor > MINIMAP_MAX_ZOOM)
 		mlx->frame->mm_zoom_factor = MINIMAP_MAX_ZOOM;
 		printf("MINIMAP ZOOM  IN FACTOR: %.2f\n", mlx->frame->mm_zoom_factor);
+		render_frame2D(mlx);
 	}
 	else
 	{
@@ -66,5 +69,6 @@ void	minimap_zoom(t_mlx *mlx, bool flag)
 		if (mlx->frame->mm_zoom_factor < MINIMAP_MIN_ZOOM)
 		mlx->frame->mm_zoom_factor = MINIMAP_MIN_ZOOM;
 		printf("MINIMAP ZOOM  OUT FACTOR: %.2f\n", mlx->frame->mm_zoom_factor);
+		render_frame2D(mlx);
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 22:59:20 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/13 15:33:26 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/13 16:08:49 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,3 @@ int	mouse_button_manager(int mouse_button, int x, int y, t_mlx *mlx)
 		mlx->player->mouse.pitch_factor = MIN_MOUSE_PITCH_FACTOR;
 	return (0);
 }
-
-
-
-
