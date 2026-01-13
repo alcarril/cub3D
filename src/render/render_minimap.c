@@ -6,13 +6,12 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/30 14:45:15 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/13 15:12:18 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/13 15:30:09 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cube3D.h"
 
-void	update_minimap_dinamic_offset(t_mlx *mlx);
 void	update_center_minimap_offset(t_mlx *mlx, float *escaled_zoom);
 
 /*
@@ -31,9 +30,6 @@ int	render_frame2D(t_mlx *mlx)
 	int		win[2];
 	float	scaled_zoom[2];
 	
-	//esto solo en modo seguiemiento jugador va a ser un puntero a funcion cunado cambie se pondra
-	//tambienn el minimap scale diferente
-	// update_minimap_dinamic_offset(mlx);
 	update_center_minimap_offset(mlx, scaled_zoom);
 	win[Y] = 0;
 	while (win[Y] <= mlx->frame->mm_height)
@@ -52,6 +48,15 @@ int	render_frame2D(t_mlx *mlx)
 	return (1);
 }
 
+/*
+	Actualiza el offset del minimapa para centrarlo en la posicion del jugador
+	Calculamos el offset del minimapa en funcion de la posicion del jugador
+	y el tamaño del minimapa y su escala. (traslacion del minimapa + zoom)
+	El offset se calcula restando la mitad del tamaño del minimapa (orihgen) escalado
+	a la posicion del jugador para centrar el minimapa en el jugador.
+	Ademas calculamos el zoom escalado para usarlo en el dibujado de los pixeles
+	del minimapa.
+*/
 void	update_center_minimap_offset(t_mlx *mlx, float *escaled_zoom)
 {
 	t_frame		*f;
@@ -159,165 +164,4 @@ bool is_minimapzone(int win_x, int win_y, t_mlx *mlx)
 	return (false);
 }
 
-/*
-	- Dibuja un píxel del minimapa en función de su correspondencia con el mapa.
-	- Los valores del mapa en float para permitir un movimiento fluido del jugador 
-		(mov continuo) si quremos que sea celda a celda tiene que ser con ints.
-	- Escala las coordenadas de la ventana a las del mapa usando mm_scale.
-	- Si la posición escalada corresponde a una pared, dibuja un píxel naranja.
-	- Si es suelo, dibuja un pixel negro/gris.
-*/
-void	draw_mini_pixel(t_mlx *mlx, int *win)
-{
-	float	map[2];
 
-	map[X] = (float)win[X] / mlx->frame->mm_scale[X];
-	map[Y] = (float)win[Y] / mlx->frame->mm_scale[Y];
-	if ((unsigned int)map[Y] < mlx->map->max_rows &&
-			(unsigned int)map[X] < mlx->map->max_columns)
-	{
-		if (is_wall(mlx, map) == true)
-			buffering_pixel(win[X], win[Y], mlx, 0xFF8C00);
-		else
-			buffering_pixel(win[X], win[Y], mlx, 0x969696);
-		is_person2D(mlx, win, map);
-	}
-}
-
-void	update_minimap_dinamic_offset(t_mlx *mlx)
-{
-	static float offset[2] = {0, 0}; // offset persistente
-	float margin_x = 1.0f;          // margen horizontal en unidades de mapa
-	float margin_y = 1.0f;          // margen vertical en unidades de mapa
-
-	// Posición del jugador
-	float px = mlx->player->pos_x;
-	float py = mlx->player->pos_y;
-
-	// Dimensiones del minimapa en píxeles
-	int mini_width  = mlx->frame->mm_widht;
-	int mini_height = mlx->frame->mm_height;
-
-	// Posición central actual del minimapa
-	float center_x = offset[X] + mini_width / (2 * mlx->frame->mm_zoom_factor * mlx->frame->mm_scale[X]);
-	float center_y = offset[Y] + mini_height / (2 * mlx->frame->mm_zoom_factor * mlx->frame->mm_scale[Y]);
-
-	// Ajustamos offset solo si el jugador sale del margen
-	if (fabs(px - center_x) > margin_x)
-	{
-		if (px > center_x)
-			offset[X] += fabs(px - center_x) - margin_x;
-		else
-			offset[X] -= fabs(px - center_x) - margin_x;
-	}
-
-	if (fabs(py - center_y) > margin_y)
-	{
-		if (py > center_y)
-			offset[Y] += fabs(py - center_y) - margin_y;
-		else
-			offset[Y] -= fabs(py - center_y) - margin_y;
-	}
-
-	mlx->frame->mm_offset[X] = offset[X];
-	mlx->frame->mm_offset[Y] = offset[Y];
-}
-
-/*
-	Esta funcion sirve para no tener que comprobar en cada par de pixeles de la 
-	matriz de la pantalla si es eso pixeles corresponden al la posisicon del person
-	naje + su volumen (epsilon). Nos permite modularizar el codigo y baja r al complejidad
-*/
-// void draw_person2D(t_mlx *mlx)
-// {
-// 	int player_x, player_y;
-// 	int start_x, start_y;
-// 	int end_x, end_y;
-// 	int x, y;
-
-// 	// Calcular la posición del jugador en el minimapa
-// 	player_x = mlx->player->pos_x * (WIDTH / MINI_WIDTH) / mlx->map->max_columns;
-// 	player_y = mlx->player->pos_y * (HEIGHT / MINI_HEIGHT) / mlx->map->max_rows;
-
-// 	// Definir el área del jugador (un cuadrado alrededor de su posición)
-// 	start_x = player_x - EPSILON * (WIDTH / MINI_WIDTH);
-// 	start_y = player_y - EPSILON * (HEIGHT / MINI_HEIGHT);
-// 	end_x = player_x + EPSILON * (WIDTH / MINI_WIDTH);
-// 	end_y = player_y + EPSILON * (HEIGHT / MINI_HEIGHT);
-
-// 	// Pintar el área del jugador
-// 	y = start_y;
-// 	while (y <= end_y)
-// 	{
-// 		x = start_x;
-// 		while (x <= end_x)
-// 		{
-// 			if (x >= 0 && x < WIDTH / MINI_WIDTH && y >= 0 && y < HEIGHT / MINI_HEIGHT)
-// 				buffering_pixel(x, y, mlx, 0x0000FFFF); // Color del jugador
-// 			x++;
-// 		}
-// 		y++;
-// 	}
-// }
-
-
-
-/////////////////////////////FUNCIONES DE REDERIZADO DE B->A//////////////////////////////////////////
-
-// void render_cell2D(t_mlx *mlx, unsigned int map_x, unsigned int map_y, int *scale)
-// {
-// 	int	window_x;
-// 	int	window_y;
-// 	int	i;
-	
-// 	i = 0;
-// 	while (i < scale[0]) // Iterar dentro de la celda en x
-// 	{
-// 		int j = 0;
-// 		while (j < scale[1]) // Iterar dentro de la celda en y
-// 		{
-// 			window_x = (map_x * scale[0]) + i; // Coordenada X en la ventana
-// 			window_y = (map_y * scale[1]) + j; // Coordenada Y en la ventana //a1
-// 			if (mlx->map->map_grids[map_y][map_x] == WALL && (i == scale[0] - 1 || i == 0))
-// 				buffering_pixel(window_x, window_y, mlx, 0x0000FF00); // Color para paredes birdes horizontales
-// 			else if (mlx->map->map_grids[map_y][map_x] == WALL && (j == scale[1] - 1 || j == 0))
-// 				buffering_pixel(window_x, window_y, mlx, 0x0000FF00); // Color para paredes bordes verticales
-// 			else if (mlx->map->map_grids[map_y][map_x] == WALL)
-// 				buffering_pixel(window_x, window_y, mlx, 0x00FF0000); // Color para paredes
-// 			else
-// 				buffering_pixel(window_x, window_y, mlx, 0x00000000); // Color para el suelo
-// 			// Dibujar al jugador si está en esta posición (como es un booleano se trcunca y se queda con la parte entera->funciona)
-// 			float epsilon = 0.4;// Margen de error para la comparación
-// 			if (fabs(mlx->player->pos_x - map_x) < epsilon &&
-// 				fabs(mlx->player->pos_y - map_y) < epsilon)
-// 			{
-// 				buffering_pixel(window_x, window_y, mlx, 0x0000FFFF); // Color para el jugador
-// 			}
-// 			j++;
-// 		}
-// 		i++;
-// 	}
-// }
-
-// //renderizado de conjunto pares del mapa (puntos x, y) A -> a conjunto de puntos (pares x, y) de la ventana
-// void render_frame2DD(t_mlx *mlx, int minimap_sizex, int minimap_sizey)
-// {
-// 	unsigned int	map_x;
-// 	unsigned int	map_y;
-// 	int				scale[2];
-	
-// 	scale[0] = (WIDTH / minimap_sizex) / mlx->map->max_columns;
-// 	scale[1] = (HEIGHT / minimap_sizey) / mlx->map->max_rows;
-// 	map_x = 0;
-// 	while (map_x < mlx->map->max_columns)
-// 	{
-// 		map_y = 0;
-// 		while (map_y < mlx->map->max_rows)
-// 		{
-// 			render_cell2D(mlx, map_x, map_y, scale);
-// 			map_y++;
-// 		}
-// 		map_x++;
-// 	}
-// 	mlx_put_image_to_window(mlx->mlx_var, mlx->mlx_window, mlx->mlx_img, 0, 0);
-// }

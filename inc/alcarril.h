@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 03:14:57 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/13 15:12:36 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/13 15:30:23 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -360,11 +360,6 @@ void	draw_mini_pixel_offset(t_mlx *mlx, int *win, float *scaled_zoom);
 bool	is_wall(t_mlx *mlx, float *map);
 void	is_person2D(t_mlx *mlx, int *window, float *map);
 bool	is_minimapzone(int win_x, int win_y, t_mlx *mlx);
-// void	draw_person2D(t_mlx *mlx);
-
-//mnimapa dinamico
-// void	update_minimap_dinamic_offset(t_mlx *mlx);
-// void	draw_mini_pixel(t_mlx *mlx, int *win);
 
 //render rays 2D
 void	draw_rays2D(t_mlx *mlx);
