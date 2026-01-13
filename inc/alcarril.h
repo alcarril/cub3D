@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 03:14:57 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/13 15:30:23 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/13 15:32:45 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -356,10 +356,10 @@ void apply_fog(t_mlx *mlx, unsigned int fog_color, float max_distance);
 
 //render minimap 2D
 int		render_frame2D(t_mlx *mlx);
+void	update_center_minimap_offset(t_mlx *mlx, float *escaled_zoom);
 void	draw_mini_pixel_offset(t_mlx *mlx, int *win, float *scaled_zoom);
 bool	is_wall(t_mlx *mlx, float *map);
 void	is_person2D(t_mlx *mlx, int *window, float *map);
-bool	is_minimapzone(int win_x, int win_y, t_mlx *mlx);
 
 //render rays 2D
 void	draw_rays2D(t_mlx *mlx);

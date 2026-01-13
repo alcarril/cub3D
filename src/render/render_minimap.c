@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/30 14:45:15 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/13 15:30:09 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/13 15:33:11 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,26 +124,6 @@ bool is_wall(t_mlx *mlx, float *map)
 	if (mlx->map->map_grids[map_y][map_x] == WALL)
 		return (true);
 	return (false);
-}
-
-/*
-	Con esta funcion comprobamso si el personaje esta en la region del mapa despues
-	de haberlo escalado teneindo en cuenta el volumen del mapa. La usamos para hacer
-	ls comporbacion en cada par de pixeles del minimapa.
-	Se hace la comprobacion en float para tener en cuenta el volumen (epsilon) del personaje
-	y que el personaje pueda estar en varias posiciones dentro de una celda del mapa. Si se
-	comparase con ints el moviento del persona no seria ocntinuo
-	Se comprueba en cada combinacion de punetos x,y de los pixeles escalados al minimapa (es menos
-	eficiente que hacer un draw person2D que dibujaria elpersonaje despues de renderizar
-	el minimaapa en la siguiente capa de renerizado)
-*/
-void	is_person2D(t_mlx *mlx, int *window, float *map)
-{
-	if (fabs(mlx->player->pos_x - map[X]) < mlx->player->volume &&
-			fabs(mlx->player->pos_y - map[Y]) < mlx->player->volume)
-	{
-		buffering_pixel(window[X], window[Y], mlx, 0x000000);
-	}
 }
 
 /*

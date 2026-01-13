@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 22:59:20 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/12 21:28:16 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/13 15:33:26 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,39 +83,6 @@ int	mouse_button_manager(int mouse_button, int x, int y, t_mlx *mlx)
 	return (0);
 }
 
-
-//Es es la que va en el hook
-//el ajuste de grados se hace en el render del frame dentro de move (rotate)
-//no hace falta hacerlo aqui seria redundante
-//lso datos del mouse pueden ir dentro de una estrcutura para no declrar
-//tanta meria local
-int	mouse_move_manager(int x, int y, t_mlx *mlx)
-{
-	t_mouse	*m;
-	int		pix_dif[2];
-	bool	is_move[2];
-	
-	m = &(mlx->player->mouse);
-	m->pos_x = x;
-	m->pos_y = y;
-	if (is_mouse_in_window(mlx, m->pos_x, m->pos_y) == false)
-		return (0);
-	ft_bzero((void*)is_move, sizeof(is_move));
-	pix_dif[X] =  m->pos_x - m->axis_x;
-	if (clamp_mouse_deltax(&pix_dif[X]) == true)
-	{
-		is_move[X] = 1;
-		mlx->player->angle -= pix_dif[X] * m->sens_x;
-		mlx->player->rad_angle = mlx->player->angle * (PI / 180.0f);
-	}
-	pix_dif[Y] = m->pos_y - m->axis_y;
-	if (clamp_mouse_deltay(&pix_dif[Y]) == true)
-	{
-		is_move[Y] = 1;
-		mlx->player->pitch_pix -= pix_dif[Y] * (m->pitch_factor * mlx->player->max_pitch_pix);
-	}
-	return (reset_mouse_position(mlx, is_move), 0);
-}
 
 
 
