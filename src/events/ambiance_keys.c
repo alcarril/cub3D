@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/15 15:20:17 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/15 22:00:48 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/17 01:13:42 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,11 @@ void	toogle_ambiance(t_mlx *mlx)
 	if (mlx->frame->ambiance_onoff == ON)
 	{
 		mlx->frame->ambiance_onoff = OFF;
-		mlx->frame->floor_celling = render_floor_and_ceiling;
 		printf("AMBIANCE OFF\n");
 	}
 	else
 	{
 		mlx->frame->ambiance_onoff = ON;
-		mlx->frame->floor_celling = render_floor_and_ceiling_amb;
 		printf("AMBIANCE ON\n");
 	}
 }
@@ -46,6 +44,8 @@ bool	ambiance_keypress(t_mlx *mlx, int keysym)
 		select_ambiance(mlx, CEMENTERY);
 	else if (keysym == XK_3)
 		select_ambiance(mlx, OPEN);
+	else if (keysym == XK_4)
+		select_ambiance(mlx, MATRIX);
 	else
 		return (false);
 	return (true);
@@ -70,6 +70,12 @@ void	select_ambiance(t_mlx *mlx, int ambiance)
 		config_ambiance_open(mlx->map, &(mlx->amb));
 		printf("OPEN AMBIANCE SELECTED: ");
 		printf("Recomendeded for open spaces with sun\n");
+	}
+	else if (ambiance == MATRIX)
+	{
+		config_ambiance_matrix(mlx->map, &(mlx->amb));
+		printf("MATRIX AMBIANCE SELECTED: ");
+		printf("Recomendeded for digital environments\n");
 	}
 }
 

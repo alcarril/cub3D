@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/30 14:45:15 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/16 15:15:36 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/16 21:19:11 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,4 +152,3 @@ void	is_person2D(t_mlx *mlx, int *window, float *map)
 		buffering_pixel(window[X], window[Y], mlx, 0x000000);
 	}
 }
-

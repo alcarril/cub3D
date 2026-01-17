@@ -14,7 +14,7 @@ NAME = cub3D
 
 CC = cc
 CC_FLAGS = -Wall -Wextra -Werror 
-MLX_FLAGS = -L$(LIB_DIR)/minilibx-linux -lmlx_Linux -lXext -lX11 -lm -lz -O3
+MLX_FLAGS = -L$(LIB_DIR)/minilibx-linux -lmlx_Linux -lXext -lX11 -lm -lz -O3 -flto -funroll-loops -march=native
 LIBFT_FLAGS = -L$(LIB_DIR)/libft -lft
 DEBUG_FLAGS = -g3 -fsanitize=address
 HEADERS = -I$(INC_DIR)
@@ -48,7 +48,8 @@ SRC_FILES = mlx_init_close/init_mlx_game.c \
 			render/utils.c \
 			render/rays_2d.c \
 			ambiances/ambiance_configs.c \
-			ambiances/shaders_fog_blur.c \
+			ambiances/ambiance_configs1.c \
+			ambiances/fog_desaturation.c \
 			ambiances/shaders.c \
 			testing/prueba.c \
 			mains/main.c

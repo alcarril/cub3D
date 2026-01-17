@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/16 00:11:37 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/16 19:04:49 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/17 15:22:59 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	ft_memset_int(void *s, int c, size_t n)
 
 	ptr = (int *)s;
 	i = 0;
-	jumps = n << sizeof(int);
+	jumps = n / sizeof(int);
 	while (i < jumps)
 	{
 		*(ptr + i) = c;

@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 16:45:21 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/16 16:26:54 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/16 23:59:19 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,69 +64,85 @@ void	render_floor_and_ceiling(t_mlx *mlx)
 	  en lugar de píxeles
 	- Se minimiza las indirecciones dentro del bucle para que puedan acceder a las variables
 	  de forma más eficiente (mediante registros en lugar de registro -> cache -> RAM)
+	- Se usan referencias locales para evitar accesos repetidos a estructuras anidadas
 */
 void render_floor_and_ceiling_speed(t_mlx *mlx)
 {
-	int y;
-	int horizon;
-	int ceiling_color;
-	int floor_color;
+	int	y;
+	int	ceiling_color;
+	int	floor_color;
+	int	refs[3];
 
+	refs[HEIG] = mlx->win_height;
+	refs[WIDTH] = mlx->win_width;
+	refs[HOR] = (refs[0] >> 1) + mlx->player->pitch_pix;
 	ceiling_color = mlx->map->ceiling_color_hex;
 	floor_color = mlx->map->floor_color_hex;
-	horizon = (mlx->win_height >> 1) + mlx->player->pitch_pix;
 	y = 0;
-	while (y < horizon && y < mlx->win_height)
+	while (y < refs[HOR] && y < refs[HEIG])
 	{
-		buffering_line(y, ceiling_color, mlx, mlx->win_width);
+		buffering_line(y, ceiling_color, mlx, refs[WIDTH]);
 		y++;
 	}
 	while (y < mlx->win_height)
 	{
-		buffering_line(y, floor_color, mlx, mlx->win_width);
+		buffering_line(y, floor_color, mlx, refs[WIDTH]);
 		y++;
 	}
 }
 
-
-
-
-//cersion profundidad
+/*
+	Función para renderizar el suelo y el techo con efectos de ambiente
+	- Similar a render_floor_and_ceiling_speed pero aplica efectos de
+	  sombreado y niebla basados en la distancia desde la cámara
+	- Calcula un factor de distancia para cada línea que determina
+	  cuánto se deben aplicar los efectos de ambiente
+	- Usa funciones específicas para aplicar sombreado y niebla al color
+	  del suelo y el techo antes de dibujarlos
+	- Esto crea una sensación de profundidad y atmósfera en la escena 3D
+	- Más costoso computacionalmente debido a los cálculos adicionales por píxel
+	  pero mejora significativamente la calidad visual
+	Mejoras de microprocesador:
+	- Se reduce la sobrecarga de llamadas a funciones al pintar líneas completas
+	  en lugar de píxeles
+	- Se minimiza las indirecciones dentro del bucle para que puedan acceder a las variables
+	  de forma más eficiente (mediante registros en lugar de registro -> cache -> RAM)
+	- Se usan referencias locales para evitar accesos repetidos a estructuras anidadas dentro de
+	las restrciiones de la norma de 42
+	- se omite la opcion de meter las opciones de ambiente en un if dentro de un bucle
+	  para evitar saltos de instruccion que penalizan el rendimiento del procesador
+*/
 void render_floor_and_ceiling_amb(t_mlx *mlx)
 {
-	int y;
-	int horizon;
-	float dist_factor;
-	unsigned int color_ceiling;
-	unsigned int color_floor;
+	int				y;
+	int				refs[3];
+	float			df;
+	unsigned int	colors[2];
 
-
-	color_ceiling = mlx->map->ceiling_color_hex;
-	color_floor = mlx->map->floor_color_hex;
-	horizon = (mlx->win_height >> 1) + mlx->player->pitch_pix;
+	colors[0] = mlx->map->ceiling_color_hex;
+	colors[1] = mlx->map->floor_color_hex;
+	refs[HEIG] = mlx->win_height;
+	refs[WIDT] = mlx->win_width;
+	refs[HOR] = (refs[0] >> 1) + mlx->player->pitch_pix;
 	y = 0;
-	while (y < horizon && y < mlx->win_height)
+	while (y < refs[HOR] && y < refs[HEIG])
 	{
-		dist_factor = dist_factor_ceiling(y, horizon, mlx->amb.ambiance);
-		color_ceiling =	shade_inverse(mlx->map->ceiling_color_hex, mlx->amb.k_factor_ceiling, dist_factor * mlx->amb.mult_shader_ceiling);
-		color_ceiling = apply_desaturation(color_ceiling, dist_factor * 0.6f);
-		color_ceiling = apply_fog_pixel(color_ceiling, mlx->amb.fog_color_fc, dist_factor * mlx->amb.mult_fog_ceiling);
-		buffering_line(y, color_ceiling, mlx, mlx->win_width);
+		df = dist_factor_ceiling(y, refs[HOR], mlx->amb.ambiance);
+		colors[0] =	apllyamb_ceiling(&(mlx->amb), df, colors[0]);
+		buffering_line(y, colors[0], mlx, refs[WIDT]);
 		y++;
 	}
-	while (y < mlx->win_height)
+	while (y < refs[HEIG])
 	{
-		dist_factor = dist_factor_floor(mlx->win_height, y, horizon, mlx->amb.ambiance);
-		color_floor = shade_inverse(mlx->map->floor_color_hex, mlx->amb.k_factor_floor, dist_factor * mlx->amb.mult_shader_floor);
-		color_floor = apply_desaturation(color_floor, dist_factor * 0.6f);
-		color_floor = apply_fog_pixel(color_floor, mlx->amb.fog_color_fc, dist_factor * mlx->amb.mult_fog_floor	);
-		buffering_line(y, color_floor, mlx, mlx->win_width);
+		df = dist_factor_floor(refs[HEIG], y, refs[HOR], mlx->amb.ambiance);
+		colors[1] =	apllyamb_ceiling(&(mlx->amb), df, colors[1]);
+		buffering_line(y, colors[1], mlx, refs[WIDT]);
 		y++;
 	}
 }
 
 
-//cersion profundidad
+//cersion profundidad PORTOTIPO DE CREACION
 void render_floor_and_ceiling_speed2(t_mlx *mlx)
 {
 	int y;
@@ -186,3 +202,4 @@ void render_floor_and_ceiling_speed2(t_mlx *mlx)
 		y++;
 	}
 }
+

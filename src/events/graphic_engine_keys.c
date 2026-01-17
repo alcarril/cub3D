@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 20:54:29 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/15 22:03:37 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/17 01:27:24 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,17 +20,17 @@ void	toogle_raycasting(t_mlx *mlx)
 	t_frame	*f;
 
 	f = mlx->frame;
-	if (mlx->frame->raycasting_onoff == true)
+	if (mlx->frame->raycasting_onoff == ON)
 	{
-		mlx->frame->raycasting_onoff = false;
+		mlx->frame->raycasting_onoff = OFF;
 		f->mm_height *= MINI_HEIGHT;
 		f->mm_widht *= MINI_WIDTH;
-		f->minimap_onoff = true;
+		f->minimap_onoff = ON;
 		printf("RAYCASTING OFF\n");
 	}
 	else
 	{
-		mlx->frame->raycasting_onoff = true;
+		mlx->frame->raycasting_onoff = ON;
 		f->mm_height /= MINI_HEIGHT;
 		f->mm_widht /= MINI_WIDTH;
 		printf("RAYCASTING ON\n");
@@ -47,9 +47,6 @@ void	toggle_textures(t_mlx *mlx)
 	if (mlx->frame->textures_onoff == OFF)
 	{
 		mlx->frame->textures_onoff = ON;
-		mlx->frame->ambiance_onoff = OFF;
-		mlx->frame->draw_walls = draw_wall_column_tex;
-		mlx->frame->floor_celling = render_floor_and_ceiling;
 		mlx->frame->fish_eye = OFF;
 		mlx->frame->euclidean = OFF;
 		printf("TEXTURED ENABLED\n");
@@ -58,8 +55,6 @@ void	toggle_textures(t_mlx *mlx)
 	{
 		mlx->frame->textures_onoff = OFF;
 		mlx->frame->ambiance_onoff = OFF;
-		mlx->frame->draw_walls = draw_wall_column;
-		mlx->frame->floor_celling = render_floor_and_ceiling;
 		printf("TEXTURES DISABLED\n");
 	}
 }
@@ -75,14 +70,14 @@ void	toogle_floor_celling(t_mlx *mlx)
 		printf("WARNING: Ambiance is on, cannot toggle floor and ceiling rendering method\n");
 		return ;
 	}
-	if (mlx->frame->floor_celling == render_floor_and_ceiling)
+	if (mlx->frame->boost == OFF)
 	{
-		mlx->frame->floor_celling = render_floor_and_ceiling_speed;
+		mlx->frame->boost = ON;
 		printf("FAST floor and ceiling rendering enabled\n");
 	}
 	else
 	{
-		mlx->frame->floor_celling = render_floor_and_ceiling;
+		mlx->frame->boost = OFF;
 		printf("ACURATED floor and ceiling rendering enabled\n");
 	}
 }
@@ -94,7 +89,7 @@ void	toogle_floor_celling(t_mlx *mlx)
 */
 void	toogle_dist_calc(t_mlx *mlx)
 {
-	if (mlx->frame->draw_walls == draw_wall_column)
+	if (mlx->frame->textures_onoff == OFF)
 	{
 		if (mlx->frame->euclidean == false)
 		{
@@ -108,7 +103,7 @@ void	toogle_dist_calc(t_mlx *mlx)
 		}
 	}
 	else
-		printf(" WARINIG: Cannot toggle distance calculation method when textures are enabled\n");
+		printf("WARNING!!: Textures must be off to toggle euclidean dist\n");
 }
 
 /*
@@ -116,7 +111,7 @@ void	toogle_dist_calc(t_mlx *mlx)
 */
 void	toggle_fish_eye(t_mlx *mlx)
 {
-	if (mlx->frame->draw_walls == draw_wall_column)
+	if (mlx->frame->textures_onoff == OFF)
 	{
 		if (mlx->frame->fish_eye == true)
 		{

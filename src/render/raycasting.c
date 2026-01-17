@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 19:04:35 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/16 15:15:42 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/17 04:40:09 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,10 @@ void	cast_ray(t_mlx *mlx, unsigned int n_ray, float ray_angle)
 	mlx->frame->fov_distances[mlx->win_width - n_ray - 1] = ray.wall_dist;
 	scale_wall(&wall, ray.proyected_wall_dist, mlx->win_height, mlx->player->pitch_pix);
 	// scale_wall_camz(&wall, ray.proyected_wall_dist, mlx->win_height, mlx->player->pitch_pix, -0.525f);
-	mlx->frame->draw_walls(mlx, n_ray, &wall, &ray);
+	if (mlx->frame->textures_onoff == ON)
+		draw_wall_column_tex(mlx, n_ray, &wall, &ray);
+	else
+		draw_wall_column(mlx, n_ray, &wall, &ray);
 }
 
 /*

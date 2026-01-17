@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 03:14:57 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/16 20:09:36 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/17 02:20:31 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,35 @@
 #define BASE_WIDTH 600
 #define BASE_HEIGHT 600
 
+//map axis
+# define X 1
+# define Y 0
+
+
+//math and phisics
+# define PI 3.14159265
+# define EPSILON 0.20f
+# define FRICTION 0.5f
+
+# define PITCH_FACTOR 0.02f//
+# define MAX_PIXELS_PITCH 0.75f
+
+//hits and walls
+# define WALL 1
+# define BONUS_WALL 2
+# define FLOOR 0
+#define VERTICAL 1
+#define HORIZONTAL 0
+
+//directions
+#define N 0
+#define S 1
+#define E 2
+#define W 3
+
+//switches
+#define ON true
+#define OFF false
 
 //Minimap
 #define MINI_WIDTH 4
@@ -44,39 +73,9 @@
 # define MINIMAP_MAX_ZOOM 3.5f
 # define MINIMAP_MIN_ZOOM 0.5f
 
-//hits
-# define WALL 1
-# define BONUS_WALL 2
-# define FLOOR 0
-
-# define X 1
-# define Y 0
-
-
-#define VERTICAL 1
-#define HORIZONTAL 0
-
-#define ON true
-#define OFF false
-
-# define PI 3.14159265
-# define EPSILON 0.20f
-# define FRICTION 0.5f
-
-//esto podria ir en enum
-#define N 0
-#define S 1
-#define E 2
-#define W 3
-
-#define CONTROLS_INFO "Press \"z\" on your keyboard to show \
-player controls and engine config Keys\n"
-
-# define PITCH_FACTOR 0.02f//
-# define MAX_PIXELS_PITCH 0.75f
-
+//mouse
 #define MOUSE_INIT_SENSX 0.2f
-# define MOUSE_PITCH_FACTOR 0.002f//
+#define MOUSE_PITCH_FACTOR 0.002f//
 #define MOUSE_DEADZONEX 4
 #define MOUSE_DEADZONEY 8
 #define MOUSE_MAX_MOV 50
@@ -88,7 +87,15 @@ player controls and engine config Keys\n"
 #define IN true
 #define MousePressMask 1L<<2//norminette
 
+//rgb
+#define R 0
+#define G 1
+#define B 2
 
+//define refsbuff
+#define HEIG 0
+#define WIDT 1
+#define HOR 2
 
 //colores de fog
 #define FOG_CLARO 0xA0A0A0
@@ -96,16 +103,21 @@ player controls and engine config Keys\n"
 #define FOG_MEDIO_OSCURO 0x606060
 #define FOG_OSCURO 0x202020
 
-//define AMBIENTES esto puede ser un enum
-#define	ASTURIAS 1
-#define	CEMENTERY 2
-#define	OPEN 3
-
 //Distancia vision para fog
 # define CLOSE_DISTANCE 6.0f
 # define MEDIUM_DISTANCE 10.0f
 # define FAR_DISTANCE 14.0f
 
+//ambiances
+#define	ASTURIAS 1
+#define	CEMENTERY 2
+#define	OPEN 3
+#define	MATRIX 4
+
+
+//messages
+#define CONTROLS_INFO "Press \"z\" on your keyboard to show \
+player controls and engine config Keys\n"
 
 
 
@@ -143,25 +155,18 @@ typedef struct	s_texture_img
 
 typedef struct	s_ambiance
 {
-	//AMBIANCE CODE
 	int ambiance;
-	
-	//Fogs
 	int	fog_color_walls;
 	int	fog_color_fc;
 	float	mult_fog_walls;
 	float	mult_fog_ceiling;
 	float	mult_fog_floor;
-	
-	//shader
 	float	k_factor_walls;
 	float	k_factor_ceiling;
 	float	k_factor_floor;
 	float	mult_shader_walls;
 	float	mult_shader_ceiling;
 	float	mult_shader_floor;
-
-	//max_distace_factor walls
 	float	v_max_distance_map;
 	float	vinv_max_diatance;
 }	t_ambiance;
@@ -184,12 +189,12 @@ typedef struct	s_ray
 	float			raydir[2];
 	float			delta[2];
 	float			sidedist[2];
+	float			proyected_wall_dist;
+	float			wall_dist;
 	int				map[2];
+	int				wall_value;
 	unsigned int	step[2];
 	bool			side_hit;
-	float			wall_dist;
-	int				wall_value;
-	float			proyected_wall_dist;
 }	t_ray;
 
 typedef struct	s_mouse
@@ -262,10 +267,9 @@ typedef struct	s_map
 	float	max_distance;
 }	t_map;
 
-
 typedef struct	s_frame_data
 {	
-	//minimap
+	float	*fov_distances;
 	float	mm_height;
 	float	mm_widht;
 	float	mm_scale[2];
@@ -273,32 +277,12 @@ typedef struct	s_frame_data
 	float 	mm_zoom_factor;
 	bool	minimap_onoff;
 	bool	minimap_showrays;
-
-
-	//Raycasting config
 	bool	raycasting_onoff;
-	bool	fish_eye;//
+	bool	fish_eye;
 	bool	euclidean;
-	void	(*draw_walls)(t_mlx *mlx, int column, t_wall *wall, t_ray *ray); //renderizar con ntexturas o sin ellas
-	void	(*floor_celling)(t_mlx *mlx); //renderiza suelo y techo speed vs low speed
-
-	//textures on off
+	bool	boost;
 	bool	textures_onoff;
-	//ambients on off
 	bool	ambiance_onoff;
-	//ESTO SE VA A BORRAR	
-	//fog
-	unsigned int	fog_color_walls;
-	unsigned int	fog_color_floor;
-	unsigned int	fog_color_ceiling;
-
-	//shaders
-	float			wall_shade_k;
-	float			floor_shade_k;
-	float			ceiling_shade_k;
-	unsigned int	(*shade_mode)(unsigned int color, float intensity_factor, float distance_factor);
-	
-	float	*fov_distances; // Array de distancias hasta las paredes quizas osbre
 }	t_frame;
 
 //esta se tendria ue llamar game y tener dentro mlx
@@ -446,8 +430,7 @@ unsigned int	extract_color(t_texture *texture, int tex_x, int tex_y);
 void render_floor_and_ceiling_amb(t_mlx *mlx);
 
 //fog blur shaders
-unsigned int apply_fog_pixel(unsigned int color, unsigned int fog_color, float proportion_dist);
-unsigned int apply_blur(t_mlx *mlx, int column, int row);
+unsigned int apply_fog_pixel(unsigned int col, unsigned int fog_color, float p);
 unsigned int apply_desaturation(unsigned int color, float factor);
 void apply_fog(t_mlx *mlx, unsigned int fog_color, float max_distance);
 
@@ -461,8 +444,11 @@ unsigned int shade_exponential(unsigned int color, float density, float proporti
 void	config_ambiance_cementery(t_ambiance *amb);
 void	config_ambiance_asturias(t_map *map, t_ambiance *amb);
 void	config_ambiance_open(t_map *map, t_ambiance *amb);
+void	config_ambiance_matrix(t_map *map, t_ambiance *amb);
 float	dist_factor_floor(int win_height, int win_y, int horizon, int ambient);
 float	dist_factor_ceiling(int win_y, int horizon, int ambient);
+unsigned int	apllyamb_ceiling(t_ambiance *a, float df, unsigned int rcol);
+unsigned int	apllyamb_floor(t_ambiance *a, float df, unsigned int rcol);
 
 //render minimap 2D
 int		render_frame2D(t_mlx *mlx);

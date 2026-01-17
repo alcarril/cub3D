@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/22 21:34:21 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/16 20:00:04 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/17 04:27:05 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,23 +29,37 @@ void	ft_memset_int(void *s, int c, size_t n);
 	- Finalmente, actualiza la ventana con la nueva imagen renderizada	
 	- Cuenta y muestra los FPS promedio y en tiempo real en el log file
 	- Retorna 0 para indicar que la función se ejecutó correctamente
+	Mejoras de microprocesador:
+	 -Se evitan los punteros a funciones para beneficiarnos de brach predicor e inlinning
+	 - Se limpia la imagen con bezero escribiendo por ints o long o no se limpia haciendo
+	 que los fps se dispare. Mejora de eficionecia bufferizacion menos accesos de memeria
+	 winth * sizeo(int) * filas menos accesos de memria que cunado usas ft_bzero que escribe
+	 de char en char pone romcparacion de ejemplo
 */
 int	game_engine(t_mlx *mlx)
 {
 	if (mlx->player->mouse.onoff == ON)
 		get_mouse_pos_and_move(mlx);
 	move_player(mlx);
-	ft_bzero(mlx->bit_map_address, mlx->win_height * mlx->line_length);
-	mlx->frame->floor_celling(mlx);
+	// ft_bzero(mlx->bit_map_address, mlx->win_height * mlx->line_length);
 	if (mlx->frame->raycasting_onoff == ON)
+	{
+		if (mlx->frame->textures_onoff == ON && mlx->frame->ambiance_onoff == ON)
+			render_floor_and_ceiling_amb(mlx);
+		else if (mlx->frame->boost == ON)
+			render_floor_and_ceiling_speed(mlx);
+		else
+			render_floor_and_ceiling(mlx);
 		throw_rays(mlx);
-	if (mlx->frame->minimap_onoff == true)
+	}
+	if (mlx->frame->minimap_onoff == ON)
 		render_frame2D(mlx);
 	mlx_put_image_to_window(mlx->mlx_var, mlx->mlx_window, mlx->mlx_img, 0, 0);
 	fps_counter_average(mlx);
 	fps_counter_realtime(mlx);
 	return (0);
 }
+
 
 /*
 	Función para biferiar un pixel en la imagen
@@ -56,18 +70,13 @@ int	game_engine(t_mlx *mlx)
 	Mejora de microprocesador:
 	- Se sustituye mlx->bits_per_pixel / 8 por mlx->bits_per_pixel >> 3 para evitar
 	  la división y mejorar el rendimiento
+	- Como es una funcion que se llama por cada pixe (600 x 600 = 3600000) llamadas por
+	  frame, hemos optimizado el uso de las variabels locales para que sea estaticas
+	  y solo se tenga que desrefrenciar la memria una vez el la primera llamada, asi los
+	  datos pueden ser colocados por el microporcesador en registrso que on mucho mas rapidos
+	- Ademas hemos quitadp las condicion de chkeo de pixeles aunque el brabch predictor
+	lo hibiese arreglado a la larga
 */
-void	buffering_pixel1(int x, int y, t_mlx *mlx, int color)
-{
-	unsigned int	offset;
-
-	if (x < 0 || x > mlx->win_width || y < 0 || y > mlx->win_height)
-		return ;
-	offset = (y * mlx->line_length) + (x * (mlx->bits_per_pixel >> 3));
-	*(unsigned int *)(mlx->bit_map_address + offset) = color;
-}
-
-//ESTA MEJORA MUCHO EL RENDIMIENTO POR LAS ESTATICAS MENOS ACCESOS DE MEMRIA
 void buffering_pixel(int x, int y, t_mlx *mlx, int color)
 {
 	unsigned int offset;
@@ -81,14 +90,7 @@ void buffering_pixel(int x, int y, t_mlx *mlx, int color)
 		line_length = mlx->line_length;
 		bpp = mlx->bits_per_pixel >> 3;
 	}
-	// Verifica si las coordenadas están dentro de los límites de la ventana
-	// if (x < 0 || x >= mlx->win_width || y < 0 || y >= mlx->win_height)
-	// 	return;
-
-	// Calcula el offset en el buffer de la imagen
 	offset = (y * line_length) + (x * bpp);
-
-	// Asigna el color al píxel
 	*(unsigned int *)(bitmap_address + offset) = color;
 }
 
@@ -105,8 +107,15 @@ void buffering_pixel(int x, int y, t_mlx *mlx, int color)
 	Mejora de microprocesador:
 	- Se reduce la sobrecarga de llamadas a funciones al pintar líneas completas
 	  en lugar de píxeles
-	- Se sutituye mlx->bits_per_pixel / 8 por mlx->bits_per_pixel >> 3 para evitar
+		Mejora de microprocesador:
+	- Se sustituye mlx->bits_per_pixel / 8 por mlx->bits_per_pixel >> 3 para evitar
 	  la división y mejorar el rendimiento
+	- Como es una funcion que se llama por cada pixe (600 x 600 = 3600000) llamadas por
+	  frame, hemos optimizado el uso de las variabels locales para que sea estaticas
+	  y solo se tenga que desrefrenciar la memria una vez el la primera llamada, asi los
+	  datos pueden ser colocados por el microporcesador en registrso que on mucho mas rapidos
+	- Ademas hemos quitadp las condicion de chkeo de pixeles aunque el brabch predictor
+	lo hibiese arreglado a la larga
 */
 void	buffering_line(int y, int color, t_mlx *mlx, int width)
 {
@@ -115,8 +124,8 @@ void	buffering_line(int y, int color, t_mlx *mlx, int width)
 	static int line_length; 
 	static int bpp;
 
-	// if (y < 0 || y >= mlx->win_height)
-	// 	return;
+	if (y < 0 || y >= mlx->win_height)
+		return;
 	if (bpp == 0)
 	{
 		bitmap_address = mlx->bit_map_address;
@@ -152,7 +161,7 @@ void	fps_counter_average(t_mlx *mlx)
 	frames++;
 	now_timestamp = (long long)time.tv_sec * 1000 + (time.tv_usec / 1000);
 	delta_time = now_timestamp - init_timestamp;
-	if (delta_time >= 1000 && (frames % 140) == 0)
+	if (delta_time >= 1000 && (frames % 200) == 0)
 	{
 		write(mlx->log_fd, "[Average] FPS: ", 15);
 		ft_putnbr_fd((int)(frames * 1000 / delta_time), mlx->log_fd);
