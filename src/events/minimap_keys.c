@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 21:16:10 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/13 16:07:32 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/20 23:28:09 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,11 @@ void	toggle_rays(t_mlx *mlx)
 */
 void	minimap_zoom(t_mlx *mlx, bool flag)
 {
+	if (mlx->frame->minimap_onoff == false)
+	{
+		printf("WARNING: Minimap is off, cannot zoom\n");
+		return ;
+	}
 	if (flag == true)
 	{
 		mlx->frame->mm_zoom_factor += 0.25f;

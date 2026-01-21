@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/15 15:20:17 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/20 08:28:08 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/20 23:53:50 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,13 @@ void	select_ambiance(t_mlx *mlx, int ambiance)
 		printf("CEMETERY AMBIANCE SELECTED: ");
 		printf("Recomendeded for closed spaces or Medieval map\n");
 	}
-	else if (ambiance == OPEN)
+	else
+		select_ambiance1(mlx, ambiance);
+}
+
+void	select_ambiance1(t_mlx *mlx, int ambiance)
+{
+	if (ambiance == OPEN)
 	{
 		config_ambiance_open(mlx->map, &(mlx->amb));
 		printf("OPEN AMBIANCE SELECTED: ");
@@ -78,4 +84,3 @@ void	select_ambiance(t_mlx *mlx, int ambiance)
 		printf("Recomendeded for digital environments\n");
 	}
 }
-

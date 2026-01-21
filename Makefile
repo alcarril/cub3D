@@ -28,20 +28,28 @@ MKDIR = mkdir -p
 
 SRC_FILES = mlx_init_close/init_mlx_game.c \
 			mlx_init_close/setup_game.c \
+			mlx_init_close/setup_game2.c \
 			mlx_init_close/init_setup_utils.c \
 			mlx_init_close/close_mlx_game.c \
 			mlx_init_close/colors.c \
 			events/keys.c \
 			events/graphic_engine_keys.c \
 			events/phisics_keys.c \
+			events/gravity_keys.c \
 			events/ambiance_keys.c \
 			events/minimap_keys.c \
 			events/player_keys.c \
 			events/player_keys2.c \
+			events/player_keys3.c \
 			events/mouse_keys_buttons.c \
 			moves/move_player.c \
+			moves/vectorization_moves.c \
+			moves/difspeed_vecmove_phisics.c \
+			moves/speed_aceleration.c \
+			moves/axisz_phisics.c \
+			moves/decelerate_air.c \
+			moves/phisics_utils.c \
 			moves/mouse.c \
-			moves/phisics.c \
 			render/render.c \
 			render/raycasting.c \
 			render/dda_algorith.c \

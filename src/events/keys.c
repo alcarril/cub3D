@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/22 22:31:15 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/20 06:07:31 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/20 23:22:28 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,8 @@ int	key_release(int keysym, t_mlx *mlx)
 		mlx->player->keys.look_down = false;
 	if (keysym == XK_Shift_L && mlx->player->keys.sprint == true)
 		player_sprint_keyrelease(mlx);
+	if (keysym == XK_space && mlx->player->is_jumping == true)
+		player_space_keyrelease(mlx);
 	return (0);
 }
 
@@ -100,7 +102,10 @@ bool	graphics_engine_keypress(t_mlx *mlx, int keysym)
 */
 void	print_controls(void)
 {
-	printf("Controls:\n");
+	printf("Controls and configs:\n");
+	printf("\n[General]\n");
+	printf("ESC: Exit Game\n");
+	printf("Z: Print Controls\n");
 	printf("\n[Graphics Engine Settings]\n");
 	printf("F: Toggle Fish Eye Effect\n");
 	printf("O: Toggle Raycasting On/Off\n");
@@ -110,18 +115,44 @@ void	print_controls(void)
 	printf("\n[Screen Display Settings]\n");
 	printf("M: Toggle Minimap\n");
 	printf("R: Toggle Rays on Minimap\n");
-	printf("+/-: Minimap zoom in/out\n");
-	printf("\n[Player Settings]\n");
+	printf("+/-: Minimap Zoom In/Out\n");
+	printf("\n[Player Movement]\n");
 	printf("WASD: Move Up, Down, Left, Right\n");
 	printf("Left Arrow: Rotate Counterclockwise\n");
 	printf("Right Arrow: Rotate Clockwise\n");
+	printf("Up Arrow: Look Up\n");
+	printf("Down Arrow: Look Down\n");
+	printf("\n[Player Movement EXTRA]\n");
+	printf("Up Arrow: Look Up\n");
+	printf("Down Arrow: Look Down\n");
 	printf("Left Shift: Sprint\n");
-	printf("V: Change Field of View (FOV)\n");
+	print_controls2();
+}
+
+void	print_controls2(void)
+{
+	printf("Space: Jump\n");
+	printf("Left Control: Crouch\n");
+	printf("Caps Lock: Ground Pound\n");
+	printf("Q: Toggle Fly Mode\n");
+	printf("Up Arrow: Look Up\n");
+	printf("Down Arrow: Look Down\n");
 	printf("\n[Mouse Settings]\n");
 	printf("J: Toggle Mouse On/Off\n");
 	printf("Mouse Scroll Up: Increase Mouse Sensitivity\n");
 	printf("Mouse Scroll Down: Decrease Mouse Sensitivity\n");
-	printf("\n[General]\n");
-	printf("ESC: Exit Game\n");
-	printf("Z: Print Controls\n");
+	printf("\n[Physics Settings]\n");
+	printf("P: Toggle Physics On/Off\n");
+	printf("K: Toggle DukeDoom Physics Mode\n");
+	printf("6: Select Earth Gravity Mode\n");
+	printf("7: Select Moon Gravity Mode\n");
+	printf("8: Select Hulkpiter Gravity Mode\n");
+	printf("9: Select Spectro Gravity Mode\n");
+	printf("0: Select Jetpack Gravity Mode\n");
+	printf("\n[Ambiance Settings]\n");
+	printf("U: Toggle Ambiance On/Off\n");
+	printf("1: Select Asturias Ambiance\n");
+	printf("2: Select Cemetery Ambiance\n");
+	printf("3: Select Open Ambiance\n");
+	printf("4: Select Matrix Ambiance\n");
 }

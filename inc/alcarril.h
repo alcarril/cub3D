@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 03:14:57 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/20 08:38:27 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/21 18:56:32 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,14 +67,27 @@
 //traccion factor player
 # define TRACCION_K 1.0f
 
+//factor de relacion aceleracion jugador eje z respecto gravedad
+# define ACCELERATION_K_EARTH 2.0f
+# define ACCELERATION_K_MOON 3.0f
+# define ACCELERATION_K_HULKPITER 2.0f
+# define ACCELERATION_K_SPECTRO 1.5f
+# define ACCELERATION_K_JETPACK 15.0f
 
-# define JUMP_FORCE_MS 0.5f
+//map axis z for camz
+# define MIDDLE_Z 0.0f
+# define MAP_MAX_Z 1.0f
+# define FLOOR_Z -1.0f
 
 //map phisics
 # define WALL_FRICTION 0.5f
 # define FLOOR_FRICTION_MS 0.002f // o 0.8
-# define AIR_FRICTION_MS 0.0000090f
-# define GRAVITY_MS 0.0015f
+# define AIR_FRICTION_MS 0.001f//mas pequela que air frintion segun varie la cueva de moviento en el aire varia
+# define GRAVITY_EARTH 30.0f
+# define GRAVITY_MOON 5.0f
+# define GRAVITY_HULKPITER 60.0f
+# define GRAVITY_SPECTRO 5.0f
+# define GRAVITY_JETPACK 5.0f
 
 //pitch player
 # define PITCH_FACTOR 0.02f//
@@ -299,6 +312,7 @@ typedef struct	s_player_data
 	float	speed;
 	float	r_speed;
 	float	diff[2];
+	float	v_move[2];
 	float	volume;
 	float	fov;
 	float	rad_fov;
@@ -306,10 +320,20 @@ typedef struct	s_player_data
 	float	pitch_factor;
 	float	pitch_pix;
 	int		max_pitch_pix;
+	
 	//phisics
-	float	camz;
-	float	vertical_offset;
-	float	jump_force;
+	float	camz; //posicion en z de la camara del jugaro (ojos)
+	float	vertical_offset; //offset vertical de la camara para saltos y caidas
+	float	aceleration_z;
+	float	aceleration_zcp;
+	float 	speed_z;
+	bool	is_sprinting;
+	bool	is_jumping;
+	bool	is_onair;
+	bool	is_flying;
+	bool	is_hided;
+	bool	is_groundpound;
+	bool	is_dragging;
 	
 	float	aceleration[3];
 	float	traccion_k;
@@ -317,6 +341,8 @@ typedef struct	s_player_data
 	float	max_speed_dt;
 	float	speed_a[2];
 	float	max_speed_a[2];
+
+	
 	int		min_dt[3];
 	int		max_dt;
 
@@ -402,12 +428,15 @@ void			start_hooks_and_game(t_mlx *mlx);
 
 //setup game
 bool			setup_game(t_mlx *mlx, t_player *player, t_map *map, t_frame *frame);
-void			setup_player_mouse(t_mlx *mlx);
+void			setup_player_mouse(t_mlx *mlx);//
 void			init_player_orientation_pos(t_player *pl, char cardinal, int pos[2]);
+void			init_player_phisics(t_player *pl, t_phisics *ph);
+void			init_player_mouse(t_player *pl, t_mlx *mlx);
 bool			init_frame_data( t_mlx *mlx);
 void			get_minimapscale(t_mlx *mlx, float *scale);
 int				create_fps_logfile(void);
 void			setup_default_ambiance(t_map *map, t_ambiance *amb);
+void			setup_default_phisics(t_phisics *phisics);
 
 //Close and free
 void			destroy_mlx_componets(int (*f)(), int (*g)(), int (*t)(), t_mlx *mlx);
@@ -425,9 +454,11 @@ int				rgb_to_hex(int r, int g, int b);
 int				key_press(int keysym, t_mlx *mlx);
 int				key_release(int keysym, t_mlx *mlx);
 void			print_controls(void);
+void			print_controls2(void);
 bool			player_keypress(t_mlx *mlx, int keysym);
 bool			player_keypres2(t_mlx *mlx, int keysym);
 void			change_fov(t_mlx *mlx);
+void			change_player_volume(t_mlx *mlx, bool flag);
 void			player_sprint_keypress(t_mlx *mlx);
 void			player_sprint_keyrelease(t_mlx *mlx);
 bool			graphics_engine_keypress(t_mlx *mlx, int keysym);
@@ -438,43 +469,62 @@ void			toggle_fish_eye(t_mlx *mlx);
 void			toogle_dist_calc(t_mlx *mlx);
 bool			ambiance_keypress(t_mlx *mlx, int keysym);
 void			select_ambiance(t_mlx *mlx, int ambiance);
+void			select_ambiance1(t_mlx *mlx, int ambiance);
 void			toogle_ambiance(t_mlx *mlx);
 void			toggle_minimap(t_mlx *mlx);
 void			toggle_rays(t_mlx *mlx);
 bool			phisics_engine_keypress(t_mlx *mlx, int keysym);
 void			toggle_phisics_mode(t_mlx *mlx);
 void			toggle_dukedoom_mode(t_mlx *mlx);
+void			player_space_keypress(t_mlx *mlx);
+void			player_space_keyrelease(t_mlx *mlx);
+void			player_control_keypress(t_mlx *mlx);
+void			player_blockmayus_keypress(t_mlx *mlx);
+void			player_q_keypress(t_mlx *mlx);
+bool			select_gravity_modes(t_mlx *mlx, int keysym);
+void			selectearth_mode(t_phisics *phisics, t_player *pl, t_mlx* mlx);
+void			selectmoon_mode(t_phisics *phisics, t_player *pl, t_mlx *mlx);
+void			selecthulker_mode(t_phisics *phisics, t_player *pl, t_mlx *mlx);
+void			selectspectr_mode(t_phisics *phisics, t_player *pl, t_mlx *mlx);
+void			selectjetpack_mode(t_phisics *phisics, t_player *pl, t_mlx *mlx);
 void			minimap_zoom(t_mlx *mlx, bool flag);
 int				mouse_init_manager(t_mlx *mlx);
 void			toogle_mouse(t_mlx *mlx);
 int				mouse_button_manager(int mouse_button, int x, int y, t_mlx *mlx);
 
-//hooks and events phisics
 
 
 //player move
-bool			is_collision(float x, float y, t_mlx *mlx, float e);
-void			rotate_player(t_player *player, float delta_grades);
-void			vectorization(t_player *pl, long long dt, float speed);
-void			move_player(t_mlx *mlx);
-void			move_player1(t_mlx *mlx);
-void			axis_y_pitch(t_player *player);
-void			speed_and_vectorization(t_mlx *mlx);
+bool	is_collision(float x, float y, t_mlx *mlx, float e);
+void	rotate_player(t_player *player, float delta_grades);
+void	vectorization(t_player *pl, long long dt, float speed, float angle);
+void	move_player(t_mlx *mlx);
+void	axis_y_pitch(t_player *player);
+void	jump_speed_vecmove(t_mlx *mlx);
 
 //move player phisics
-void	vectorization_phisics(t_mlx *mlx, long long delta_time);
-void	acelerate_player(t_mlx *mlx, unsigned int vec_index, long long dt, bool *is_moving);
-void	decelerate_player(t_mlx *mlx, long long dt, bool is_moving);
-void	acelerate_dukedoom(t_mlx *mlx, unsigned int vec_index, long long dt, bool *is_moving);
-void	decelerate_dukedoom(t_mlx *mlx, long long dt, bool is_moving);
-void	vectorization_dukedoom(t_player *player, long long dt);
+void	difspeed_and_vecmove(t_mlx *mlx, long long delta_time);
+void	difvspeed_and_vecmove_nukedoom(t_mlx *mlx, long long delta_time);
+void	acelerate_player(t_mlx *mlx, unsigned int vi, long long dt, bool *mo);
+void	decelerate_player(t_mlx *mlx, long long dt, bool mo);
+void	acelerate_dukedoom(t_mlx *mlx, unsigned int vi, long long dt, bool *mo);
+void	decelerate_dukedoom(t_mlx *mlx, long long dt, bool mo);
+void	vectorization_dukedoom(t_player *pl, long long dt, float angle);
+
+void	decelerate_player_air(t_mlx *mlx, long long dt);
+void	decelerate_dukedoom_air(t_mlx *mlx, long long dt);
+void	airborne_vectorization(t_player *pl, long long dt, bool is_dukedoom);
+void	jump(t_mlx *mlx, long long dt_ms);
+void	check_altitude(t_player	*pl);
+
+void	normalize_vector(float *v_speed, float *max_speed);
 
 //mouse move
-void			get_mouse_pos_and_move(t_mlx *mlx);
-bool			is_mouse_in_window(t_mlx *mlx, int mouse_x, int mouse_y);
-bool			clamp_mouse_deltax(int *pix_dif);
-bool			clamp_mouse_deltay(int *pix_dif);
-void			reset_mouse_position(t_mlx *mlx, bool *is_move);
+void	get_mouse_pos_and_move(t_mlx *mlx);
+bool	is_mouse_in_window(t_mlx *mlx, int mouse_x, int mouse_y);
+bool	clamp_mouse_deltax(int *pix_dif);
+bool	clamp_mouse_deltay(int *pix_dif);
+void	reset_mouse_position(t_mlx *mlx, bool *is_move);
 
 //render
 int				game_engine(t_mlx *mlx);
@@ -492,8 +542,6 @@ void			throw_rays(t_mlx *mlx);
 void			cast_ray(t_mlx *mlx, unsigned int n_ray, float ray_angle);
 void			set_ray(t_mlx *mlx, t_ray *ray, float ray_angle);
 void			draw_wall_column(t_mlx *mlx, int column, t_wall *wall, t_ray *ray);
-
-void			scale_wall(t_wall *wall, float perpendicular_distance, int win_height, int pitch);
 void			scale_wall_phisics(t_wall *wall, float perpendicular_distance, t_mlx *mlx);
 
 //dda algorithm

@@ -6,58 +6,11 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/06 12:30:42 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/19 19:04:37 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/21 17:44:36 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cube3D.h"
-
-/*
-	Calculo del movimiento del jugador en cada eje del plano. Descomponemos el 
-	moviento y lo bufferizamos dentro del array diferencial. Para ellos usamos 
-	los principios de trigonometria de la circunferencia gonimetrica, vectorizacion y el
-	diferencial de un punto en un espacio euclideo. Segun el angulo de rotacion 
-	del jugador respeto a los ejes del plano y la direcion relativa en la que queramos
-	movernos el difrecial se calcula de un maera u otra
-	- Cosas a tener en cuenta:
-		- En la ventana el NORTE (90 grados) y el SUR (270) estan invertidos.
-		- Hay un vectorixacion diferente para cada uno de los movientos dentro
-		de la circunferencia (cada uno de los cuadrantes del plano)
-		- En ver de sumar 90 grados para los movimientos laterales se podria usar
-		la relacion de signos de la matriz de rotacion
-	//strafing movimiento latera
-	
-	Optimizacione sde procesasdor:
-	- Elimino funoperacinoes aritemetizza de division porque consument muxhocilos de CPU
-		
-*/
-void	vectorization(t_player *pl, long long dt, float speed)
-{
-	float	angle_rad;
-	
-	ft_bzero(pl->diff, sizeof(pl->diff));
-	angle_rad = pl->rad_angle;
-	if (pl->keys.move_up)
-	{
-		pl->diff[X] += cos(angle_rad) * speed * dt;
-		pl->diff[Y] -= sin(angle_rad) * speed * dt;
-	}
-	if (pl->keys.move_down)
-	{
-		pl->diff[X] -= cos(angle_rad) * speed * dt;
-		pl->diff[Y] += sin(angle_rad) * speed * dt;
-	}
-	if (pl->keys.move_left)
-	{
-		pl->diff[X] += cos(angle_rad + (PI * 0.5f)) * speed * dt;
-		pl->diff[Y] += sin(angle_rad - (PI * 0.5f)) * speed * dt;
-	}
-	if (pl->keys.move_right)
-	{
-		pl->diff[X] += cos(angle_rad - (PI * 0.5f)) * speed * dt;
-		pl->diff[Y] += sin(angle_rad + (PI * 0.5f)) * speed * dt;
-	}
-}
 
 /*
 	Con esta funcion rotamos la direccion hacia la que mira el jugador. Dado que los
@@ -88,6 +41,64 @@ void	rotate_player(t_player *player, float delta_grades)
 	player->rad_angle = player->angle * (PI / 180.0f);
 }
 
+
+/*
+	Falta comnetario
+*/
+void	axis_y_pitch(t_player *player)
+{
+	t_player	*pl;
+	
+	pl = player;
+	if (pl->keys.look_up == true)
+		pl->pitch_pix += pl->pitch_factor * pl->max_pitch_pix;
+	if (pl->keys.look_down == true)
+		pl->pitch_pix -= pl->pitch_factor * pl->max_pitch_pix;
+	if (pl->pitch_pix > pl->max_pitch_pix)
+		pl->pitch_pix = pl->max_pitch_pix;
+	if (pl->pitch_pix < -pl->max_pitch_pix)
+		pl->pitch_pix = -pl->max_pitch_pix;
+	return ;
+}
+
+/*
+	Funcion para calcular la componetes del vector velocidad del jugador segun en el la configuracion
+	de fisicas del motor grafico este activada o no o qen que modo lo este. 
+	MOdo normal: Se calcula el vector de velocidad segun una velocidad fija y un delta time
+	fijo (estilo retro para videojuegos clasicos) si tasa fps varia velocidad varia no portable-
+	Modo fisicas: Se calcula el vector de velocidad segun una velocidad diferencial y un delta time
+	Esto incluye aceleracion e inercias y permite que el juego tenga un moviento determinista
+	independientemente de la tasa de fps. (estilo motores modernos) y permite meter inercias
+	tipos de suelo, distintas aceleraciones etc..
+	Modo doom/quake: Se calcula el vector de velocidad segun una velocidad diferencial en cada uno de los ejes
+	y un delta time. Esto permite simluar todo lo anterior y ademas permite meter aceleraciones diferenciales
+	que puedan verse afectadas de manera realista por efectos externos. Tambien solucionamos el strafe
+*/
+void	jump_speed_vecmove(t_mlx *mlx)
+{
+	t_player	*pl;
+	long long	delta_time;
+
+	pl = mlx->player;
+	if (mlx->frame->phisics_onoff == ON)
+	{
+		delta_time = mlx->del_timestamp;
+		if (delta_time > MAX_DT_FRAME)
+			delta_time = MAX_DT_FRAME;
+		jump(mlx, delta_time);
+		if (mlx->frame->dukedoom_mode == OFF)
+			difspeed_and_vecmove(mlx, delta_time);
+		else
+			difvspeed_and_vecmove_nukedoom(mlx, delta_time);
+	}
+	else
+	{
+		delta_time = 1;
+		vectorization(mlx->player, delta_time, pl->speed, pl->rad_angle);
+	}
+}
+
+
 /*
 	Función uxiliar para verificar colisiones en un área alrededor del jugador
 	cada un de las comporbaciones de WALL es para cada uno de las 4 direcciones de 
@@ -110,25 +121,6 @@ bool	is_collision(float x, float y, t_mlx *mlx, float e)
 }
 
 /*
-	Falta comnetario
-*/
-void	axis_y_pitch(t_player *player)
-{
-	t_player	*pl;
-	
-	pl = player;
-	if (pl->keys.look_up == true)
-		pl->pitch_pix += pl->pitch_factor * pl->max_pitch_pix;
-	if (pl->keys.look_down == true)
-		pl->pitch_pix -= pl->pitch_factor * pl->max_pitch_pix;
-	if (pl->pitch_pix > pl->max_pitch_pix)
-		pl->pitch_pix = pl->max_pitch_pix;
-	if (pl->pitch_pix < -pl->max_pitch_pix)
-		pl->pitch_pix = -pl->max_pitch_pix;
-	return ;
-}
-
-/*
 	Con esta funcion actualizamos la posiscion del juahador dentro del plano
 	segun el vector de movimitento en el que se mueva. Antes de moverlo calculamos
 	la nueva posicion en cada eje (movimeinto descompuesto) asi podemos calcular si hay
@@ -146,35 +138,7 @@ void	move_player(t_mlx *mlx)
 	player = mlx->player;
 	rotate_player(player, 1.1f);
 	axis_y_pitch(player);
-	vectorization(player, 1, mlx->player->speed);
-	new_pos[X] = player->pos_x + player->diff[X];
-	new_pos[Y] = player->pos_y + player->diff[Y];
-	colision[X] = is_collision(new_pos[X], player->pos_y, mlx, player->volume);
-	colision[Y] = is_collision(player->pos_x, new_pos[Y], mlx, player->volume);
-	if (!colision[X] && !colision[Y])
-	{
-		player->pos_x = new_pos[X];
-		player->pos_y = new_pos[Y];
-	}
-	else
-	{
-		if (!colision[X])
-			player->pos_x += player->diff[X] * WALL_FRICTION;
-		if (!colision[Y])
-			player->pos_y += player->diff[Y] * WALL_FRICTION;
-	}
-}
-
-void	move_player1(t_mlx *mlx)
-{
-	t_player	*player;
-	float		new_pos[2];
-	bool		colision[2];
-	
-	player = mlx->player;
-	rotate_player(player, 1.1f);
-	axis_y_pitch(player);
-	speed_and_vectorization(mlx);
+	jump_speed_vecmove(mlx);
 	new_pos[X] = player->pos_x + player->diff[X];
 	new_pos[Y] = player->pos_y + player->diff[Y];
 	colision[X] = is_collision(new_pos[X], player->pos_y, mlx, player->volume);

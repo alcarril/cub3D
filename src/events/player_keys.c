@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 13:06:24 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/20 05:54:48 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/20 23:27:14 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,10 +54,19 @@ bool	player_keypress(t_mlx *mlx, int keysym)
 bool	player_keypres2(t_mlx *mlx, int keysym)
 {
 	if (keysym == XK_Shift_L)
-	{
-		if (mlx->player->keys.sprint == OFF)
-			player_sprint_keypress(mlx);
-	}
+		return (player_sprint_keypress(mlx), true);
+	if (keysym == XK_Control_L)
+		return (player_control_keypress(mlx), true);
+	if (keysym == XK_Caps_Lock)
+		return (player_blockmayus_keypress(mlx), true);
+	if (keysym == XK_q)
+		return (player_q_keypress(mlx), true);
+	if (keysym == XK_space)
+		player_space_keypress(mlx);
+	else if (keysym == XK_comma)
+		change_player_volume(mlx, true);
+	else if (keysym == XK_period)
+		change_player_volume(mlx, false);
 	else if (keysym == XK_v)
 		change_fov(mlx);
 	else if (keysym == XK_j)
@@ -110,6 +119,3 @@ void	change_player_volume(t_mlx *mlx, bool flag)
 		printf("Volume: %.1f\n", mlx->player->volume);
 	}
 }
-
-
-

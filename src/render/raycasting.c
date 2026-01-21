@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 19:04:35 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/17 19:11:53 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/21 18:55:51 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,8 +66,8 @@ void	cast_ray(t_mlx *mlx, unsigned int n_ray, float ray_angle)
 	set_ray(mlx, &ray, ray_angle);
 	ray.proyected_wall_dist = get_distance_to_wall(mlx, &ray, ray_angle);
 	mlx->frame->fov_distances[mlx->win_width - n_ray - 1] = ray.wall_dist;
-	scale_wall(&wall, ray.proyected_wall_dist, mlx->win_height, mlx->player->pitch_pix);
-	// scale_wall_phisics(&wall, ray.proyected_wall_dist, mlx);
+	// scale_wall(&wall, ray.proyected_wall_dist, mlx->win_height, mlx->player->pitch_pix);
+	scale_wall_phisics(&wall, ray.proyected_wall_dist, mlx);
 	if (mlx->frame->textures_onoff == ON)
 		draw_wall_column_tex(mlx, n_ray, &wall, &ray);
 	else
@@ -110,23 +110,6 @@ void	set_ray(t_mlx *mlx, t_ray *ray, float ray_angle)
 	  respecto al minimapa, pero es mas facil de entender asi
 	- 
 */
-void scale_wall(t_wall *wall, float perpendicular_distance, int win_height, int pitch)
-{
-	if (perpendicular_distance <= 0)
-		wall->wall_height = win_height;
-	else
-		wall->wall_height = (int)(win_height / perpendicular_distance);
-	wall->wall_start = (win_height >> 1) - ((wall->wall_height >> 1)) + pitch;
-	//mirar si esto hace que vaya mas lento apriori no afecta al rendimiento
-	wall->wall_end = (win_height >> 1) + (wall->wall_height >> 1) + pitch;//tocando este valor elpersoje se puede hacer mas alto o mas pequeño
-	// wall->wall_end = (win_height >> 1) + (wall->wall_height * 2) + pitch;//tocando este valor elpersoje se puede hacer mas alto o mas pequeño
-	if (wall->wall_start < 0)
-		wall->wall_start = 0;
-	if (wall->wall_end >= win_height)
-		wall->wall_end = win_height - 1;
-}
-
-
 void scale_wall_phisics(t_wall *wall, float perpendicular_distance, t_mlx *mlx)
 {
 	static int	win_height;

@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 11:42:33 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/20 08:34:39 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/21 18:37:11 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,14 +69,6 @@ bool	setup_game(t_mlx *mlx, t_player *player, t_map *map, t_frame *frame)
 	  de la camara del jugador (variable)
 	- El max pitch que es el numero maximo de pixeles que puede trasladarse el mapa para simular la inclinaicon
 	Inicializar los boleanos para el moviento del jugador con bezero (ver strcut player keys)
-	Inicializar los valores del mouse:
-	- La posicion x e y del mouse en la ventana (pixeles en la matrix depixeles)
-	- El eje de la ventana en x e y
-	- El pitch factor del mouse se multiplica por el diferecial de la posion del mouse para saber el pitch
-	  de inclinacion del jugador cunado se usa el mouse (variable) sensibilidad el mouse en el eje y
-	  (pitch_pix / pixely)
-	- La sensibilidad por moviento de pixeles del mouse en el eje x para rotar al jugador (grados / pixelx)
-	- Mouse on off para apagar y encender el mouse
 */
 void setup_player_mouse(t_mlx *mlx)
 {
@@ -90,47 +82,20 @@ void setup_player_mouse(t_mlx *mlx)
 	middle[Y] = 1; //esto se va a borra
 	
 	pl = mlx->player;
-	init_player_orientation_pos(mlx->player, 'N', middle);
+	init_player_orientation_pos(mlx->player, 'N', middle);//esta quizas se quita
 	pl->speed = SPEED_DIGITAL;
 	pl->fov = 60.0f;
 	pl->rad_fov = pl->fov * (PI / 180.0f);
 	pl->fov_half = pl->rad_fov / 2.0f;
 	ft_bzero((void *)(pl->diff), sizeof(pl->diff));
+	ft_bzero((void *)(pl->v_move), sizeof(pl->v_move));
 	pl->volume = EPSILON;
 	pl->pitch_pix = 0;
 	pl->pitch_factor = PITCH_FACTOR;
 	pl->max_pitch_pix = mlx->win_height * MAX_PIXELS_PITCH;
-	//phisics
-	pl->camz = 1.0f;//
-	pl->vertical_offset = 0.0f;
-	
-	pl->aceleration[FRONT] = ACCELERATION_FRONT_FACTOR * mlx->phisics.floor_friction;
-	pl->aceleration[BACK] = ACCELERATION_BACK_FACTOR * mlx->phisics.floor_friction;
-	pl->aceleration[SIDES] = ACCELERATION_SIDES_FACTOR * mlx->phisics.floor_friction;
-	
-	pl->traccion_k = TRACCION_K;
-	pl->speed_dt = 0.0f;
-	pl->max_speed_dt = MAX_PLAYER_SPEED;
-	pl->speed_a[X] = 0.0f;
-	pl->speed_a[Y] = 0.0f;
-	pl->max_speed_a[X] = MAX_PLAYER_SPEED;
-	pl->max_speed_a[Y] = MAX_PLAYER_SPEED;
-
-	pl->min_dt[FRONT] = SPEEDMIN_MS / pl->aceleration[FRONT];
-	pl->min_dt[BACK] = SPEEDMIN_MS / pl->aceleration[BACK];
-	pl->min_dt[SIDES] = SPEEDMIN_MS / pl->aceleration[SIDES];
-	
-	//keys
+	init_player_mouse(pl, mlx);
+	init_player_phisics(pl, &(mlx->phisics));
 	ft_bzero((void *)&(pl->keys), sizeof(pl->keys));
-	//map
-	pl->mouse.pos_x = mlx->win_width / 2;
-	pl->mouse.pos_y = mlx->win_height / 2;
-	pl->mouse.axis_x = mlx->win_width / 2;
-	pl->mouse.axis_y = mlx->win_height / 2;
-	pl->mouse.sens_x = MOUSE_INIT_SENSX;
-	pl->mouse.pitch_factor = MOUSE_PITCH_FACTOR;
-	pl->mouse.onoff = OFF;
-	pl->mouse.out_and_on = true;
 }
 
 /*
@@ -165,6 +130,10 @@ void	init_player_orientation_pos(t_player *pl, char cardinal, int pos[2])
 	- Inicializamos el efecto euclidean como apagado
 	- Inicializamos el pintado de muros texturizado o no
 	- Inicilaizamos el modo de renderizado el suelo y techo
+	- Inicializamos el delta de angulo entre rayos en funcion del fov del jugador y el ancho de la ventana:
+	  delta_rays = fov_rad / win_width (nos sorve para no tener que calcular el angulo de cada rayo en cada frame)
+	- Inicializamos el modo de fisica como apagado
+	- Inicializamos el modo dukedoom como apagado
 	- Inicilaiciomos el array de distancias de cada rayo a la pared
 */
 bool	init_frame_data( t_mlx *mlx)
@@ -222,33 +191,3 @@ int	create_fps_logfile(void)
 		return (log_fd);
 }
 
-/*
-	Cinfiguracion por defecto edel ambiente por is lo activamos
-*/
-void	setup_default_ambiance(t_map *map, t_ambiance *amb)
-{
-	amb->fog_color_walls = FOG_MEDIO_OSCURO;
-	amb->fog_color_fc = FOG_MEDIO_CLARO;
-	amb->v_max_distance_map = map->max_distance * 0.9f;
-	amb->vinv_max_diatance = 1.0f / amb->v_max_distance_map;
-	amb->mult_fog_walls = 0.2f;
-	amb->mult_fog_floor = 0.3f;
-	amb->mult_fog_ceiling = 0.2f;
-	
-	amb->k_factor_walls = 8.0f;
-	amb->k_factor_floor = 1.0f;
-	amb->k_factor_ceiling = 4.0f;
-	amb->mult_shader_walls = 1.0f;
-	amb->mult_shader_floor = 0.7f;
-	amb->mult_shader_ceiling = 0.5f;
-	amb->ambiance = OPEN;
-}
-
-void	setup_default_phisics(t_phisics *phisics)
-{
-	phisics->gravity = GRAVITY_MS;
-	phisics->air_friction = AIR_FRICTION_MS;
-	phisics->floor_friction = FLOOR_FRICTION_MS;
-	printf("Phisics initialized: gravity=%f, air_friction=%f, floor_friction=%f\n",
-		phisics->gravity, phisics->air_friction, phisics->floor_friction);
-}
