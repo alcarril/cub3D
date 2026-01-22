@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 03:14:57 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/22 03:24:39 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/22 19:59:37 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -404,6 +404,7 @@ typedef struct	s_mlx_api_components
 	long long	now_timestamp;
 	long long	bef_timestamp;
 	long long	del_timestamp;
+	bool		has_been_mouse_in_window;
 	
 	//game components
 	t_player	*player;
@@ -607,6 +608,8 @@ void	ft_memsetlong(void *s, int c, size_t n);
 void	ft_memsetint(void *s, int c, size_t n);
 void	ft_memsetchar(void *s, int c, size_t n);
 void	ft_bzeroboost(void *s, size_t n);
+
+void ft_memsetboost_safe(void *s, int c, size_t n);
 
 
 //debug

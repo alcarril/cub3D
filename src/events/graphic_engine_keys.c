@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 20:54:29 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/17 01:27:24 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/22 20:09:27 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,12 @@ void	toggle_textures(t_mlx *mlx)
 */
 void	toogle_floor_celling(t_mlx *mlx)
 {
+	if (mlx->has_been_mouse_in_window == false)
+	{
+		printf("WARNING: Boost mode requires kernell create pixmap for mouse\n");
+		printf("TRADUCTION: Put the f... mouse in window at least once !!!!\n");
+		return ;
+	}
 	if (mlx->frame->ambiance_onoff == ON)
 	{
 		printf("WARNING: Ambiance is on, cannot toggle floor and ceiling rendering method\n");

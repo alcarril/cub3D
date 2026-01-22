@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/22 21:34:21 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/22 03:26:44 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/22 20:02:08 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,11 +47,12 @@ int	game_engine(t_mlx *mlx)
 	if (mlx->player->mouse.onoff == ON)
 		get_mouse_pos_and_move(mlx);
 	move_player(mlx);
+	bzero(mlx->bit_map_address, mlx->line_length * mlx->win_height);
 	if (mlx->frame->raycasting_onoff == ON)
 	{
 		if (mlx->frame->textures_onoff == ON && mlx->frame->ambiance_onoff == ON)
 			render_floor_and_ceiling_amb(mlx);
-		else if (mlx->frame->boost == ON)
+		else if (mlx->frame->boost == ON && mlx->has_been_mouse_in_window == true)
 			render_floor_and_ceiling_speed(mlx);
 		else
 			render_floor_and_ceiling(mlx);

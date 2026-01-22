@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 22:59:20 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/16 18:44:44 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/22 20:04:45 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,11 @@
 */
 int	mouse_init_manager(t_mlx *mlx)
 {
-	static bool	initialized;
-	if (initialized == true)
+	if (mlx->has_been_mouse_in_window == true)
 		return (0);
-	initialized = true;
+	if (mlx->has_been_mouse_in_window == false)
+		mlx->has_been_mouse_in_window = true;
+	printf("Now you can use boost mode without crash kernell pixmap, ;)\n");
 	mlx_mouse_hide(mlx->mlx_var, mlx->mlx_window);
 	mlx->player->mouse.onoff = ON;
 	return (0);

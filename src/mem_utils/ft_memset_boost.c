@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 00:43:30 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/22 03:20:12 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/22 18:03:23 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,4 +121,43 @@ void ft_memsetchar(void *s, int c, size_t n)
 	i = 0;
 	while (i < n)
 		ptr[i++] = (unsigned char)c;
+}
+
+
+void ft_memsetboost_safe(void *s, int c, size_t n)
+{
+	uintptr_t addr = (uintptr_t)s;
+	// size_t bpp_block = sizeof(unsigned long long);
+	unsigned char *ptr = (unsigned char *)s;
+
+	// 1️⃣ escribir bytes hasta alinearnos a 8
+	while ((addr & 7) && n >= 4) {
+		*(uint32_t *)ptr = c;  // 1 píxel de 4 bytes
+		ptr += 4;
+		addr += 4;
+		n -= 4;
+	}
+
+	// 2️⃣ bloques de 8 bytes (long long) mientras que quede
+	unsigned long long data = (unsigned int)c;
+	data |= data << 32;
+
+	while (n >= 8) {
+		*(unsigned long long *)ptr = data;
+		ptr += 8;
+		n -= 8;
+	}
+
+	// 3️⃣ bloques de 4 bytes (int) si quedan
+	while (n >= 4) {
+		*(int *)ptr = c;
+		ptr += 4;
+		n -= 4;
+	}
+
+	// 4️⃣ bloques de 1 byte (char) si quedan
+	while (n > 0) {
+		*ptr++ = (unsigned char)c;
+		n--;
+	}
 }

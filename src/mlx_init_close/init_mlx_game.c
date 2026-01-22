@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 20:07:49 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/16 19:57:27 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/22 20:05:19 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ bool	init_mlx_components(t_mlx *mlx)
 	}
 	if (init_images_data(mlx) == false)
 		return (false);
+	mlx->has_been_mouse_in_window = false;
 	return (true);
 }
 
