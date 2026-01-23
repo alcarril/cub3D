@@ -31,7 +31,6 @@ SRC_FILES = mlx_init_close/init_mlx_game.c \
 			mlx_init_close/setup_game2.c \
 			mlx_init_close/init_setup_utils.c \
 			mlx_init_close/close_mlx_game.c \
-			mlx_init_close/colors.c \
 			events/keys.c \
 			events/graphic_engine_keys.c \
 			events/phisics_keys.c \

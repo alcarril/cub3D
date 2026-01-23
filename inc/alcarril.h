@@ -6,36 +6,30 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 03:14:57 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/23 21:50:36 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/24 00:16:53 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# ifndef ALCARRIL_H
+#ifndef ALCARRIL_H
 # define ALCARRIL_H
 
 /*
-	LIBRERIAS:
+	LIBRARIES:
 */
-
 # include <stdbool.h>
 # include <limits.h>
-#include <stddef.h>
-#include <stdint.h>
+# include <stddef.h>
+# include <stdint.h>
 
-/*
-	DEFINES:
-*/
-
-//deprecated
 # define WIDTH 600
 # define HEIGHT 600
 # define WIN_SCALE 15
 # define MAX_COLUMS 25
 # define MAX_ROWS 25
 
-//windows minimun with height
-#define BASE_WIDTH 1280 // 3456x1080 // 600 // 1536x864
-#define BASE_HEIGHT 720
+//window minimum width and height
+# define BASE_WIDTH 600
+# define BASE_HEIGHT 600
 
 //map axis
 # define X 1
@@ -60,9 +54,9 @@
 # define SPRINT_ACCELERATION_FRONT_FACTOR 10.00f
 
 //player speed max min values
-# define SPEED_DIGITAL 0.033f//esta bien
-# define MAX_PLAYER_SPEED 0.008f//queda bien //0.16f sprint
-# define MAX_PLAYER_SPEED_STRINT 0.018f//queda bien //0.16f sprint
+# define SPEED_DIGITAL 0.033f
+# define MAX_PLAYER_SPEED 0.008f
+# define MAX_PLAYER_SPEED_STRINT 0.018f
 # define SPEEDMIN_MS 0.0001f
 
 //traccion factor player
@@ -82,8 +76,8 @@
 
 //map phisics
 # define WALL_FRICTION 0.5f
-# define FLOOR_FRICTION_MS 0.002f // o 0.8
-# define AIR_FRICTION_MS 0.001f//mas pequela que air frintion segun varie la cueva de moviento en el aire varia
+# define FLOOR_FRICTION_MS 0.002f
+# define AIR_FRICTION_MS 0.001f
 # define GRAVITY_EARTH 30.0f
 # define GRAVITY_MOON 5.0f
 # define GRAVITY_HULKPITER 60.0f
@@ -98,55 +92,54 @@
 # define WALL 1
 # define BONUS_WALL 2
 # define FLOOR 0
-#define VERTICAL 1
-#define HORIZONTAL 0
+# define VERTICAL 1
+# define HORIZONTAL 0
 
 //directions
-#define N 0
-#define S 1
-#define E 2
-#define W 3
+# define N 0
+# define S 1
+# define E 2
+# define W 3
 
 //switches
-#define ON true
-#define OFF false
+# define ON true
+# define OFF false
 
 //Minimap
-#define MINI_WIDTH 4
-#define MINI_HEIGHT 4
+# define MINI_WIDTH 4
+# define MINI_HEIGHT 4
 # define MINI_ZOOM_FACTOR 1.75f
 # define MINIMAP_MAX_ZOOM 3.5f
 # define MINIMAP_MIN_ZOOM 0.5f
 
 //mouse
-#define MOUSE_INIT_SENSX 0.2f
-#define MOUSE_PITCH_FACTOR 0.002f//
-#define MOUSE_DEADZONEX 4
-#define MOUSE_DEADZONEY 8
-#define MOUSE_MAX_MOV 50
-#define MOUSE_MAX_SENSX 0.9f
-#define MOUSE_MIN_SENSX 0.1f
-#define MAX_MOUSE_PITCH_FACTOR 0.014f//
-#define MIN_MOUSE_PITCH_FACTOR 0.0009f//
-#define OUT false
-#define IN true
-#define MousePressMask 1L<<2//norminette
+# define MOUSE_INIT_SENSX 0.2f
+# define MOUSE_PITCH_FACTOR 0.002f
+# define MOUSE_DEADZONEX 4
+# define MOUSE_DEADZONEY 8
+# define MOUSE_MAX_MOV 50
+# define MOUSE_MAX_SENSX 0.9f
+# define MOUSE_MIN_SENSX 0.1f
+# define MAX_MOUSE_PITCH_FACTOR 0.014f
+# define MIN_MOUSE_PITCH_FACTOR 0.0009f
+# define OUT false
+# define IN true
 
 //rgb
-#define R 0
-#define G 1
-#define B 2
+# define R 0
+# define G 1
+# define B 2
 
 //define refsbuff
-#define HEIG 0
-#define WIDT 1
-#define HOR 2
+# define HEIG 0
+# define WIDT 1
+# define HOR 2
 
 //colores de fog
-#define FOG_CLARO 0xA0A0A0
-#define FOG_MEDIO_CLARO 0xA0A0A0
-#define FOG_MEDIO_OSCURO 0x606060
-#define FOG_OSCURO 0x202020
+# define FOG_CLARO 0xA0A0A0
+# define FOG_MEDIO_CLARO 0xA0A0A0
+# define FOG_MEDIO_OSCURO 0x606060
+# define FOG_OSCURO 0x202020
 
 //Distancia vision para fog
 # define CLOSE_DISTANCE 6.0f
@@ -154,47 +147,43 @@
 # define FAR_DISTANCE 14.0f
 
 //ambiances
-#define	ASTURIAS 1
-#define	CEMENTERY 2
-#define	OPEN 3
-#define	MATRIX 4
-
+# define ASTURIAS 1
+# define CEMENTERY 2
+# define OPEN 3
+# define MATRIX 4
 
 //messages
-#define CONTROLS_INFO "Press \"z\" on your keyboard to show \
+# define CONTROLS_INFO "Press \"z\" on your keyboard to show \
 player controls and engine config Keys\n"
 
-
-
 /*
-	STRUCTS: Usamos el padrón de diseño "Data Oriented Design" para optimizar el acceso a memoria y el uso del caché.
-	Asi evitamos paginar estructuras muy grandes que provoquen fallos de caché (cache missing) y lentitud en el acceso a datos.
-	Ademas limitamos el padding de las estructuras para optimizar el uso de memoria.
+	STRUCTS: We use the "Data Oriented Design" pattern to optimize memory 
+	access and cache usage. This helps avoid paging very large structures 
+	that could cause cache misses and slow data access. Additionally, we 
+	limit structure padding to optimize memory usage.
 */
-
 
 /*
 	DECLARACIONES ANTICIPADAS:
 */
-typedef struct s_mlx_api_components t_mlx;
-typedef struct s_texture_img t_texture;
-typedef struct	s_ambiance	t_ambiance;
-typedef struct s_wall	t_wall;
-typedef struct	s_mouse		t_mouse;
-typedef struct	s_player_controls	t_controls;
-typedef struct s_player_data t_player;
-typedef struct s_map t_map;
-typedef struct s_frame_data t_frame;
-typedef struct s_ray t_ray;
-typedef struct	s_phisics t_phisics;
-typedef struct s_player_phisics t_plphisics;
+typedef struct s_mlx_api_components	t_mlx;
+typedef struct s_texture_img		t_texture;
+typedef struct s_ambiance			t_ambiance;
+typedef struct s_wall				t_wall;
+typedef struct s_mouse				t_mouse;
+typedef struct s_player_controls	t_controls;
+typedef struct s_player_data		t_player;
+typedef struct s_map				t_map;
+typedef struct s_frame_data			t_frame;
+typedef struct s_ray				t_ray;
+typedef struct s_phisics			t_phisics;
+typedef struct s_player_phisics		t_plphisics;
 
-
-typedef struct	s_phisics
+typedef struct s_phisics
 {
-	float	gravity; //hace que camz baje /frame
-	float	air_friction; //hace que el jugador se desacelere cunado esta en el aire dx dy bajando speed
-	float	floor_friction; //Fuerza de frenado del jugador
+	float	gravity;
+	float	air_friction; //hace queesta en el aire dx dy bajando speed
+	float	floor_friction;
 }	t_phisics;
 
 typedef struct s_player_phisics
@@ -202,7 +191,7 @@ typedef struct s_player_phisics
 	float	jump_force;
 }	t_plphisics;
 
-typedef struct	s_texture_img
+typedef struct s_texture_img
 {
 	void	*img;
 	char	*addr;
@@ -213,7 +202,7 @@ typedef struct	s_texture_img
 	int		endian;
 }	t_texture;
 
-typedef struct	s_ambiance
+typedef struct s_ambiance
 {
 	int		ambiance;
 	int		fog_color_walls;
@@ -233,18 +222,18 @@ typedef struct	s_ambiance
 
 typedef struct s_wall
 {
-	int		wall_height;      // Altura de la pared en píxeles
-	int		wall_start;       // Inicio de la pared en la pantalla pixeles
-	int		wall_end;         // Fin de la pared en la pantalla pixeles
-	int		tex_x;            // Coordenada X de la textura en la pared
-	int		tex_y;            // Coordenada Y de la textura en la pared
-	float	text_v_step;      // Text height to screen height ratio
-	float	tex_pos;          // Posición inicial en la textura
-	double	wall_x;           // Posición de impacto en la pared (0-1)
-	t_texture *texture;       // Puntero a la textura seleccionada
+	int			wall_height;// Altura de la pared en píxeles
+	int			wall_start;// Inicio de la pared en la pantalla pixeles
+	int			wall_end;// Fin de la pared en la pantalla pixeles
+	int			tex_x;// Coordenada X de la textura en la pared
+	int			tex_y;// Coordenada Y de la textura en la pared
+	float		text_v_step;// Text height to screen height ratio
+	float		tex_pos;// Posición inicial en la textura
+	double		wall_x;// Posición de impacto en la pared (0-1)
+	t_texture	*texture;// Puntero a la textura seleccionada
 }	t_wall;
 
-typedef struct	s_ray
+typedef struct s_ray
 {
 	float			raydir[2];
 	float			delta[2];
@@ -257,15 +246,14 @@ typedef struct	s_ray
 	bool			side_hit;
 }	t_ray;
 
-
-typedef struct	s_frame_data
-{	
+typedef struct s_frame_data
+{
 	float	*fov_distances;
 	float	delta_rays;
 	float	mm_height;
 	float	mm_widht;
 	float	mm_scale[2];
-	float 	mm_offset[2];
+	float	mm_offset[2];
 	float	mm_zoom_factor;
 	bool	minimap_onoff;
 	bool	minimap_showrays;
@@ -279,21 +267,21 @@ typedef struct	s_frame_data
 	bool	dukedoom_mode;
 }	t_frame;
 
-typedef struct	s_mouse
+typedef struct s_mouse
 {
-	int		pos_x; // posiicon x en matrxi de pixeles (pantalla)
-	int		pos_y; // posicion y en matriz de pixeles (pantalla)
-	int		axis_x; //posicion x de referncia matriz de pixeles (pantalla)
-	int		axis_y; // posicion x de referncia matriz de pixeles (pantalla)
-	float	sens_x; // grados por pixel del mouse
-	float	pitch_factor; // fractor de pitch por pixel del mouse (ajustable)
-	bool	onoff; //activar y desactivar mouse
+	int		pos_x;// posiicon x en matrxi de pixeles (pantalla)
+	int		pos_y;// posicion y en matriz de pixeles (pantalla)
+	int		axis_x;//posicion x de referncia matriz de pixeles (pantalla)
+	int		axis_y;// posicion x de referncia matriz de pixeles (pantalla)
+	float	sens_x;// grados por pixel del mouse
+	float	pitch_factor;// fractor de pitch por pixel del mouse (ajustable)
+	bool	onoff;//activar y desactivar mouse
 	bool	out_and_on;
 }	t_mouse;
 
-typedef struct	s_player_controls
+typedef struct s_player_controls
 {
-	bool	move_up; 
+	bool	move_up;
 	bool	move_down;
 	bool	move_left;
 	bool	move_right;
@@ -304,117 +292,92 @@ typedef struct	s_player_controls
 	bool	look_down;
 }	t_controls;
 
-typedef struct	s_player_data
+typedef struct s_player_data
 {
-	float	pos_x;
-	float	pos_y;
-	float	angle;
-	float	rad_angle;
-	float	speed;
-	float	r_speed;
-	float	diff[2];
-	float	v_move[2];
-	float	volume;
-	float	fov;
-	float	rad_fov;
-	float	fov_half;
-	float	pitch_factor;
-	float	pitch_pix;
-	int		max_pitch_pix;
-	
-	//phisics
-	float	camz; //posicion en z de la camara del jugaro (ojos)
-	float	vertical_offset; //offset vertical de la camara para saltos y caidas
-	float	aceleration_z;
-	float	aceleration_zcp;
-	float 	speed_z;
-	bool	is_sprinting;
-	bool	is_jumping;
-	bool	is_onair;
-	bool	is_flying;
-	bool	is_hided;
-	bool	is_groundpound;
-	bool	is_dragging;
-	
-	float	aceleration[3];
-	float	traccion_k;
-	float 	speed_dt;
-	float	max_speed_dt;
-	float	speed_a[2];
-	float	max_speed_a[2];
-
-	
-	int		min_dt[3];
-	int		max_dt;
-
+	float		pos_x;
+	float		pos_y;
+	float		angle;
+	float		rad_angle;
+	float		speed;
+	float		r_speed;
+	float		diff[2];
+	float		v_move[2];
+	float		volume;
+	float		fov;
+	float		rad_fov;
+	float		fov_half;
+	float		pitch_factor;
+	float		pitch_pix;
+	int			max_pitch_pix;
+	float		camz;
+	float		vertical_offset;
+	float		aceleration_z;
+	float		aceleration_zcp;
+	float		speed_z;
+	float		aceleration[3];
+	float		traccion_k;
+	float		speed_dt;
+	float		max_speed_dt;
+	float		speed_a[2];
+	float		max_speed_a[2];
+	int			min_dt[3];
+	int			max_dt;
+	bool		is_sprinting;
+	bool		is_jumping;
+	bool		is_onair;
+	bool		is_flying;
+	bool		is_hided;
+	bool		is_groundpound;
+	bool		is_dragging;
 	t_controls	keys;
 	t_mouse		mouse;
 }	t_player;
 
-typedef struct	s_map
+typedef struct s_map
 {
 	char			map_grids[14][25]; //esto va a ser un puntero doble a liberar pero la mmera de accader a el es igual
 	unsigned int	max_columns; //x lo rellena carbon con los valores del mapa y con esto se reserva memeria
 	unsigned int	max_rows; //y lo rrelena carbon cunado copie los valores del maap y con esto se reserva memeria
-
 	//textures (estos se van a tener que liberar)
 		//ahora es un array de texturas en memeria local de 5 posiciones tu vas a tenern que reservar memoria para n texturas se ocvnerita en un puntero simple //t_texture	*textures
-		t_texture	textures[5]; 
+	t_texture	textures[5]; 
 		//esta variable es la que dice cunatas texturas hay en el mapa con ella reservamos memeria paa los paths y las texturas
 		//ahora esta por defecto en 5 y lo uso para reservar memeria pero la necesito
-		int n_textures;
+	int		n_textures;
 		//ahora esta en 5 en memria local pero tu vas a tener que reservar memeria para n texturas se convertira en un puntero doble char **teexture_paths
-		char *texture_paths[5];//Esto va a ser un puntero a linerar con los nombre que reserva carbon
-	//TODAS MEM ENCARGO DE LIBERARLAS YO NO TE PREOCUPES TU SOLO LIBERALA MEMRIA DE TUS STRCUTURSA DESOUES DE HACER LE EMPAALME
-	
+	char *texture_paths[5];//Esto va a ser un puntero a linerar con los nombre que reserva carbon
+	//TODAS MEM ENCARGO DE LIBERARLAS YO NO TE PREOCUPES TU SOLO LIBERALA MEMRIA DE TUS STRCUTURSA DESOUES DE HACER LE EMPAALME¡
 	//floor ceilling colors (estos no se tiene que liberar)
 	int		floor_color[3];		// R, G, B
 	int		ceiling_color[3];	// R, G, B
-	int 	floor_color_hex;	// Hexadecimal
-	int 	ceiling_color_hex;	// Hexadecimal
-
+	int		floor_color_hex;	// Hexadecimal
+	int		ceiling_color_hex;	// Hexadecimal
 	//Max distance for shading and for (diagonal)
 	float	max_distance;
 }	t_map;
 
-
-//esta se tendria ue llamar game y tener dentro mlx
-//las estrcuturas anidaddas que no requiran cambios
-//se pueden cambiar los punteros a estrcuturaas para 
-//optiim los accesos al cache de la memoria
-typedef struct	s_mlx_api_components
+typedef struct s_mlx_api_components
 {
-	//mlx components
-	void	*mlx_var;
-	void	*mlx_window;
-	void	*mlx_img;
-	
-	//window data
-	int		win_height;
-	int		win_width;
-
-	//image data
-	char	*bit_map_address;
-	char	*bit_map_address_copy;
-	int		bits_per_pixel;
-	int		line_length;
-	int		endian;
-
-	//timestamps for fps and phisics
+	void		*mlx_var;
+	void		*mlx_window;
+	void		*mlx_img;
+	char		*bit_map_address;
+	char		*bit_map_address_copy;
+	int			bits_per_pixel;
+	int			line_length;
+	int			endian;
+	int			win_height;
+	int			win_width;
+	int			log_fd;
 	long long	now_timestamp;
 	long long	bef_timestamp;
 	long long	del_timestamp;
 	bool		has_been_mouse_in_window;
-	
-	//game components
 	t_player	*player;
 	t_map		*map;
 	t_frame		*frame;
 	t_ambiance	amb;
 	t_phisics	phisics;
-	
-	//log file
-	int		log_fd;
 }	t_mlx;
 
 /*
@@ -427,7 +390,6 @@ bool			init_images_data(t_mlx *mlx);
 bool			load_textures(t_mlx *mlx);
 bool			load_single_texture(t_mlx *mlx, t_texture *texture, char *path);
 void			start_hooks_and_game(t_mlx *mlx);
-
 //setup game
 bool			setup_game(t_mlx *mlx, t_player *player, t_map *map, t_frame *frame);
 void			setup_player_mouse(t_mlx *mlx);//
@@ -439,19 +401,16 @@ void			get_minimapscale(t_mlx *mlx, float *scale);
 int				create_fps_logfile(void);
 void			setup_default_ambiance(t_map *map, t_ambiance *amb);
 void			setup_default_phisics(t_phisics *phisics);
-
 //Close and free
 void			destroy_mlx_componets(int (*f)(), int (*g)(), int (*t)(), t_mlx *mlx);
 void			free_loaded_textures(t_mlx *mlx, int loaded, int max_textures);
 void			free_map_data(t_mlx *mlx);//
 void			free_game(t_mlx *mlx);
 int				close_game_manager(t_mlx *mlx);
-
 //quizas desaparezcan
 void			init_floor_and_ceiling_colors(t_map *map);
 void			setup_window_wh(t_mlx *mlx);
 int				rgb_to_hex(int r, int g, int b);
-
 //hooks and events
 int				key_press(int keysym, t_mlx *mlx);
 int				key_release(int keysym, t_mlx *mlx);
@@ -493,45 +452,37 @@ void			minimap_zoom(t_mlx *mlx, bool flag);
 int				mouse_init_manager(t_mlx *mlx);
 void			toogle_mouse(t_mlx *ml);
 int				mouse_button_manager(int mouse_button, int x, int y, t_mlx *mlx);
-
-
-
 //player move
-bool	is_collision(float x, float y, t_mlx *mlx, float e);
-void	rotate_player(t_player *player, float delta_grades);
-void	vectorization(t_player *pl, long long dt, float speed, float angle);
-void	move_player(t_mlx *mlx);
-void	axis_y_pitch(t_player *player);
-void	jump_speed_vecmove(t_mlx *mlx);
-
+bool			is_collision(float x, float y, t_mlx *mlx, float e);
+void			rotate_player(t_player *player, float delta_grades);
+void			vectorization(t_player *pl, long long dt, float speed, float angle);
+void			move_player(t_mlx *mlx);
+void			axis_y_pitch(t_player *player);
+void			jump_speed_vecmove(t_mlx *mlx);
 //move player phisics
-void	difspeed_and_vecmove(t_mlx *mlx, long long delta_time);
-void	difvspeed_and_vecmove_nukedoom(t_mlx *mlx, long long delta_time);
-void	acelerate_player(t_mlx *mlx, unsigned int vi, long long dt, bool *mo);
-void	decelerate_player(t_mlx *mlx, long long dt, bool mo);
-void	acelerate_dukedoom(t_mlx *mlx, unsigned int vi, long long dt, bool *mo);
-void	decelerate_dukedoom(t_mlx *mlx, long long dt, bool mo);
-void	vectorization_dukedoom(t_player *pl, long long dt, float angle);
-
-void	decelerate_player_air(t_mlx *mlx, long long dt);
-void	decelerate_dukedoom_air(t_mlx *mlx, long long dt);
-void	airborne_vectorization(t_player *pl, long long dt, bool is_dukedoom);
-void	jump(t_mlx *mlx, long long dt_ms);
-void	check_altitude(t_player	*pl);
-
-void	normalize_vector(float *v_speed, float *max_speed);
-
+void			difspeed_and_vecmove(t_mlx *mlx, long long delta_time);
+void			difvspeed_and_vecmove_nukedoom(t_mlx *mlx, long long delta_time);
+void			acelerate_player(t_mlx *mlx, unsigned int vi, long long dt, bool *mo);
+void			decelerate_player(t_mlx *mlx, long long dt, bool mo);
+void			acelerate_dukedoom(t_mlx *mlx, unsigned int vi, long long dt, bool *mo);
+void			normalize_vector(float *v_speed, float *max_speed);
+void			decelerate_dukedoom(t_mlx *mlx, long long dt, bool mo);
+void			vectorization_dukedoom(t_player *pl, long long dt, float angle);
+//moveplayer air
+void			decelerate_player_air(t_mlx *mlx, long long dt);
+void			decelerate_dukedoom_air(t_mlx *mlx, long long dt);
+void			airborne_vectorization(t_player *pl, long long dt, bool is_dukedoom);
+void			jump(t_mlx *mlx, long long dt_ms);
+void			check_altitude(t_player	*pl);
 //mouse move
-void	get_mouse_pos_and_move(t_mlx *mlx);
-bool	is_mouse_in_window(t_mlx *mlx, int mouse_x, int mouse_y);
-void	move_player_with_mouse(t_mlx *mlx, int *pix_dif, bool *is_move);
-bool	clamp_mouse_deltax(int *pix_dif);
-bool	clamp_mouse_deltay(int *pix_dif);
-void	reset_mouse_position(t_mlx *mlx, bool *is_move);
-
+void			get_mouse_pos_and_move(t_mlx *mlx);
+bool			is_mouse_in_window(t_mlx *mlx, int mouse_x, int mouse_y);
+void			move_player_with_mouse(t_mlx *mlx, int *pix_dif, bool *is_move);
+bool			clamp_mouse_deltax(int *pix_dif);
+bool			clamp_mouse_deltay(int *pix_dif);
+void			reset_mouse_position(t_mlx *mlx, bool *is_move);
 //render
 int				game_engine(t_mlx *mlx);
-
 //render utils
 void			buffering_pixel(int x, int y, t_mlx *mlx, int color);
 void			buffering_line(int y, int color, t_mlx *mlx, int width);
@@ -539,47 +490,40 @@ void			fps_counter_average(t_mlx *mlx);
 void			fps_counter_realtime(t_mlx *mlx);
 void			ft_memset_int(void *s, int c, size_t n);
 bool			is_wall_tile(char map_value);
-
 //raycasting
 void			throw_rays(t_mlx *mlx);
 void			cast_ray(t_mlx *mlx, unsigned int n_ray, float ray_angle);
 void			set_ray(t_mlx *mlx, t_ray *ray, float ray_angle);
 void			draw_wall_column(t_mlx *mlx, int column, t_wall *wall, t_ray *ray);
 void			scale_wall_phisics(t_wall *wall, float perp_dist, t_mlx *mlx);
-
 //dda algorithm
 float			get_distance_to_wall(t_mlx *mlx, t_ray *ray, float ray_angle);
 void			calc_side_dist(t_mlx * mlx, t_ray *ray);
 void			dda_loop(t_mlx * mlx, t_ray *ray);
 float			get_ray_distance(t_mlx *mlx, t_ray *ray);
 float			get_ray_distance_euclidean(t_mlx *mlx, t_ray *ray);
-
 //floor and ceiling
 void			render_floor_and_ceiling(t_mlx *mlx);
 void			render_floor_and_ceiling_speed(t_mlx *mlx);
-
 //textured walls
 void			draw_wall_column_tex(t_mlx *mlx, int column, t_wall *wall, t_ray *ray);
 t_texture		*select_texture(t_mlx *mlx, t_ray *ray);
 double			calculate_wall_x(t_mlx *mlx, t_ray *ray);
 void			calculate_tex(t_wall *wall, t_texture *texture, int win_height, t_player *player);
-unsigned int	extract_color(t_texture *texture, int tex_x, int tex_y);
 
+unsigned int	extract_color(t_texture *texture, int tex_x, int tex_y);
 //floor_and_ceiling amiances
 void			render_floor_and_ceiling_amb(t_mlx *mlx);
 //wall ambiance
 void			drawinglopp_tex_amb(t_mlx *mlx, int column, t_wall *wall, t_ray *ray);
-
 //fog blur shaders
 unsigned int	apply_fog_pixel(unsigned int col, unsigned int fog_c, float p);
 unsigned int	apply_desaturation(unsigned int color, float factor);
-
 //shaders
 unsigned int	apply_shade(unsigned int color, float shade);
 unsigned int	shade_linear(unsigned int color, float dist, float max_dist);
 unsigned int	shade_inverse(unsigned int color, float k, float prop_dist);
 unsigned int	shade_exponential(unsigned int color, float dens, float prop);
-
 //ambiance
 void			config_ambiance_cementery(t_ambiance *amb);
 void			config_ambiance_asturias(t_map *map, t_ambiance *amb);
@@ -589,34 +533,28 @@ float			dist_factor_floor(int win_height, int win_y, int horizon, int ambient);
 float			dist_factor_ceiling(int win_y, int horizon, int ambient);
 unsigned int	apllyamb_ceiling(t_ambiance *a, float df, unsigned int rcol);
 unsigned int	apllyamb_floor(t_ambiance *a, float df, unsigned int rcol);
-
 //render minimap 2D
 int				render_frame2d(t_mlx *mlx);
 void			update_center_minimap_offset(t_mlx *mlx, float *escaled_zoom);
 void			draw_mini_pixel_offset(t_mlx *mlx, int *win, float *scaled_zoom);
 bool			is_wall(t_mlx *mlx, float *map);
 void			is_person2d(t_mlx *mlx, int *window, float *map);
-
 //render rays 2D
 void			draw_rays2d(t_mlx *mlx, float *scal_z);
 void			draw_ray2d(t_mlx *mlx, float *differencial, float rad, float *scal_z);
 bool			touch_wall(t_mlx *mlx, float x, float y);
-
 //mem utils
-void	ft_memsetboost(void *s, int c, size_t n);
-void	ft_memsetlonglong(void *s, int c, size_t n);
-void	ft_memsetlong(void *s, int c, size_t n);
-void	ft_memsetint(void *s, int c, size_t n);
-void	ft_memsetchar(void *s, int c, size_t n);
-void	ft_bzeroboost(void *s, size_t n);
-
-void ft_memfillboost(void *s, int c, size_t n);
-void ft_memfilllonglong(void **s, int c, size_t *n);
-void ft_memfilllong(void **s, int c, size_t *n);
-void ft_memfillint(void **s, int c, size_t *n);
-void ft_memfillchar(void *s, int c, size_t n);
-
-
+void			ft_memsetboost(void *s, int c, size_t n);
+void			ft_memsetlonglong(void *s, int c, size_t n);
+void			ft_memsetlong(void *s, int c, size_t n);
+void			ft_memsetint(void *s, int c, size_t n);
+void			ft_memsetchar(void *s, int c, size_t n);
+void			ft_bzeroboost(void *s, size_t n);
+void			ft_memfillboost(void *s, int c, size_t n);
+void			ft_memfilllonglong(void **s, int c, size_t *n);
+void			ft_memfilllong(void **s, int c, size_t *n);
+void			ft_memfillint(void **s, int c, size_t *n);
+void			ft_memfillchar(void *s, int c, size_t n);
 //debug
 void			print_texture_values(t_mlx *mlx);
 
