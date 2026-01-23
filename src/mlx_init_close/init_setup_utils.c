@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 23:20:39 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/23 23:01:11 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/23 23:05:51 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,4 +61,9 @@ void	setup_window_wh(t_mlx *mlx)
 		mlx->win_height = BASE_HEIGHT / rows_per_col;
 		mlx->win_width = BASE_WIDTH;
 	}
+}
+
+int	rgb_to_hex(int r, int g, int b)
+{
+	return ((r << 16) | (g << 8) | b);
 }
