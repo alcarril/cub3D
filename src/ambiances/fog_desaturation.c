@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   shaders_fog_blur.c                                 :+:      :+:    :+:   */
+/*   fog_desaturation.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/10 15:40:14 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/16 21:09:36 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/22 21:03:20 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,18 @@
 	la atenuacion del color con la distancia, haciendo que los objetos lejanos
 	se vean mas afectados por el color de la niebla. Da profundidad de manera
 	barata sin terner que usar postprocesados complejos.
+	Pasos:
 	- Se descompone el color original y el color de fog en sus componentes RGB.
-	- Se calcula el nuevo color mezclando cada componente del color original con
-	la componente correspondiente del color de fog, ponderado por el factor p.
+	- Se calcula el nuevo color mezclando cada componente del color original 
+	  con la componente correspondiente del color de fog, ponderado por 
+	  el factor p.
 	- Finalmente se vuelve a componer el color y se retorna el nuevo color con
-	el efecto de fog aplicado.
+	  el efecto de fog aplicado.
 	Parametros:
 	- col: Color original en formato hexadecimal (0xRRGGBB).
 	- fog_color: Color de la niebla en formato hexadecimal (0xRRGGBB).
-	- p: Proporcion de la distancia entre 0.0 (sin fog) y 1.0 (completamente fog).
+	- p: Proporcion de la distancia entre 0.0 (sin fog) y 1.0 
+	  (completamente fog).
 	Mejoras de microporcesador:
 	- Se usan operaciones de desplazamiento de bits para extraer y combinar los
 	  componentes RGB, que son mas eficientes que las operaciones aritmeticas
@@ -36,7 +39,7 @@
 	- Uso de arrays de variables locales para usar registros de microprocesador
 	  en lugar de memoria, lo que mejora la velocidad de acceso a datos.
 */
-unsigned int apply_fog_pixel(unsigned int col, unsigned int fog_color, float p)
+unsigned int	apply_fog_pixel(unsigned int col, unsigned int fog_c, float p)
 {
 	unsigned char	rgb[3];
 	unsigned char	fog[3];
@@ -47,9 +50,9 @@ unsigned int apply_fog_pixel(unsigned int col, unsigned int fog_color, float p)
 	rgb[R] = (col >> 16) & 0xFF;
 	rgb[G] = (col >> 8) & 0xFF;
 	rgb[B] = col & 0xFF;
-	fog[R] = (fog_color >> 16) & 0xFF;
-	fog[G] = (fog_color >> 8) & 0xFF;
-	fog[B] = fog_color & 0xFF;
+	fog[R] = (fog_c >> 16) & 0xFF;
+	fog[G] = (fog_c >> 8) & 0xFF;
+	fog[B] = fog_c & 0xFF;
 	i = 0;
 	while (i < 3)
 	{
@@ -79,11 +82,11 @@ unsigned int apply_fog_pixel(unsigned int col, unsigned int fog_color, float p)
 	  tradicionales. (mucho menos ciclos de procesador por poreracion)
 	- Se evitan operaciones de division y modulo, que son mas lentas.
 */
-unsigned int apply_desaturation(unsigned int color, float factor)
+unsigned int	apply_desaturation(unsigned int color, float factor)
 {
-	unsigned char rgb[3];
-	unsigned char gray;
-	int i;
+	unsigned char	rgb[3];
+	unsigned char	gray;
+	int				i;
 
 	if (factor < 0.0f)
 		factor = 0.0f;

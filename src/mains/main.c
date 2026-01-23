@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/21 18:12:38 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/22 20:13:53 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/22 22:03:28 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,11 +134,11 @@ int main (void)
 	
 	//MATRIX
 	char *texture_paths[5] = {
-		"/home/alejandro/42Universe/42Proyects/cube3D/assets/textures/other/matrix.xpm", // NORTE -> SUR
-		"/home/alejandro/42Universe/42Proyects/cube3D/assets/textures/other/matrix.xpm", // NORTE -> SUR
-		"/home/alejandro/42Universe/42Proyects/cube3D/assets/textures/other/matrix.xpm", // NORTE -> SUR
-		"/home/alejandro/42Universe/42Proyects/cube3D/assets/textures/other/matrix.xpm", // NORTE -> SUR
-		"/home/alejandro/42Universe/42Proyects/cube3D/assets/textures/other/matrix.xpm", // NORTE -> SUR
+		"assets/textures/other/matrix.xpm", // NORTE -> SUR
+		"assets/textures/other/matrix.xpm", // NORTE -> SUR
+		"assets/textures/other/matrix.xpm", // NORTE -> SUR
+		"assets/textures/other/matrix.xpm", // NORTE -> SUR
+		"assets/textures/other/matrix.xpm", // NORTE -> SUR
 	};
 	
 

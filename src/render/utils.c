@@ -6,12 +6,11 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/16 00:11:37 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/22 00:59:59 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/23 21:38:22 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cube3D.h"
-
 
 /*
 	Función para determinar si un valor del mapa representa una pared
@@ -47,4 +46,3 @@ void	ft_memset_int(void *s, int c, size_t n)
 		i++;
 	}
 }
-

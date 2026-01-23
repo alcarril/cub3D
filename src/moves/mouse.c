@@ -6,63 +6,73 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/11 01:48:42 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/17 01:42:17 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/23 20:42:14 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cube3D.h"
 
 /*
-	Funcion que obtiene la posicion actual del mouse en la ventana
-	y la compara con la posicion de referencia (axis_x, axis_y).
-	Si hay diferencia en algun eje, se acota el movimiento y se
-	actualiza el angulo de vision (eje x) o el pitch (eje y) del jugador
-	segun la sensibilidad o factor de pitch por pixel.
-	Finalmente resetea la posicion del mouse a la posicion de referencia.
-	Esta funcion se  ejecuta si el mouse esta activo y cada frame del juego
-	es mas eficiente que renderizar por eventos puesto que asi noas aseguramos
-	un moviento fluido a la velocidad del frame rate del juego. Si usamos eventos
-	estaoms limitados por la frecuencia de eventos del sistema operativo (suele ser
-	mas baja que la del frame rate del juego)
-	
-	Ademas si da la casualidad de que se han cancelado mucho movientos en un eje
-	y se han ido sumando a la posicon del mouse hasta salirse de la ventana, se fuerza
-	la posicion del mouse a la posicion de referencia en ambos ejes. Ademas si se hacen
-	un movineto de pixxeles en patalla muy brusco, como esta funcion se ejecuta en cada
-	frame, la unica manera de hacer que m,use estuvieese eimpre en la ventan es resetearlo
-	en cada frame. pero esto tiene un coste claro por la como gestion la cola de eventos la mini
-	libx en conjunto con el kernell por lo que es mejor llamarla solo cuando se hace un moviento
-	efectivo (140 frames segundo seria n 140 llamadas independientemente de que el mouse se haya
-	movido + o menos veces en ese lapso de tiempo, siempre es menos es mejor detectar en cada frame
-	si se ha movido o no y resetear solo si se ha movido en algun eje o se ha salido de la ventana)
+	Función que obtiene la posición actual del mouse en la ventana y la compara
+	con la posición de referencia (axis_x, axis_y). Si hay diferencia en algún 
+	eje, se acota el movimiento y se actualiza el ángulo de visión (eje x) o el
+	pitch (eje y) del jugador según la sensibilidad o factor de pitch por 
+	píxel. Finalmente, resetea la posición del mouse a la posición de 
+	referencia.
 
-	Ahora al meter esta mejora si apagamos el mouse movemos el raton y lo volvemos a encender fuera
-	de la pantalla automaticamente lo centra, para controlaer que eso no pase metemos una variable extra
-	que sirbe para saber si el mouse esta fuera de la ventana y encendido. nos sirve por
-	que asi si esto pasa simplemete se sale de la funcion a no ser que detecte el mouse dentro de la venta
-	que hace que esta variable se apage false (porque estaria encendido pero no duera de la pantalla). Conesta
-	variable se podria quitar motion NOtify para saber si el mouse ha entrado en la ventana en la primera iteracion
-	pero usando motion notify nos aseguramos de que en cada frame no se comprueb la posision del mouse si esta
-	y se saque la posioin que so n dos llamada a fucniones de la API de mlx que realentizan un poco el funcionamien
-	to del programa y s se puede evitar mejor. Ademas por el branch predictor el if del render no consume excesivos
-	ciclos de porcesado cuando el contador de programa ha pasado por ahi varias veces.
+	Esta función se ejecuta si el mouse está activo y en cada frame del juego.
+	Es más eficiente que renderizar por eventos, ya que así nos aseguramos un 
+	movimiento fluido a la velocidad del frame rate del juego. Si usamos 
+	eventos, estamos limitados por la frecuencia de eventos del sistema 
+	operativo (que suele ser más baja que la del frame rate del juego).
 
-	Al poner este ajuste el mouse cunado se activa con el puintero en la venta lo interpreta directamente y lo moeve,
-	como no quemos que esto pase, en el manejador reseteamos su posicion al eje o no segun donde se encuentre cunado se 
-	activa po rsi se activa dentro de la ventana que pase al centro y no haga el moviento bruco
-	
+	Además, si da la casualidad de que se han cancelado muchos movimientos en 
+	un eje y se han ido sumando a la posición del mouse hasta salirse de la 
+	ventana, se fuerza la posición del mouse a la posición de referencia en 
+	ambos ejes. Si se hace un movimiento de píxeles en pantalla muy brusco, 
+	como esta función se ejecuta en cada frame, la única manera de hacer que el
+	mouse esté siempre en la ventana es resetearlo en cada frame. Sin embargo, 
+	esto tiene un coste debido a cómo gestiona la cola de eventos la mini libx 
+	en conjunto con el kernel. Por lo tanto, es mejor llamarla solo cuando se 
+	hace un movimiento efectivo (140 frames por segundo serían 140 llamadas, 
+	independientemente de que el mouse se haya movido más o menos veces en ese 
+	intervalo de tiempo). Siempre es mejor detectar en cada frame si se ha 
+	movido o no y resetear solo si se ha movido en algún eje o se ha salido de 
+	la ventana.
+
+	Con esta mejora, si apagamos el mouse, movemos el ratón y lo volvemos a 
+	encender fuera de la pantalla, automáticamente se centra. Para controlar 
+	que esto no pase, se introduce una variable extra que sirve para saber si 
+	el mouse está fuera de la ventana y encendido. Esto nos permite que, si 
+	esto ocurre, simplemente se salga de la función a menos que detecte que el 
+	mouse está dentro de la ventana, en cuyo caso esta variable se apaga 
+	(false). Con esta variable, podríamos eliminar el uso de Motion Notify 
+	para saber si el mouse ha entrado en la ventana en la primera iteración, 
+	pero usando Motion Notify nos aseguramos de que en cada frame no se 
+	compruebe la posición del mouse si no es necesario. Esto evita dos llamadas
+	a funciones de la API de mlx que ralentizan un poco el funcionamiento del 
+	programa, y si se puede evitar, mejor. Además, gracias al branch predictor,
+	el `if` del render no consume excesivos ciclos de procesador cuando el 
+	contador de programa ha pasado por ahí varias veces.
+
+	Con este ajuste, cuando el mouse se activa con el puntero en la ventana, lo
+	interpreta directamente y lo mueve. Como no queremos que esto pase, en el 
+	manejador reseteamos su posición al eje o no, según donde se encuentre 
+	cuando se activa. Si se activa dentro de la ventana, lo centramos para que 
+	no haga un movimiento brusco.
+
 	Mejora de microprocesador:
-	- Como es un funcion que se llama en cada frame se han optimizado el numero
-	 de variables locales a un minimo necesario intentando hacer el motor lo mas eficiente
-	 posible al igual que con en resto de funciones qu se ejutan dentro del loop de renderi
-	 zado.
+	- Como es una función que se llama en cada frame, se han optimizado el 
+	  número de variables locales al mínimo necesario, intentando hacer el 
+	  motor lo más eficiente posible, al igual que con el resto de funciones 
+	  que se ejecutan dentro del loop de renderizado.
 */
 void	get_mouse_pos_and_move(t_mlx *mlx)
 {
 	t_mouse	*m;
 	int		pix_dif[2];
 	bool	is_move[2];
-	
+
 	m = &(mlx->player->mouse);
 	mlx_mouse_get_pos(mlx->mlx_var, mlx->mlx_window, &(m->pos_x), &(m->pos_y));
 	if (is_mouse_in_window(mlx, m->pos_x, m->pos_y) == OUT)
@@ -73,8 +83,35 @@ void	get_mouse_pos_and_move(t_mlx *mlx)
 	}
 	else
 		m->out_and_on = false;
-	ft_bzero((void*)is_move, sizeof(is_move));
-	pix_dif[X] =  m->pos_x - m->axis_x;
+	ft_bzero((void *)is_move, sizeof(is_move));
+	move_player_with_mouse(mlx, pix_dif, is_move);
+	reset_mouse_position(mlx, is_move);
+}
+
+/*
+	Funcion que mueve al jugador segun la diferencia de pixeles
+	del mouse en cada eje respecto a la posicion de referencia
+	(axis_x, axis_y). Si hay moviento en el eje x se actualiza
+	el angulo de vision del jugador segun la sensibilidad por pixel
+	del mouse. Si hay moviento en el eje y se actualiza el pitch
+	del jugador segun el factor de pitch por pixel del mouse.
+	Si hay moviento en algun eje se marca en is_move para que luego
+	se resete la posicion del mouse en ese eje.
+	Parametros:
+	- mlx: estructura principal del motor grafico
+	- pix_dif: array de 2 enteros donde se guarda la diferencia
+	  de pixeles del mouse en cada eje respecto a la posicion
+	  de referencia
+	- is_move: array de 2 booleanos donde se marca si ha habido
+	  moviento en cada eje para luego resetear la posicion del
+	  mouse en ese eje
+*/
+void	move_player_with_mouse(t_mlx *mlx, int *pix_dif, bool *is_move)
+{
+	t_mouse	*m;
+
+	m = &(mlx->player->mouse);
+	pix_dif[X] = m->pos_x - m->axis_x;
 	if (clamp_mouse_deltax(&pix_dif[X]) == true)
 	{
 		is_move[X] = 1;
@@ -85,27 +122,31 @@ void	get_mouse_pos_and_move(t_mlx *mlx)
 	if (clamp_mouse_deltay(&pix_dif[Y]) == true)
 	{
 		is_move[Y] = 1;
-		mlx->player->pitch_pix -= pix_dif[Y] * (m->pitch_factor * mlx->player->max_pitch_pix);
+		mlx->player->pitch_pix -= pix_dif[Y]
+			* (m->pitch_factor * mlx->player->max_pitch_pix);
 	}
-	reset_mouse_position(mlx, is_move);
 }
 
-
 /*
-	Comprueba si la posicion del mouse (mouse_x, mouse_y) esta dentro
-	de los limites de la ventana (0 a win_width, 0 a win_height). Nos sirve
-	una vex que el mouse este activado comprobemos que esta dentro de la ventana.
-	Ya que podemos activarlo estando con le cuersor fuera de la ventana (multitarea)
-	y no quemros que tenga encuenta los movimientos del mouse hasta que entre en la ventana
+	Comprueba si la posición del mouse (mouse_x, mouse_y) está dentro de los 
+	limites de la ventana (0 a win_width, 0 a win_height). Esto es útil para 
+	asegurarnos de que, una vez que el mouse esté activado, se encuentre dentro
+	de la ventana. Esto es importante porque el mouse puede activarse mientras 
+	el cursor está fuera de la ventana (por ejemplo, al usar multitarea), y no 
+	queremos que se tengan en cuenta los movimientos del mouse hasta que entre 
+	en la ventana.
+
 	Retornos:
-	- true: si el mouse esta dentro de la ventana
-	- false: si el mouse esta fuera de la ventana
+	- true: Si el mouse está dentro de la ventana.
+	- false: Si el mouse está fuera de la ventana.
 */
 bool	is_mouse_in_window(t_mlx *mlx, int mouse_x, int mouse_y)
 {
-	if (mouse_x >= 0 && mouse_x < mlx->win_width &&
-		mouse_y >= 0 && mouse_y < mlx->win_height)
+	if (mouse_x >= 0 && mouse_x < mlx->win_width
+		&& mouse_y >= 0 && mouse_y < mlx->win_height)
+	{
 		return (IN);
+	}
 	return (OUT);
 }
 
@@ -151,43 +192,4 @@ bool	clamp_mouse_deltay(int *pix_dif)
 	if (*pix_dif < -MOUSE_MAX_MOV)
 		*pix_dif = -MOUSE_MAX_MOV;
 	return (true);
-}
-
-
-/*
-	Funcion que resetea la posicion del mouse a la posicion
-	de referencia (axis_x, axis_y) dependiendo de en que ejes
-	se haya movido el mouse (is_move). La posicion de referencia 
-	es la posicion a la que vuelve en mouse en cada iteracion y la
-	posicion a la que se mueve al activar el mouse. Ademas nor permite
-	que el usuario pueda mover la muñeca en un rango pequeño, si se actulizase
-	siempre a la ultima posicion se haga el moviento o no del mouse el cursor
-	el usuaraio se quedaria sin escritoio para mover el mouse y ademas se saldria
-	de la ventana facilmente.
-	Tiene 4 casos:
-	- No se ha movido en ningun eje: no hace nada (evitamos llamadas innecesarias a la API
-	  de minilibx ya que esto tiene un coste grande en el rendimiento del motor grafico)
-	- Se ha movido en ambos ejes: resetea en ambos ejes
-	- Se ha movido solo en el eje x: resetea solo en el eje x y el eje y
-	  queda en la posicion actual para evitar que un pequelo moviento
-	  del mouse en le eje y en el siguiente frame se tenga en cuenta
-	  con esto mantenemos la logica de la deadzone
-	- Se ha movido solo en el eje y: resetea solo en el eje y y el eje x
-	  queda en la posicion actual para evitar que un pequelo moviento
-	  del mouse en le eje x en el siguiente frame se tenga en cuenta
-	  con esto mantenemos la logica de la deadzone
-*/
-void	reset_mouse_position(t_mlx *mlx, bool *is_move)
-{
-	t_mouse	*m;
-
-	m = &(mlx->player->mouse);
-	if (is_move[X] == 0 && is_move[Y] == 0)
-		return ;
-	else if (is_move[X] == 1 && is_move[Y] == 1)
-		mlx_mouse_move(mlx->mlx_var, mlx->mlx_window, m->axis_x, m->axis_y);
-	else if (is_move[X] == 1 && is_move[Y] == 0)
-		mlx_mouse_move(mlx->mlx_var, mlx->mlx_window, m->axis_x, m->pos_y);
-	else if (is_move[X] == 0 && is_move[Y] == 1)
-		mlx_mouse_move(mlx->mlx_var, mlx->mlx_window, m->pos_x, m->axis_y);
 }

@@ -6,24 +6,30 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 19:07:51 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/21 21:03:19 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/23 21:37:51 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cube3D.h"
 
 /*
-	Función principal para calcular la distancia de cada rayo hasta la pared utilizando el algoritmo DDA
-	- Calcula la distancia inicial a los lados hast ala primera interseccion con el limite de una celda (olineas horizontales y verticales)
-	- Ejecuta el bucle DDA para encontrar la intersección con una pared
-	- Calcula la distancia al muro según la configuración del frame (euclidiana o no)
-	- Aplica corrección de efecto de ojo de pez si está desactivado en la configuración del frame
-	- Retirna la distancia a la pared para pintar la columna correspondiente (corregida o no)
+	Función principal para calcular la distancia de cada rayo hasta la pared 
+	utilizando el algoritmo DDA.
+
+	- Calcula la distancia inicial a los lados hasta la primera intersección 
+	  con el límite de una celda (líneas horizontales y verticales).
+	- Ejecuta el bucle DDA para encontrar la intersección con una pared.
+	- Calcula la distancia al muro según la configuración del frame (euclidiana 
+	  o no).
+	- Aplica corrección de efecto de ojo de pez si está desactivado en la 
+	  configuración del frame.
+	- Retorna la distancia a la pared para pintar la columna correspondiente 
+	  (corregida o no).
 */
 float	get_distance_to_wall(t_mlx *mlx, t_ray *ray, float ray_angle)
 {
-	float	wall_dist_corrected;
-	
+	float	walldist;
+
 	calc_side_dist(mlx, ray);
 	dda_loop(mlx, ray);
 	if (mlx->frame->euclidean == false)
@@ -31,57 +37,96 @@ float	get_distance_to_wall(t_mlx *mlx, t_ray *ray, float ray_angle)
 	else
 		ray->wall_dist = get_ray_distance_euclidean(mlx, ray);
 	if (mlx->frame->fish_eye == false)
-		wall_dist_corrected = ray->wall_dist * cos(ray_angle - (mlx->player->rad_angle));
+		walldist = ray->wall_dist * cos(ray_angle - (mlx->player->rad_angle));
 	else
-		wall_dist_corrected = ray->wall_dist;
-	return (wall_dist_corrected);
+		walldist = ray->wall_dist;
+	return (walldist);
 }
 
-// Determinar la dirección del paso y la distancia inicial a los lados
-//falta control de errores de seno y conseno siempre es entre -1 y 1
 /*
-	CAlcuacmos la distancia hasta la primera interseccion con una celda del mapa
-	espacio euclidiano segun ella doreccion del rayo sea negaiva o positiva en 
-	cada una de la componentes del vector unitario que define su direcccion.
+	En este paso, se compara `sidedist[X]` y `sidedist[Y]` para determinar si 
+	el rayo cruza primero un borde vertical (eje X) o un borde horizontal (eje 
+	Y). Según el resultado de la comparación:
+	- Si `sidedist[X]` es menor, significa que el rayo cruza un borde vertical 
+	  antes que un borde horizontal. En este caso:
+	  - Se suma `delta[X]` a `sidedist[X]` para avanzar al siguiente borde 
+		vertical.
+	  - Se actualiza la posición del rayo en el eje X (`map[X]`) sumando el 
+		valor de `step[X]`, que indica la dirección del movimiento en el eje X 
+		(1 para derecha, -1 para izquierda).
+	  - Se marca el tipo de borde cruzado como `VERTICAL` en `side_hit`.
+	- Si `sidedist[Y]` es menor o igual, significa que el rayo cruza un borde 
+	  horizontal antes que un borde vertical. En este caso:
+	  - Se suma `delta[Y]` a `sidedist[Y]` para avanzar al siguiente borde 
+		horizontal.
+	  - Se actualiza la posición del rayo en el eje Y (`map[Y]`) sumando el 
+		valor de `step[Y]`, que indica la dirección del movimiento en el eje Y 
+		(1 para abajo, -1 para arriba).
+	  - Se marca el tipo de borde cruzado como `HORIZONTAL` en `side_hit`.
 */
-void	calc_side_dist(t_mlx * mlx, t_ray *ray)
+void	calc_side_dist(t_mlx *mlx, t_ray *ray)
 {
+	t_player	*pl;
+
+	pl = mlx->player;
 	if (ray->raydir[X] < 0)
 	{
 		ray->step[X] = -1;
-		ray->sidedist[X] = (mlx->player->pos_x - ray->map[X]) * ray->delta[X];
+		ray->sidedist[X] = (pl->pos_x - ray->map[X]) * ray->delta[X];
 	}
 	else
 	{
 		ray->step[X] = 1;
-		ray->sidedist[X] = (ray->map[X] + 1.0 - mlx->player->pos_x) * ray->delta[X];
+		ray->sidedist[X] = (ray->map[X] + 1.0 - pl->pos_x) * ray->delta[X];
 	}
 	if (ray->raydir[Y] < 0)
 	{
 		ray->step[Y] = -1;
-		ray->sidedist[Y] = (mlx->player->pos_y - ray->map[Y]) * ray->delta[Y];
+		ray->sidedist[Y] = (pl->pos_y - ray->map[Y]) * ray->delta[Y];
 	}
 	else
 	{
 		ray->step[Y] = 1;
-		ray->sidedist[Y] = (ray->map[Y] + 1.0 - mlx->player->pos_y) * ray->delta[Y];
+		ray->sidedist[Y] = (ray->map[Y] + 1.0 - pl->pos_y) * ray->delta[Y];
 	}
 }
 
-// Avanzar al siguiente lado de la celda
 /*
-	Una vex que hemos calculado la primera interseccion con la celda
-	Segun si ha dido la vertical o la horizaontal sabemosq qeu en la siguietnte
-	celda al encontrarnos en unborde la siguiente distncia seria la actual mas
-	el valor que tiene que tomar Alpha o Beta segun sea vertical u horizontal
-	para cruzar toda la celda por eso se lo sumamos a sidedist. Como ese valor es uno
-	hemos cruzado el borde AX o AY * delta x o Y valdra delta X o Y por eso se el suma el valor
-	LA otras celda mantiene el valor anterior no se le suma nada porqeur no se ha cruzado ese borde
-	asi se van acumulando los cambios de celda en celda hasta llegar a una pared.
+	Una vez que hemos calculado la primera intersección con la celda, según si
+	ha sido la vertical o la horizontal, sabemos que en la siguiente celda, al
+	encontrarnos en un borde, la siguiente distancia será la actual más el 
+	valor que tiene que tomar Alpha o Beta (según sea vertical u horizontal) 
+	para cruzar toda la celda. Por eso se lo sumamos a `sidedist`.
+
+	El valor de la celda siempre es uno porque estamos trabajando en un espacio
+	euclidiano, donde las celdas tienen un tamaño uniforme de 1x1. Esto implica
+	que, al cruzar un borde (AX o AY), el incremento en la distancia será igual
+	a `delta[X]` o `delta[Y]`, que representan la distancia necesaria para 
+	recorrer una celda completa en el eje correspondiente. Por eso, se suma 
+	`delta[X]` o `delta[Y]` a `sidedist`.
+
+	La otra celda mantiene el valor anterior porque no se ha cruzado ese borde.
+	De esta forma, se van acumulando los cambios de celda en celda hasta llegar
+	a una pared.
+
+	Con este proceso conseguimos saber cuál es la siguiente celda a la que 
+	vamos a entrar y si es una pared o no, sin tener que calcular la 
+	intersección exacta con las ecuaciones paramétricas de la recta. Esto evita
+	hacer numerosos sistemas de ecuaciones que aumentarían mucho la complejidad
+	computacional en comparación con el algoritmo DDA, que es mucho más sencill
+	y rápido.
+
+	El algoritmo DDA es eficiente porque:
+	- No requiere cálculos complejos como intersecciones exactas o sistemas de
+	  ecuaciones.
+	- Reduce la complejidad computacional al trabajar directamente con las 
+	  celdas del mapa.
+	- Es aplicable en cualquier espacio euclidiano, lo que lo hace versátil y
+	  eficiente para este tipo de problemas.
 */
-void	dda_loop(t_mlx * mlx, t_ray *ray)
+void	dda_loop(t_mlx *mlx, t_ray *ray)
 {
-	int hit;
+	int	hit;
 
 	hit = 0;
 	while (hit == 0)
@@ -106,21 +151,47 @@ void	dda_loop(t_mlx * mlx, t_ray *ray)
 	}
 }
 
-//dda algorithm calculus
 /*
-	-Forma 1:
-	LA distacnia ala pared se calcula con sidedist - delta dist para quitarle
-	la distancia de la ultima celda que hemos cruzado y que nos ha hecho salir del bucle.
-	dist = ray->sidedist[X] - ray->delta[X]; (sidedist es la hipotenusa)
-	dist = ray->sidedist[Y] - ray->delta[Y]; (sidedist es la hipotenusa)
-	-Forma 2:
-	La distancia perpendicular se calcula segun si hemos chocado con una pared vertical u horizontal
-	segun la direccion del rayo y la posicion del jugador.
-	Distancia =  posicion oared - posicion jugaror + compensacion cara / direccion rayo
-	La compensacion cara es (1 - step) / 2 porque si el paso es hacia atras conseguimos sumarle 1 y si es hacia adelante le sumamos 0
-	Ladireccion de rayo es por los trianglos semenjantes con esto conseguimos la distancia perpendicular
+	Calcula la distancia perpendicular desde la posición del jugador hasta la 
+	pared con la que el rayo ha colisionado. Este cálculo es necesario para 
+	evitar el efecto de distorsión conocido como "efecto ojo de pez" y para 
+	obtener una representación correcta de las paredes en el plano 3D.
+
+	Existen dos formas principales de calcular la distancia a la pared:
+
+	**Forma 1:**
+	- La distancia a la pared se calcula restando `delta[X]` o `delta[Y]` a 
+	  `sidedist[X]` o `sidedist[Y]`, respectivamente. Esto elimina la distancia
+	  de la última celda que el rayo cruzó antes de salir del bucle DDA.
+	  - Fórmula para eje X: `dist = ray->sidedist[X] - ray->delta[X]`.
+	  - Fórmula para eje Y: `dist = ray->sidedist[Y] - ray->delta[Y]`.
+	- En este caso, `sidedist` representa la hipotenusa del triángulo formado 
+	  por el rayo y las celdas del mapa.
+
+	**Forma 2:**
+	- La distancia perpendicular se calcula según si el rayo ha chocado con una
+	  pared vertical u horizontal. Esto se determina en función de la dirección
+	  del rayo y la posición del jugador.
+	- Fórmula general: 
+	  `dist = (wall_pos - player_pos + face_compensation) / ray_direction`.
+	- La compensación de la cara (`face_compensation`) se calcula como 
+	  `(1 - step) / 2`. Esto asegura que, si el paso (`step`) es hacia atrás, 
+	  se suma 1, y si es hacia adelante, se suma 0.
+	- La dirección del rayo se utiliza para calcular la distancia perpendicular 
+	  mediante triángulos semejantes. Esto permite obtener una distancia 
+	  precisa y corregir el efecto de ojo de pez.
+
+	Parámetros:
+	- mlx: Puntero a la estructura principal del motor gráfico que contiene 
+	  toda la información del juego.
+	- ray: Puntero a la estructura del rayo que contiene los datos calculados 
+	  durante el algoritmo DDA.
+
+	Retorno:
+	- La distancia perpendicular desde el jugador hasta la pared con la que el 
+	  rayo ha colisionado.
 */
-float get_ray_distance(t_mlx *mlx, t_ray *ray)
+float	get_ray_distance(t_mlx *mlx, t_ray *ray)
 {
 	float	dist;
 	float	wall_dist;
@@ -142,16 +213,38 @@ float get_ray_distance(t_mlx *mlx, t_ray *ray)
 }
 
 /*
-	Calcula la distancia euclidiana desde la posición del jugador hasta el punto de impacto en la pared
-	usando trifonometría básica (teorema de Pitágoras). Esta función no corrige el efecto de ojo de pez.
-	Hace que las apredes se vean concavas o convexas dependiendo de la posicion del jugador y el angulo del rayo.
-*/
-float get_ray_distance_euclidean(t_mlx *mlx, t_ray *ray)
-{
-	float fish_eye_dist;
-	
-	fish_eye_dist = sqrt(pow(ray->map[X] - mlx->player->pos_x, 2) +
-							   pow(ray->map[Y] - mlx->player->pos_y, 2));
-	 return fish_eye_dist;
-}
+	Calcula la distancia euclidiana desde la posición del jugador hasta el 
+	punto de impacto en la pared utilizando trigonometría básica (teorema de 
+	Pitágoras). A diferencia de otras funciones de cálculo de distancia, esta 
+	función no corrige el efecto de ojo de pez.
 
+	Detalles de implementación:
+	- La distancia euclidiana se calcula como la raíz cuadrada de la suma de 
+	  los cuadrados de las diferencias entre las coordenadas del jugador y las 
+	  coordenadas del punto de impacto del rayo en la pared.
+	- Fórmula utilizada: 
+	  `dist = sqrt((map[X] - pos_x)^2 + (map[Y] - pos_y)^2)`.
+
+	Nota:
+	- Este método no aplica corrección para el efecto de ojo de pez, lo que 
+	  significa que las paredes pueden aparecer distorsionadas (cóncavas o 
+	  convexas) dependiendo de la posición del jugador y el ángulo del rayo.
+
+	Parámetros:
+	- mlx: Puntero a la estructura principal del motor gráfico que contiene 
+	  toda la información del juego.
+	- ray: Puntero a la estructura del rayo que contiene los datos calculados 
+	  durante el algoritmo DDA.
+
+	Retorno:
+	- La distancia euclidiana desde el jugador hasta el punto de impacto en la 
+	  pared.
+*/
+float	get_ray_distance_euclidean(t_mlx *mlx, t_ray *ray)
+{
+	float	fish_eye_dist;
+
+	fish_eye_dist = sqrt(pow(ray->map[X] - mlx->player->pos_x, 2)
+			+ pow(ray->map[Y] - mlx->player->pos_y, 2));
+	return (fish_eye_dist);
+}

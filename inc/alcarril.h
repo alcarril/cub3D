@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 03:14:57 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/22 20:36:22 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/23 21:50:36 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,7 +174,7 @@ player controls and engine config Keys\n"
 
 
 /*
-    DECLARACIONES ANTICIPADAS:
+	DECLARACIONES ANTICIPADAS:
 */
 typedef struct s_mlx_api_components t_mlx;
 typedef struct s_texture_img t_texture;
@@ -491,7 +491,7 @@ void			selectspectr_mode(t_phisics *phisics, t_player *pl, t_mlx *mlx);
 void			selectjetpack_mode(t_phisics *phisics, t_player *pl, t_mlx *mlx);
 void			minimap_zoom(t_mlx *mlx, bool flag);
 int				mouse_init_manager(t_mlx *mlx);
-void			toogle_mouse(t_mlx *mlx);
+void			toogle_mouse(t_mlx *ml);
 int				mouse_button_manager(int mouse_button, int x, int y, t_mlx *mlx);
 
 
@@ -524,6 +524,7 @@ void	normalize_vector(float *v_speed, float *max_speed);
 //mouse move
 void	get_mouse_pos_and_move(t_mlx *mlx);
 bool	is_mouse_in_window(t_mlx *mlx, int mouse_x, int mouse_y);
+void	move_player_with_mouse(t_mlx *mlx, int *pix_dif, bool *is_move);
 bool	clamp_mouse_deltax(int *pix_dif);
 bool	clamp_mouse_deltay(int *pix_dif);
 void	reset_mouse_position(t_mlx *mlx, bool *is_move);
@@ -544,7 +545,7 @@ void			throw_rays(t_mlx *mlx);
 void			cast_ray(t_mlx *mlx, unsigned int n_ray, float ray_angle);
 void			set_ray(t_mlx *mlx, t_ray *ray, float ray_angle);
 void			draw_wall_column(t_mlx *mlx, int column, t_wall *wall, t_ray *ray);
-void			scale_wall_phisics(t_wall *wall, float perpendicular_distance, t_mlx *mlx);
+void			scale_wall_phisics(t_wall *wall, float perp_dist, t_mlx *mlx);
 
 //dda algorithm
 float			get_distance_to_wall(t_mlx *mlx, t_ray *ray, float ray_angle);
@@ -570,14 +571,14 @@ void			render_floor_and_ceiling_amb(t_mlx *mlx);
 void			drawinglopp_tex_amb(t_mlx *mlx, int column, t_wall *wall, t_ray *ray);
 
 //fog blur shaders
-unsigned int	apply_fog_pixel(unsigned int col, unsigned int fog_color, float p);
+unsigned int	apply_fog_pixel(unsigned int col, unsigned int fog_c, float p);
 unsigned int	apply_desaturation(unsigned int color, float factor);
 
 //shaders
 unsigned int	apply_shade(unsigned int color, float shade);
 unsigned int	shade_linear(unsigned int color, float dist, float max_dist);
-unsigned int	shade_inverse(unsigned int color, float k, float proportion_dist);
-unsigned int	shade_exponential(unsigned int color, float density, float proportion_dist);
+unsigned int	shade_inverse(unsigned int color, float k, float prop_dist);
+unsigned int	shade_exponential(unsigned int color, float dens, float prop);
 
 //ambiance
 void			config_ambiance_cementery(t_ambiance *amb);
@@ -590,15 +591,15 @@ unsigned int	apllyamb_ceiling(t_ambiance *a, float df, unsigned int rcol);
 unsigned int	apllyamb_floor(t_ambiance *a, float df, unsigned int rcol);
 
 //render minimap 2D
-int				render_frame2D(t_mlx *mlx);
+int				render_frame2d(t_mlx *mlx);
 void			update_center_minimap_offset(t_mlx *mlx, float *escaled_zoom);
 void			draw_mini_pixel_offset(t_mlx *mlx, int *win, float *scaled_zoom);
 bool			is_wall(t_mlx *mlx, float *map);
-void			is_person2D(t_mlx *mlx, int *window, float *map);
+void			is_person2d(t_mlx *mlx, int *window, float *map);
 
 //render rays 2D
-void			draw_rays2D(t_mlx *mlx, float *scal_z);
-void			draw_ray2D(t_mlx *mlx, float *differencial, float rad, float *scal_z);
+void			draw_rays2d(t_mlx *mlx, float *scal_z);
+void			draw_ray2d(t_mlx *mlx, float *differencial, float rad, float *scal_z);
 bool			touch_wall(t_mlx *mlx, float x, float y);
 
 //mem utils

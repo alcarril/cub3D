@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/18 17:57:44 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/21 18:55:16 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/23 08:59:10 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,12 @@
 	del valor maximo de velocidad permitido. Si la magnitud del vector
 	supera el valor maximo se escala el vector para que su magnitud sea
 	igual al valor maximo.
+	El modulo del vector se calcula usando el terorema de pitagoras.
+	(hipotenusa^2 = cateto1^2 + cateto2^2)
 	Con esto evitamos el strafeing speed o velocidad de deslizamiento que 
 	courre en mucho videojuegos. Muy sensacion doomlike and nukelike
 */
-void normalize_vector(float *v_speed, float *max_speed)
+void	normalize_vector(float *v_speed, float *max_speed)
 {
 	float	total_speed;
 
@@ -31,4 +33,3 @@ void normalize_vector(float *v_speed, float *max_speed)
 		v_speed[Y] *= max_speed[X] / total_speed;
 	}
 }
-

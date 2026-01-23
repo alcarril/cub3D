@@ -6,30 +6,63 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/20 09:02:37 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/21 18:52:33 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/23 07:00:44 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cube3D.h"
 
 /*
-	Funcion para calcular el valor de camz del jugador en funcion del del tiempo
-	Gracias esta variable vamos a poder elevar al jugador hacer que se agache. Y con
-	esto podemos saltar de diferentes maneras y alturas (segun gravesdad y configuracions
-	del salto), volar, flotar etc.. NOr sirve para calcular despues el vertical offse
-	en funcion del camz que nos da esa senciaon de altura al trasladar los puntos del
-	frame en funcion de la distancia es decir no de manera lineal como el pitch.
-	Funncio que nos permite calcula la posicion de la camara en z, que simula los ojos
-	del jugador y permite crear sensacion de moviento vertical (saltos, caidas, vuelos etc..)
-	Para ellos si el jugador esta en modo salto aplicamos la fuerza de salto menos la fuerza
-	de gravedad del mapa. De la luvha de estas dos fuerzas en base al itmeposale la celeracion
-	total que multiplicada por el diferencial de tiempo da luagar la velocidad el jugador en el ejez. 
-	Si la velocidad es positiva el jugador asciende si es negativa
-	el jugador desciende. Finalmente usamos multiplicamos la velocidad obtenida  por el diferen
-	cial de tiempo normalizado para obtener el desplazamiento en z diferencial de la posicion)
-	del jugador y lo sumamos a su posicion actual en z (camz). 
-	 Por ultimo comprobamos que camz no se salga de los limites maximos y minimos
-	 se comprueba en cada frame
+	Funcion que nos permite aplicar al fisicas del satltao y caida del jugador.
+	Para ello modificamos el valor de la variable camz del jugador en funcion 
+	de los distintos momentos del tiempo. Camz representa los ojos del jugador 
+	en el eje z.
+	
+	Para modicar camz aplicamos las ecuaciones de movimiento rectilineo 
+	uniformemente acelerado (MRUA) en el eje z. Dinde la aceleracion que impulsa 
+	al jugadorhacia aribba (elevar camz) es la fuerza de salto y la que lo 
+	impulsa hacia abajo (es decir que disminuye camz) es la fuerza de gravedad 
+	del mapa. De la luchade las dos fuerzas obtenemos la aceleracion total en el 
+	eje z (ficticio).
+	Calculamos la velocidad en z del jugador sumando la aceleracion total por el 
+	diferencialde tiempo (dt) al valor de la velocidad en z del frame anterior. 
+	Con esto obetenemosla el valor del diferencial de al velocidad en ese frame. 
+	De la multiplicacion de la velocidad en z por el diferencial de tiempo 
+	obtenemos el desplazamiento del jugador en z en ese frame. Sumamos este 
+	desplazamiento a la posicion actual.
+	
+	Usamos el tiempo para que el movimiento sea independiente de la tasa de fps. 
+	(forma de hacelo en moto res graficos realistas).
+	
+	¿Como hacemos que el jugador salte y caiga?
+	El MURUA es un tipo de movimiento en el que un objeto se desplaza en
+	una linea recta con una aceleracion constante. En este caso la aceleracion
+	es variable en funcion de las fuerzas que actuan sobre el jugador. No son
+	fisicas realista en el eje z, la aceleracion tambien es un vector con
+	un diferencial de tiempo que hace que se disipe en funcion de la energia
+	potencial y cinetica. Pero para este juego es suficiente con este modelo
+	simplificado. Para poder simular saltos y caidas de manera sencilla hemos
+	establecido una variable booleana que marca cunado el jugador esta pulsando
+	el boton de salto (is_jumping). Cuando esta variable es true aplicamos la
+	fuerza de salto menos la fuerza de gravedad para calcular la aceleracion
+	total en z. Cunado la variable es false porque el jugador suelta las teclas
+	de salto o ya no puede saltar mas alto (ha llegado al maximo de altura del
+	salto) solo aplicamos la fuerza de gravedad para que el jugador caiga.
+
+	Porque usamos dos fuerzas opuestas si la ascenssion se controla con
+	la variable is jumping?
+	La razon es que de esta manera podemos ajustar la fuerza de salto y la
+	fuerza de gravedad de manera independiente. Dandole diferentes configuracio
+	nes a estas dos fuerzas podemos conseguir saltos mas altos o mas bajos,
+
+	Variables:
+		- pl: puntero a la estructura del jugador
+		- ph: puntero a la estructura de las fisicas del juego
+		- dt: diferencial de tiempo en segundos
+		- tm_aceleration: aceleracion total en z del jugador en ese frame
+		  compuesta por la fuerza de salto menos la fuerza de gravedad
+		- dt_ms: diferencial de tiempo en milisegundos
+		
 */
 void	jump(t_mlx *mlx, long long dt_ms)
 {
@@ -37,7 +70,7 @@ void	jump(t_mlx *mlx, long long dt_ms)
 	t_phisics	*ph;
 	float		dt;
 	float		tm_aceleration;
-	
+
 	pl = mlx->player;
 	if (pl->is_dragging || pl->is_hided || pl->is_flying || pl->is_groundpound)
 		return ;
@@ -46,18 +79,21 @@ void	jump(t_mlx *mlx, long long dt_ms)
 	if (pl->is_jumping)
 		tm_aceleration = pl->aceleration_z - ph->gravity;
 	else
-		tm_aceleration = - ph->gravity;
+		tm_aceleration = -ph->gravity;
 	pl->speed_z += tm_aceleration * dt;
 	pl->camz += pl->speed_z * dt;
 	check_altitude(pl);
 }
 
 /*
-	Funcion que comprueba que la posicion en z de la camara del jugador
-	no se salga de los limites maximos y minimos permitidos en el mapa.
-	Si se sale de los limites se corrige la posicion y se resetea la velocidad
-	en z a 0 para evitar que siga moviendose en esa direccion. Tambien se desactiva
-	el estado de salto y aire del jugador. Se comprueab en cada frame
+	Funcion que comprueba que la altura de la camara del jugador (camz)
+	este dentro de los limites permitidos por el mapa:
+	- Si camz es mayor que el maximo permitido (MAP_MAX_Z) lo igualamos
+	  a MAP_MAX_Z y ponemos la velocidad en z a 0 (el jugador deja de subir).
+	- Si camz es menor que el minimo permitido (MIDDLE_Z) lo igualamos
+	  a MIDDLE_Z y ponemos la velocidad en z a 0 (el jugador deja de bajar).
+	  Ademas ponemos los booleanos is_jumping e is_onair a false porque
+	  el jugador ha tocado el suelo.
 */
 void	check_altitude(t_player	*pl)
 {

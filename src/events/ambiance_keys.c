@@ -6,12 +6,17 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/15 15:20:17 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/20 23:53:50 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/22 21:19:34 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/cube3D.h"
 
+/*
+	- Toggles the ambiance effect on or off and prints the current state on
+	the console (stdout).
+	- If textures are off, ambiance cannot be toggled.
+*/
 void	toogle_ambiance(t_mlx *mlx)
 {
 	if (mlx->frame->textures_onoff == OFF)
@@ -31,6 +36,11 @@ void	toogle_ambiance(t_mlx *mlx)
 	}
 }
 
+/*
+	- Handles keypress events for selecting different ambiance settings.
+	- Maps specific key symbols to ambiance selection functions.
+	- Returns true if an ambiance was selected, false otherwise.
+*/
 bool	ambiance_keypress(t_mlx *mlx, int keysym)
 {
 	if (keysym == XK_1)
@@ -46,6 +56,11 @@ bool	ambiance_keypress(t_mlx *mlx, int keysym)
 	return (true);
 }
 
+/*
+	- Selects and configures the ambiance based on the provided ambiance type.
+	- If ambiance is off, it prints a warning and does not change the ambiance.
+	- Supports different ambiance types: ASTURIAS, CEMENTERY, OPEN, MATRIX.
+*/
 void	select_ambiance(t_mlx *mlx, int ambiance)
 {
 	if (mlx->frame->ambiance_onoff == false)
@@ -69,6 +84,10 @@ void	select_ambiance(t_mlx *mlx, int ambiance)
 		select_ambiance1(mlx, ambiance);
 }
 
+/*
+	- Helper function to select and configure additional ambiance types.
+	- Supports OPEN and MATRIX ambiance types.
+*/
 void	select_ambiance1(t_mlx *mlx, int ambiance)
 {
 	if (ambiance == OPEN)

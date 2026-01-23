@@ -6,12 +6,11 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/12 23:20:39 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/17 01:50:59 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/23 23:01:11 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/cube3D.h"
-
 
 /*
 	Esta funcion sirve para poder sacar la escala del minimapa en funcion de:
@@ -32,7 +31,7 @@ void	init_floor_and_ceiling_colors(t_map *map)
 {
 	int	floor[3];
 	int	ceiling[3];
-	
+
 	ft_memcpy(floor, map->floor_color, sizeof(floor));
 	ft_memcpy(ceiling, map->ceiling_color, sizeof(ceiling));
 	map->floor_color_hex = rgb_to_hex(floor[0], floor[1], floor[2]);
@@ -40,7 +39,8 @@ void	init_floor_and_ceiling_colors(t_map *map)
 }
 
 /*
-	Asi solo estiro el lado que sea mas grande en relacion al mapa pero no mantengo
+	Asi solo estiro el lado que sea mas grande en relacion al mapa pero no 
+	mantengo
 	una escala fija. Si no lamantengo hace core dumped
 	NOTA:
 	Si se quiere cambiar se pone el row pr col con factor dedivision
@@ -61,6 +61,4 @@ void	setup_window_wh(t_mlx *mlx)
 		mlx->win_height = BASE_HEIGHT / rows_per_col;
 		mlx->win_width = BASE_WIDTH;
 	}
-	printf("El elato y el largo es: %d %d\n", mlx->win_height, mlx->win_width);
 }
-

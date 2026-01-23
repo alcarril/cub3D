@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 00:50:59 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/22 03:24:16 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/23 20:46:55 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,5 +14,5 @@
 
 void	ft_bzeroboost(void *s, size_t n)
 {
-	ft_memsetboost(s, 0, n);
+	ft_memfillboost(s, 0, n);
 }

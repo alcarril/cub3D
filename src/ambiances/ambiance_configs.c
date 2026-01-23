@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/15 19:14:29 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/16 20:29:55 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/22 20:54:55 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,8 @@ void	config_ambiance_asturias(t_map *map, t_ambiance *amb)
 
 /*
 	Configuracion de la ambiance open
-	- Fog color: Dark medium gray for walls, light medium gray for floor and ceiling
+	- Fog color: Dark medium gray for walls, light medium gray for 
+		floor and ceiling
 	- Max distance: 90% of map max distance
 	- Fog multipliers: 0.2 for walls and ceiling, 0.3 for floor
 	- Shader k-factors: 8.0 for walls, 4.0 for ceiling, 1.0 for floor
@@ -94,7 +95,6 @@ void	config_ambiance_open(t_map *map, t_ambiance *amb)
 	amb->mult_shader_ceiling = 0.5f;
 	amb->ambiance = OPEN;
 }
-
 
 /*
 	Configuracion de la ambiance matrix

@@ -50,6 +50,7 @@ SRC_FILES = mlx_init_close/init_mlx_game.c \
 			moves/decelerate_air.c \
 			moves/phisics_utils.c \
 			moves/mouse.c \
+			moves/mouse2.c \
 			render/render.c \
 			render/raycasting.c \
 			render/dda_algorith.c \

@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/22 00:43:30 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/22 20:26:07 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/23 20:53:11 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 /*
 	Puedoo usar sizeof ya que el compilador lo hace en compilacion
 	menos cuando se hace sizeof de un variable no de un tipo de dao
-	Ademas podria usar la dicsion constantemente poreel compilador lo trasnforma 
+	Ademas podria usar la dicsion constantemente poreel compilador lo trasnform
 	por bitwise si es potencia de dos y es recurrente.
 
 	libc internals
@@ -33,7 +33,7 @@
 		motores de memoria
 		
 */
-void ft_memsetboost(void *s, int c, size_t n)
+void	ft_memsetboost(void *s, int c, size_t n)
 {
 	while (n > 0 && ((uintptr_t)s % sizeof(unsigned long long)) != 0)
 	{
@@ -51,17 +51,22 @@ void ft_memsetboost(void *s, int c, size_t n)
 		ft_memsetchar(s, c, n);
 }
 
-void ft_memsetlonglong(void *s, int c, size_t n)
+/*
+	#if ULONG_MAX > 0xFFFFFFFFUL
+	data |= data << 32;   // Si long es 8 bytes
+	#endif
+*/
+void	ft_memsetlonglong(void *s, int c, size_t n)
 {
-	unsigned long long data;
-	unsigned long long *ptr;
-	size_t jumps, i;
+	unsigned long long	data;
+	unsigned long long	*ptr;
+	size_t				jumps;
+	size_t				i;
 
 	data = (unsigned int)c;
 	data |= data << 32;
 	ptr = (unsigned long long *)s;
-	// jumps = n / sizeof(unsigned long long);
-	jumps = n >> 3; // optimizacion bitwise
+	jumps = n >> 3;
 	i = 0;
 	while (i < jumps)
 		ptr[i++] = data;
@@ -75,17 +80,17 @@ void ft_memsetlonglong(void *s, int c, size_t n)
 	data |= data << 32;   // Si long es 8 bytes
 	#endif
 */
-void ft_memsetlong(void *s, int c, size_t n)
+void	ft_memsetlong(void *s, int c, size_t n)
 {
-	unsigned long data;
-	unsigned long *ptr;
-	size_t jumps, i;
+	unsigned long	data;
+	unsigned long	*ptr;
+	size_t			jumps;
+	size_t			i;
 
 	data = (unsigned int)c;
 	data |= data << 8;
 	data |= data << 16;
 	ptr = (unsigned long *)s;
-	// jumps = n / sizeof(unsigned long);
 	jumps = n >> 3;
 	i = 0;
 	while (i < jumps)
@@ -95,13 +100,13 @@ void ft_memsetlong(void *s, int c, size_t n)
 	ft_memsetboost(s, c, n);
 }
 
-void ft_memsetint(void *s, int c, size_t n)
+void	ft_memsetint(void *s, int c, size_t n)
 {
-	int *ptr;
-	size_t jumps, i;
+	int		*ptr;
+	size_t	jumps;
+	size_t	i;
 
 	ptr = (int *)s;
-	// jumps = n / sizeof(int);
 	jumps = n >> 2;
 	i = 0;
 	while (i < jumps)
@@ -111,11 +116,10 @@ void ft_memsetint(void *s, int c, size_t n)
 	ft_memsetboost(s, c, n);
 }
 
-
-void ft_memsetchar(void *s, int c, size_t n)
+void	ft_memsetchar(void *s, int c, size_t n)
 {
-	unsigned char *ptr;
-	size_t i;
+	unsigned char	*ptr;
+	size_t			i;
 
 	ptr = (unsigned char *)s;
 	i = 0;

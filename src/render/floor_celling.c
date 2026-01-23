@@ -6,34 +6,49 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 16:45:21 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/16 23:59:19 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/23 22:03:49 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cube3D.h"
 
 /*
-	Función para renderizar el suelo y el techo píxel a píxel
-	- Calcula la línea del horizonte (origen o centro) basada en la altura de la ventana
-	  y el la desviación vertical del jugador (pitch_pix) -> trasñacion vertical de los
-	  puntos del conjunto
-	- Itera sobre cada píxel desde la parte superior hasta la línea del horizonte
-	  y pinta el techo con el color definido en el mapa
-	- Luego, itera desde la línea del horizonte hasta la parte inferior de la ventana
-	  y pinta el suelo con el color definido en el mapa
-	- En resumen sivide la ventana en dos partes: techo y suelo, y las pinta
-	  con los colores especificados
-	- Se usa en el renderizado, despues se sobreescrobe la imagen con las paredes y
-	  otros elementos 3D y el minimapa 2D
-	- Mas lento que render floor and ceiling speed
-	- Mas modular que renderizar en el el pintado de del raycasting (aunque
-	  menos eficiente)
+	Función para renderizar el suelo y el techo píxel a píxel.
+
+	Detalles:
+	- Calcula la línea del horizonte (origen o centro) basada en la altura de 
+	  la ventana y la desviación vertical del jugador (`pitch_pix`), que 
+	  representa la traslación vertical de los puntos del conjunto.
+	- Itera sobre cada píxel desde la parte superior hasta la línea del 
+	  horizonte y pinta el techo con el color definido en el mapa.
+	- La linea del horizonte se calcula como la mitad de la altura de la ventan
+	  más el pitch del jugador en píxeles, es una tralacion del origen vertical
+	  de la camara para simular mirar hacia arriba o hacia abajo en vez de hace
+	  una traslacion de los puntos del conjunti.
+	- Luego, itera desde la línea del horizonte hasta la parte inferior de la 
+	  ventana y pinta el suelo con el color definido en el mapa.
+	- Divide la ventana en dos partes: techo y suelo, y las pinta con los 
+	  colores especificados.
+
+	Detalles adicionales:
+	- Se utiliza en el renderizado antes de sobrescribir la imagen con las 
+	  paredes, otros elementos 3D y el minimapa 2D.
+	- Es más lento que `render_floor_and_ceiling_speed`, pero es más modular.
+	- Es menos eficiente que renderizar el suelo y el techo directamente en el 
+	  proceso de raycasting, pero mejora la modularidad del código.
+
+	Parámetros:
+	- mlx: Puntero a la estructura principal del motor gráfico que contiene 
+	  toda la información del juego.
+
+	Esta función es útil para dividir el renderizado en pasos más claros y 
+	modulares, aunque con un mayor coste computacional.
 */
 void	render_floor_and_ceiling(t_mlx *mlx)
 {
 	int	x;
 	int	y;
-	int horizon;
+	int	horizon;
 
 	horizon = (mlx->win_height >> 1) + mlx->player->pitch_pix;
 	y = -1;
@@ -53,20 +68,40 @@ void	render_floor_and_ceiling(t_mlx *mlx)
 }
 
 /*
-	Hace lo mismo que render_floor_and_ceiling pero de forma más rápida
-	- En lugar de pintar píxel a píxel, pinta línea por línea usando
-	  la función buffering_line
-	- Con esto se reduce la cantidad de llamadas a la función de biferiado
-	  y se mejora el rendimiento.
-	- Solo se puede usar cuando el renderizado del suelo y el techo no estan texturizados
-	Mejoras de microprocesador:
-	- Se reduce la sobrecarga de llamadas a funciones al pintar líneas completas
-	  en lugar de píxeles
-	- Se minimiza las indirecciones dentro del bucle para que puedan acceder a las variables
-	  de forma más eficiente (mediante registros en lugar de registro -> cache -> RAM)
-	- Se usan referencias locales para evitar accesos repetidos a estructuras anidadas
+	Función para renderizar el suelo y el techo de manera más rápida.
+
+	Detalles:
+	- En lugar de pintar píxel a píxel, esta función pinta línea por línea 
+	  utilizando la función `buffering_line`. Esto reduce la cantidad de 
+	  llamadas a la función de bufferización y mejora el rendimiento.
+	- Divide la ventana en dos partes: techo y suelo. Calcula la línea del 
+	  horizonte (centro de la ventana) basada en la altura de la ventana y el 
+	  desplazamiento vertical del jugador (`pitch_pix`).
+	- Pinta todas las líneas por encima del horizonte con el color del techo y 
+	  todas las líneas por debajo del horizonte con el color del suelo.
+
+	Limitaciones:
+	- Esta función solo puede usarse cuando el renderizado del suelo y el techo
+	  no están texturizados, ya que no se realizan cálculos por píxel.
+
+	Mejoras de rendimiento:
+	- Reduce la sobrecarga de llamadas a funciones al pintar líneas completas 
+	  en lugar de píxeles individuales.
+	- Minimiza las indirecciones dentro del bucle, permitiendo un acceso más 
+	  eficiente a las variables (usando registros en lugar de registro -> 
+	  caché -> RAM).
+	- Utiliza referencias locales para evitar accesos repetidos a estructuras 
+	  anidadas, mejorando el rendimiento dentro de las restricciones de la 
+	  norma de 42.
+
+	Parámetros:
+	- mlx: Puntero a la estructura principal del motor gráfico que contiene 
+	  toda la información del juego.
+
+	Esta función es ideal para mejorar el rendimiento en escenas donde el 
+	renderizado del suelo y el techo no requieren texturas ni efectos avanzados
 */
-void render_floor_and_ceiling_speed(t_mlx *mlx)
+void	render_floor_and_ceiling_speed(t_mlx *mlx)
 {
 	int	y;
 	int	ceiling_color;
@@ -92,27 +127,42 @@ void render_floor_and_ceiling_speed(t_mlx *mlx)
 }
 
 /*
-	Función para renderizar el suelo y el techo con efectos de ambiente
-	- Similar a render_floor_and_ceiling_speed pero aplica efectos de
-	  sombreado y niebla basados en la distancia desde la cámara
-	- Calcula un factor de distancia para cada línea que determina
-	  cuánto se deben aplicar los efectos de ambiente
-	- Usa funciones específicas para aplicar sombreado y niebla al color
-	  del suelo y el techo antes de dibujarlos
-	- Esto crea una sensación de profundidad y atmósfera en la escena 3D
-	- Más costoso computacionalmente debido a los cálculos adicionales por píxel
-	  pero mejora significativamente la calidad visual
-	Mejoras de microprocesador:
-	- Se reduce la sobrecarga de llamadas a funciones al pintar líneas completas
-	  en lugar de píxeles
-	- Se minimiza las indirecciones dentro del bucle para que puedan acceder a las variables
-	  de forma más eficiente (mediante registros en lugar de registro -> cache -> RAM)
-	- Se usan referencias locales para evitar accesos repetidos a estructuras anidadas dentro de
-	las restrciiones de la norma de 42
-	- se omite la opcion de meter las opciones de ambiente en un if dentro de un bucle
-	  para evitar saltos de instruccion que penalizan el rendimiento del procesador
+	Función para renderizar el suelo y el techo con efectos de ambiente.
+
+	Detalles:
+	- Similar a `render_floor_and_ceiling_speed`, pero aplica efectos de 
+	  sombreado y niebla basados en la distancia desde la cámara.
+	- Calcula un factor de distancia (`dist_factor`) para cada línea, que 
+	  determina la intensidad de los efectos de ambiente.
+	- Aplica sombreado y niebla al color del suelo y el techo antes de 
+	  dibujarlos, creando una sensación de profundidad y atmósfera en la escena 
+	  3D.
+	- El sombreado y la niebla se aplican utilizando funciones específicas como 
+	  `applyamb_ceiling` y `applyamb_floor`, que ajustan los colores según el 
+	  factor de distancia.
+
+	Mejoras de rendimiento:
+	- Reduce la sobrecarga de llamadas a funciones al pintar líneas completas 
+	  en lugar de píxeles individuales.
+	- Minimiza las indirecciones dentro del bucle, permitiendo un acceso más 
+	  eficiente a las variables (usando registros en lugar de registro -> 
+	  caché -> RAM).
+	- Utiliza referencias locales para evitar accesos repetidos a estructuras 
+	  anidadas, mejorando el rendimiento dentro de las restricciones de la 
+	  norma de 42.
+	- Evita el uso de condiciones dentro del bucle para aplicar los efectos de 
+	  ambiente, eliminando saltos de instrucción que penalizan el rendimiento 
+	  del procesador en hoot loops.
+
+	Parámetros:
+	- mlx: Puntero a la estructura principal del motor gráfico que contiene 
+	  toda la información del juego.
+
+	Esta función mejora significativamente la calidad visual al añadir efectos 
+	de profundidad y atmósfera, aunque con un mayor coste computacional debido 
+	a los cálculos adicionales por píxel.
 */
-void render_floor_and_ceiling_amb(t_mlx *mlx)
+void	render_floor_and_ceiling_amb(t_mlx *mlx)
 {
 	int				y;
 	int				refs[3];
@@ -128,78 +178,15 @@ void render_floor_and_ceiling_amb(t_mlx *mlx)
 	while (y < refs[HOR] && y < refs[HEIG])
 	{
 		df = dist_factor_ceiling(y, refs[HOR], mlx->amb.ambiance);
-		colors[0] =	apllyamb_ceiling(&(mlx->amb), df, colors[0]);
+		colors[0] = apllyamb_ceiling(&(mlx->amb), df, colors[0]);
 		buffering_line(y, colors[0], mlx, refs[WIDT]);
 		y++;
 	}
 	while (y < refs[HEIG])
 	{
 		df = dist_factor_floor(refs[HEIG], y, refs[HOR], mlx->amb.ambiance);
-		colors[1] =	apllyamb_ceiling(&(mlx->amb), df, colors[1]);
+		colors[1] = apllyamb_ceiling(&(mlx->amb), df, colors[1]);
 		buffering_line(y, colors[1], mlx, refs[WIDT]);
 		y++;
 	}
 }
-
-
-//cersion profundidad PORTOTIPO DE CREACION
-void render_floor_and_ceiling_speed2(t_mlx *mlx)
-{
-	int y;
-	int horizon;
-	float dist_factor;
-	unsigned int color_ceiling;
-	unsigned int color_floor;
-	unsigned int fog_color = FOG_MEDIO_CLARO; // niebla más oscura
-
-
-	color_ceiling = mlx->map->ceiling_color_hex;
-	color_floor = mlx->map->floor_color_hex;
-	horizon = (mlx->win_height >> 1) + mlx->player->pitch_pix;
-	y = 0;
-	while (y < horizon)
-	{
-		// dist_factor = 1.0f - (float)(y - horizon) / horizon; //NIEBLA TOTAL
-		dist_factor = (float)(horizon - y) / horizon; //AMBIENTE ABIERTO SOL DETRAS PAREDES
-		// dist_factor = 1.0f - (float)(horizon - y) / horizon; //-> NIEBLA CON SOL ARRIBA DESCARTADA
-		
-		if (dist_factor < 0.0f)
-			dist_factor = 0.0f;	
-		if (dist_factor > 1.0f)
-			dist_factor = 1.0f;
-		float k = 4.0f;//->ESTE VALOR ES AJUSTABLE
-		color_ceiling =	shade_inverse(mlx->map->ceiling_color_hex, k, dist_factor * 0.5f);// valores pequeñas en configuracions de ambiente queda bien y el configuracions de niebla grandes
-		// color_ceiling = apply_desaturation(color_ceiling, dist_factor * 0.6f);
-		color_ceiling = apply_fog_pixel(color_ceiling, fog_color, dist_factor * 0.2f);// valores pequeñas en configuracions de ambiente queda bien y el configuracions de niebla grandes
-		buffering_line(y, color_ceiling, mlx, mlx->win_width);
-		y++;
-	}
-	while (y < mlx->win_height)
-	{
-		//siemrep en eld enominador  hwight - horizon para que no crashee
-		//si poner horizon - y es mas grados pero con y - horizon es mas fucnoinal difuminado se funde mejor
-		
-		//al haber cambiado los de horizon - y si quito el 1.0f - rompe y se pone negro
-		// dist_factor = 1.0f - (float)( horizon - y) / (mlx->win_height - horizon); // NIEBLA TOTAL PERFECTO
-		dist_factor = 1.0f - (float)( y - horizon) / (mlx->win_height - horizon); // AMBIENTE ABIERTO SOL DETRAS PARAREDES (cerca claro lejos oscuro)
-		// dist_factor = (float)( y - horizon) / (mlx->win_height - horizon); // AMBIENTE ABOERTO SOL DERTAS JUGADOR SIEMPRE DESCARTADO
-		
-		if (dist_factor < 0.0f)
-			dist_factor = 0.0f;	
-		if (dist_factor > 1.0f)
-			dist_factor = 1.0f;
-		
-		// Inverse shading fuerte para suelo
-		
-		float k = 1.0f;
-		
-		color_floor = shade_inverse(mlx->map->floor_color_hex, k, dist_factor * 0.7f);
-		color_floor = apply_desaturation(color_floor, dist_factor * 0.6f);
-		// Aplicar fog usando tu función
-		color_floor = apply_fog_pixel(color_floor, FOG_MEDIO_CLARO, dist_factor * 0.3f);
-
-		buffering_line(y, color_floor, mlx, mlx->win_width);
-		y++;
-	}
-}
-
