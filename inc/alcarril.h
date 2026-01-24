@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 03:14:57 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/24 21:12:51 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/24 21:15:14 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,7 +153,7 @@
 # define MATRIX 4
 
 //hud color
-#define COLOR_HUD 0x47704CFF
+# define COLOR_HUD 0x47704CFF
 
 //messages
 # define CONTROLS_INFO "Press \"z\" on your keyboard to show \
@@ -601,7 +601,5 @@ void			ft_memfillint(void **s, int c, size_t *n);
 void			ft_memfillchar(void *s, int c, size_t n);
 //debug
 void			print_texture_values(t_mlx *mlx);
-
-void			draw_hud_mlx(t_mlx *mlx, t_texture *hud);
 
 #endif

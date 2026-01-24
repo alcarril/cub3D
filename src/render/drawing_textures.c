@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 20:55:10 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/24 21:13:15 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/24 21:14:01 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -221,36 +221,5 @@ void	drawinglopp_tex_amb(t_mlx *mlx, int column, t_wall *wall, t_ray *ray)
 				proporcion_dist * mlx->amb.mult_fog_walls);
 		buffering_pixel(column, i, mlx, color);
 		wall->tex_pos += wall->text_v_step;
-	}
-}
-
-
-
-void draw_hud_mlx(t_mlx *mlx, t_texture *hud)
-{
-	int y, x;
-	uint32_t *src_row;
-	uint32_t *dst_row;
-
-	// La posición horizontal: queremos que la esquina derecha del HUD coincida con la pantalla
-	int pos_x = mlx->win_width - hud->width;
-	if (pos_x < 0) pos_x = 0; // si la textura es más ancha que la pantalla, empezamos en 0
-
-	// La posición vertical: pegado abajo
-	int pos_y = mlx->win_height - hud->height;
-	if (pos_y < 0) pos_y = 0;
-
-	// Recorrer cada fila del HUD
-	for (y = 0; y < hud->height && (pos_y + y) < mlx->win_height; y++)
-	{
-		src_row = (uint32_t *)(hud->addr + y * hud->line_length);
-		dst_row = (uint32_t *)(mlx->bit_map_address + (pos_y + y) * mlx->line_length + pos_x * (mlx->bits_per_pixel / 8));
-
-		// Recorrer cada columna
-		for (x = 0; x < hud->width && (pos_x + x) < mlx->win_width; x++)
-		{
-			if (src_row[x] != COLOR_HUD)
-				dst_row[x] = src_row[x];
-		}
 	}
 }
