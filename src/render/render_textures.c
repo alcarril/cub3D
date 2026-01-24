@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 15:44:58 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/23 22:09:16 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/24 17:46:10 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,7 @@ double	calculate_wall_x(t_mlx *mlx, t_ray *ray)
 		wall_x = mlx->player->pos_y + ray->wall_dist * ray->raydir[Y];
 	else
 		wall_x = mlx->player->pos_x + ray->wall_dist * ray->raydir[X];
-	wall_x -= floor(wall_x);
+	wall_x -= (int)(wall_x);
 	if ((ray->side_hit == VERTICAL && ray->raydir[X] < 0)
 		|| (ray->side_hit == HORIZONTAL && ray->raydir[Y] > 0))
 	{

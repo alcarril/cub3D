@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 03:14:57 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/24 00:23:13 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/24 18:55:03 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,8 @@
 # define MAX_ROWS 25
 
 //window minimum width and height
-# define BASE_WIDTH 600
-# define BASE_HEIGHT 600
+# define BASE_WIDTH 1280
+# define BASE_HEIGHT 720
 
 //map axis
 # define X 1
@@ -135,13 +135,13 @@
 # define WIDT 1
 # define HOR 2
 
-//colores de fog
+//fog colora
 # define FOG_CLARO 0xA0A0A0
 # define FOG_MEDIO_CLARO 0xA0A0A0
 # define FOG_MEDIO_OSCURO 0x606060
 # define FOG_OSCURO 0x202020
 
-//Distancia vision para fog
+//dist vision for fog
 # define CLOSE_DISTANCE 6.0f
 # define MEDIUM_DISTANCE 10.0f
 # define FAR_DISTANCE 14.0f
@@ -164,7 +164,7 @@ player controls and engine config Keys\n"
 */
 
 /*
-	DECLARACIONES ANTICIPADAS:
+	Declarations:
 */
 typedef struct s_mlx_api_components	t_mlx;
 typedef struct s_texture_img		t_texture;
@@ -182,7 +182,7 @@ typedef struct s_player_phisics		t_plphisics;
 typedef struct s_phisics
 {
 	float	gravity;
-	float	air_friction; //hace queesta en el aire dx dy bajando speed
+	float	air_friction;
 	float	floor_friction;
 }	t_phisics;
 
@@ -190,6 +190,21 @@ typedef struct s_player_phisics
 {
 	float	jump_force;
 }	t_plphisics;
+
+typedef struct s_locals
+{
+	int	i;
+	int	wall_end;
+	int	tex_y;
+	int	tex_stride;
+	int	unused;
+}	t_locals;
+
+typedef struct s_ptrs
+{
+	unsigned int	*tex_ptr;
+	unsigned int	*fb_ptr;
+}	t_ptrs;
 
 typedef struct s_texture_img
 {
@@ -269,13 +284,13 @@ typedef struct s_frame_data
 
 typedef struct s_mouse
 {
-	int		pos_x;// posiicon x en matrxi de pixeles (pantalla)
-	int		pos_y;// posicion y en matriz de pixeles (pantalla)
-	int		axis_x;//posicion x de referncia matriz de pixeles (pantalla)
-	int		axis_y;// posicion x de referncia matriz de pixeles (pantalla)
-	float	sens_x;// grados por pixel del mouse
-	float	pitch_factor;// fractor de pitch por pixel del mouse (ajustable)
-	bool	onoff;//activar y desactivar mouse
+	int		pos_x;// x position in pixel matrix (screen)
+	int		pos_y;// y position in pixel matrix (screen)
+	int		axis_x;// x reference position in pixel matrix (screen)
+	int		axis_y;// y reference position in pixel matrix (screen)
+	float	sens_x;// degrees per mouse pixel
+	float	pitch_factor;// pitch factor per mouse pixel (adjustable)
+	bool	onoff;// enable and disable mouse
 	bool	out_and_on;
 }	t_mouse;
 
@@ -523,6 +538,8 @@ void			render_floor_and_ceiling(t_mlx *mlx);
 void			render_floor_and_ceiling_speed(t_mlx *mlx);
 //textured walls
 void			draw_wall_column_tex(t_mlx *mlx, int column, t_wall *wall,
+					t_ray *ray);
+void			drawwallcoltexspeed(t_mlx *mlx, int column, t_wall *wall,
 					t_ray *ray);
 t_texture		*select_texture(t_mlx *mlx, t_ray *ray);
 double			calculate_wall_x(t_mlx *mlx, t_ray *ray);

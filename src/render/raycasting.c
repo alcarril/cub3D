@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 19:04:35 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/23 21:19:34 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/24 19:14:39 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,12 @@ void	cast_ray(t_mlx *mlx, unsigned int n_ray, float ray_angle)
 	if (mlx->frame->textures_onoff == ON)
 	{
 		if (mlx->frame->ambiance_onoff == OFF)
-			draw_wall_column_tex(mlx, n_ray, &wall, &ray);
+		{
+			if (mlx->frame->boost == OFF)
+				draw_wall_column_tex(mlx, n_ray, &wall, &ray);
+			else
+				drawwallcoltexspeed(mlx, n_ray, &wall, &ray);
+		}
 		else
 			drawinglopp_tex_amb(mlx, n_ray, &wall, &ray);
 	}

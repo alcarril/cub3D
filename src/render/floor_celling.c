@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 16:45:21 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/23 22:03:49 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/24 17:18:41 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@ void	render_floor_and_ceiling_speed(t_mlx *mlx)
 		buffering_line(y, ceiling_color, mlx, refs[WIDTH]);
 		y++;
 	}
-	while (y < mlx->win_height)
+	while (y < refs[HEIG])
 	{
 		buffering_line(y, floor_color, mlx, refs[WIDTH]);
 		y++;

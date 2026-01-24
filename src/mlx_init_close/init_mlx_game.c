@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 20:07:49 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/23 22:46:26 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/24 00:53:00 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 /*
 	Inicializamos los componentes de la mlx:
-
 	- Inicializamos la conexión con el servidor X11 (Xorg) con `mlx_init`. Esto 
 	  establece la comunicación entre el programa y el servidor gráfico.
 	- Configuramos las dimensiones de la ventana en función del número de filas 
@@ -25,7 +24,6 @@
 	  renderizado.
 	- Inicializamos la variable `has_been_mouse_in_window` para controlar si el 
 	  ratón ha entrado en la ventana.
-
 	En caso de error:
 	- Liberamos los componentes creados hasta el momento.
 	- Mostramos un mensaje de error por `stderr`.
@@ -58,13 +56,11 @@ bool	init_mlx_components(t_mlx *mlx)
 
 /*
 	Inicializamos los datos de la imagen que se usará como buffer de la ventana:
-
 	- Creamos la imagen con `mlx_new_image`, que reserva memoria para el buffer 
 	  de la ventana.
 	- Obtenemos la dirección de memoria del buffer de la imagen con 
 	  `mlx_get_data_addr`, que nos permite acceder directamente a los píxeles 
 	  de la imagen para modificarlos.
-
 	En caso de error:
 	- Liberamos los componentes creados hasta el momento.
 	- Mostramos un mensaje de error por `stderr`.
@@ -93,14 +89,12 @@ bool	init_images_data(t_mlx *mlx)
 
 /*
 	Cargamos las texturas del mapa:
-
 	- Recorremos las rutas de las texturas del mapa y cargamos cada textura con 
 	  la función `load_single_texture`.
 	- Verificamos que cada textura se haya cargado correctamente. Si ocurre un 
 	  error, liberamos las texturas que se hayan cargado hasta el momento.
 	- Mostramos un mensaje en la consola indicando la ruta de cada textura que 
 	  se carga correctamente.
-
 	NOTA:
 	- Usamos `n_textures` (número de texturas encontradas en el parseo) para 
 	  saber cuántas texturas debemos cargar. Actualmente, este valor está 
@@ -136,21 +130,17 @@ bool	load_textures(t_mlx *mlx)
 
 /*
 	Cargamos una textura individual desde un archivo XPM:
-
 	- Cargamos la imagen XPM de la textura con `mlx_xpm_file_to_image`, que 
 	  convierte el archivo XPM en una imagen compatible con la `mlx`.
 	- Obtenemos los datos de la imagen con `mlx_get_data_addr`, que nos permite
 	  acceder directamente a los píxeles de la textura para renderizarlos.
-
 	En caso de error:
 	- Mostramos un mensaje de error por `stderr`.
 	- Devolvemos `false` para indicar que la carga de la textura falló.
-
 	Parámetros:
 	- mlx: Puntero a la estructura principal del motor gráfico.
 	- texture: Puntero a la estructura de la textura que se va a cargar.
 	- path: Ruta del archivo XPM que contiene la textura.
-
 	Retorno:
 	- `true` si la textura se cargó correctamente.
 	- `false` si ocurrió un error durante la carga.

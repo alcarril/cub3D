@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/21 19:53:10 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/23 22:37:55 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/24 00:50:14 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,10 @@
 	(Xorg). A esta conexión se le llama display, y se está creando una 
 	estructura dentro a la que apunta `mlx_var`, que almacena los componentes o
 	dependencias necesarias para la conexión.
-
 	- `mlx_destroy_display` libera un puntero estático que tiene la `mlx_var` 
 	  dentro y evita el "still reachable".
 	- `free(mlx->mlx_var)` libera la estructura para la que se ha reservado 
 	  memoria.
-
 	Cuando se establece el display con el servidor X11, se puede crear la 
 	ventana y, después, las imágenes asociadas a la ventana. El orden no se 
 	puede invertir. De igual forma, para la liberación, primero se tiene que 
@@ -31,7 +29,6 @@
 	segfault porque el puntero que almacena la imagen está dentro de la 
 	estructura de la ventana. Esto provocará un acceso a memoria ya liberada 
 	(segfault).
-
 	- `mlx_destroy_image` libera la información de la imagen creada para 
 	  bufferizar en la ventana.
 	- `mlx_destroy_window` libera la memoria de la ventana.
@@ -41,13 +38,11 @@
 	- Finalmente, libera la conexión con el servidor X11 (`mlx_var`) si la 
 	  función `t` no es NULL.
 	- Libera la memoria reservada para la estructura `mlx_var`.
-
 	Parámetros:
 	- f: Puntero a la función para liberar la imagen.
 	- g: Puntero a la función para liberar la ventana.
 	- t: Puntero a la función para liberar la conexión con el servidor X11.
 	- mlx: Puntero a la estructura principal del motor gráfico.
-
 	Esta función asegura que los recursos se liberen en el orden correcto para
 	evitar errores como segfaults.
 */
@@ -65,19 +60,16 @@ void	destroy_mlx_componets(int (*f)(), int (*g)(), int (*t)(),
 
 /*
 	Libera las texturas cargadas dentro del array de texturas del mapa.
-
 	Detalles:
 	- Se libera cada textura cargada en el array `textures` de la estructura 
 	  del mapa.
 	- Se utiliza el parámetro `loaded` para liberar únicamente las texturas 
 	  que ya han sido cargadas, en caso de que ocurra un error antes de cargar
 	  todas las texturas esperadas.
-
 	Parámetros:
 	- mlx: Puntero a la estructura principal del motor gráfico.
 	- loaded: Número de texturas cargadas hasta el momento.
 	- max_textures: Número máximo de texturas que se espera cargar.
-
 	Esta función es útil para manejar errores durante la carga de texturas,
 	asegurando que solo se liberen las texturas que ya han sido cargadas.
 */

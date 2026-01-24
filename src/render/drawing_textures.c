@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 20:55:10 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/23 22:14:33 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/24 18:57:16 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,82 @@ void	draw_wall_column_tex(t_mlx *mlx, int column, t_wall *wall, t_ray *ray)
 		buffering_pixel(column, i, mlx, color);
 		wall->tex_pos += wall->text_v_step;
 		i++;
+	}
+}
+
+/*
+	Dibuja una columna de pared texturizada en la pantalla utilizando 
+	punteros para optimizar el acceso a la memoria.
+
+	Parámetros:
+	- mlx: Puntero a la estructura principal que contiene toda la información 
+	  del juego.
+	- column: Índice de la columna en la pantalla donde se dibujará la pared.
+	- wall: Puntero a la estructura de la pared que contiene información sobre 
+	  la pared a dibujar.
+	- ray: Puntero a la estructura del rayo que contiene información sobre el 
+	  rayo que golpeó la pared.
+
+	Funcionalidad:
+	- Selecciona la textura adecuada según la dirección del rayo y el lado de 
+	  la pared golpeada.
+	- Calcula la posición exacta en la pared donde el rayo impactó para mapear 
+	  correctamente la textura.
+	- Calcula las coordenadas de la textura y la posición inicial para el 
+	  mapeo vertical.
+	- Utiliza punteros para acceder directamente a los datos de la textura y 
+	  del búfer de imagen, mejorando el rendimiento al reducir el overhead de 
+	  múltiples accesos a estructuras.
+	- Itera sobre cada píxel de la columna de la pared desde el inicio hasta el 
+	  final, extrayendo el color correspondiente de la textura y dibujándolo en 
+	  el búfer de la imagen.
+
+	Mejoras de microprocesador:
+	- **Prefetch automático:** Al usar punteros alineados a memoria contigua, 
+	  la CPU puede anticipar lecturas de memoria y cargar bloques en caché ante
+	  de que sean usados, reduciendo stalls de memoria (memory-bound).
+	- **Variables locales / struct local:** Debido a la limitación de solo 5 
+	  variables locales por función, se usan structs locales para agrupar los 
+	  valores de bucle. Esto mantiene los datos en registros de CPU y mejora la 
+	  eficiencia, aunque lo ideal para prefetch absoluto sería usar variables 
+	  individuales locales. 
+	- **Evitar cálculos repetitivos:** Se precalculan offsets de textura y 
+	  framebuffer fuera del bucle crítico, evitando multiplicaciones y sumas 
+	  en cada iteración.
+	- **Alineación de punteros:** Los punteros al framebuffer y a la textura se 
+	  calculan de forma lineal y se accede a memoria contigua. Esto evita que l
+	  CPU haga accesos desalineados que penalizan el throughput de la caché y 
+	  mejora el uso de SIMD.
+	- **Reducción de overhead de estructuras:** Se evita acceder directamente 
+	  a `wall->texture`, `wall->wall_end` o `wall->tex_y` dentro del bucle. 
+	  En vez de eso, se copian a variables locales, minimizando el número de 
+	  lecturas a memoria y acelerando la iteración.
+	- **Optimización de bucle crítico:** Todo el trabajo dentro del bucle se 
+	  hace con punteros y operaciones simples (suma de punteros), lo que permit
+	  a la CPU pipelinear las instrucciones y reducir latencia.
+*/
+void	drawwallcoltexspeed(t_mlx *mlx, int column, t_wall *wall, t_ray *ray)
+{
+	t_locals	locals;
+	t_ptrs		ptrs;
+	t_texture	*texture;
+
+	texture = select_texture(mlx, ray);
+	wall->wall_x = calculate_wall_x(mlx, ray);
+	calculate_tex(wall, texture, mlx->win_height, mlx->player);
+	locals.wall_end = wall->wall_end;
+	locals.tex_stride = texture->line_length >> 2;
+	ptrs.tex_ptr = (unsigned int *)texture->addr + wall->tex_x;
+	ptrs.fb_ptr = (unsigned int *)mlx->bit_map_address
+		+ column + wall->wall_start * mlx->win_width;
+	locals.i = wall->wall_start;
+	while (locals.i <= locals.wall_end)
+	{
+		locals.tex_y = (int)wall->tex_pos;
+		*ptrs.fb_ptr = ptrs.tex_ptr[locals.tex_y * locals.tex_stride];
+		wall->tex_pos += wall->text_v_step;
+		ptrs.fb_ptr += mlx->win_width;
+		locals.i++;
 	}
 }
 
