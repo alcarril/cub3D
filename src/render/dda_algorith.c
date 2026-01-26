@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 19:07:51 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/23 21:37:51 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/26 15:42:11 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,21 +26,21 @@
 	- Retorna la distancia a la pared para pintar la columna correspondiente 
 	  (corregida o no).
 */
-float	get_distance_to_wall(t_mlx *mlx, t_ray *ray, float ray_angle)
+float	get_distance_to_wall(t_mlx *mlx, t_ray *ray, float ray_angle, unsigned int n_ray)
 {
-	float	walldist;
+    float	walldist;
 
-	calc_side_dist(mlx, ray);
-	dda_loop(mlx, ray);
-	if (mlx->frame->euclidean == false)
-		ray->wall_dist = get_ray_distance(mlx, ray);
-	else
-		ray->wall_dist = get_ray_distance_euclidean(mlx, ray);
-	if (mlx->frame->fish_eye == false)
-		walldist = ray->wall_dist * cos(ray_angle - (mlx->player->rad_angle));
-	else
-		walldist = ray->wall_dist;
-	return (walldist);
+    calc_side_dist(mlx, ray, n_ray);
+    dda_loop(mlx, ray, n_ray);
+    if (mlx->frame->euclidean == false)
+        ray->wall_dist[n_ray] = get_ray_distance(mlx, ray, n_ray);
+    else
+        ray->wall_dist[n_ray] = get_ray_distance_euclidean(mlx, ray, n_ray);
+    if (mlx->frame->fish_eye == false)
+        walldist = ray->wall_dist[n_ray] * cos(ray_angle - (mlx->player->rad_angle));
+    else
+        walldist = ray->wall_dist[n_ray];
+    return (walldist);
 }
 
 /*
@@ -64,31 +64,31 @@ float	get_distance_to_wall(t_mlx *mlx, t_ray *ray, float ray_angle)
 		(1 para abajo, -1 para arriba).
 	  - Se marca el tipo de borde cruzado como `HORIZONTAL` en `side_hit`.
 */
-void	calc_side_dist(t_mlx *mlx, t_ray *ray)
+void	calc_side_dist(t_mlx *mlx, t_ray *ray, unsigned int n_ray)
 {
-	t_player	*pl;
+    t_player	*pl;
 
-	pl = mlx->player;
-	if (ray->raydir[X] < 0)
-	{
-		ray->step[X] = -1;
-		ray->sidedist[X] = (pl->pos_x - ray->map[X]) * ray->delta[X];
-	}
-	else
-	{
-		ray->step[X] = 1;
-		ray->sidedist[X] = (ray->map[X] + 1.0 - pl->pos_x) * ray->delta[X];
-	}
-	if (ray->raydir[Y] < 0)
-	{
-		ray->step[Y] = -1;
-		ray->sidedist[Y] = (pl->pos_y - ray->map[Y]) * ray->delta[Y];
-	}
-	else
-	{
-		ray->step[Y] = 1;
-		ray->sidedist[Y] = (ray->map[Y] + 1.0 - pl->pos_y) * ray->delta[Y];
-	}
+    pl = mlx->player;
+    if (ray->raydir_x[n_ray] < 0)
+    {
+        ray->step_x[n_ray] = -1;
+        ray->sidedist_x[n_ray] = (pl->pos_x - ray->map_x[n_ray]) * ray->delta_x[n_ray];
+    }
+    else
+    {
+        ray->step_x[n_ray] = 1;
+        ray->sidedist_x[n_ray] = (ray->map_x[n_ray] + 1.0 - pl->pos_x) * ray->delta_x[n_ray];
+    }
+    if (ray->raydir_y[n_ray] < 0)
+    {
+        ray->step_y[n_ray] = -1;
+        ray->sidedist_y[n_ray] = (pl->pos_y - ray->map_y[n_ray]) * ray->delta_y[n_ray];
+    }
+    else
+    {
+        ray->step_y[n_ray] = 1;
+        ray->sidedist_y[n_ray] = (ray->map_y[n_ray] + 1.0 - pl->pos_y) * ray->delta_y[n_ray];
+    }
 }
 
 /*
@@ -124,31 +124,31 @@ void	calc_side_dist(t_mlx *mlx, t_ray *ray)
 	- Es aplicable en cualquier espacio euclidiano, lo que lo hace versátil y
 	  eficiente para este tipo de problemas.
 */
-void	dda_loop(t_mlx *mlx, t_ray *ray)
+void	dda_loop(t_mlx *mlx, t_ray *ray, unsigned int n_ray)
 {
-	int	hit;
+    int	hit;
 
-	hit = 0;
-	while (hit == 0)
-	{
-		if (ray->sidedist[X] < ray->sidedist[Y])
-		{
-			ray->sidedist[X] += ray->delta[X];
-			ray->map[X] += ray->step[X];
-			ray->side_hit = VERTICAL;
-		}
-		else
-		{
-			ray->sidedist[Y] += ray->delta[Y];
-			ray->map[Y] += ray->step[Y];
-			ray->side_hit = HORIZONTAL;
-		}
-		if (is_wall_tile(mlx->map->map_grids[ray->map[Y]][ray->map[X]]))
-		{
-			hit = 1;
-			ray->wall_value = mlx->map->map_grids[ray->map[Y]][ray->map[X]];
-		}
-	}
+    hit = 0;
+    while (hit == 0)
+    {
+        if (ray->sidedist_x[n_ray] < ray->sidedist_y[n_ray])
+        {
+            ray->sidedist_x[n_ray] += ray->delta_x[n_ray];
+            ray->map_x[n_ray] += ray->step_x[n_ray];
+            ray->side_hit[n_ray] = VERTICAL;
+        }
+        else
+        {
+            ray->sidedist_y[n_ray] += ray->delta_y[n_ray];
+            ray->map_y[n_ray] += ray->step_y[n_ray];
+            ray->side_hit[n_ray] = HORIZONTAL;
+        }
+        if (is_wall_tile(mlx->map->map_grids[ray->map_y[n_ray]][ray->map_x[n_ray]]))
+        {
+            hit = 1;
+            ray->wall_value[n_ray] = mlx->map->map_grids[ray->map_y[n_ray]][ray->map_x[n_ray]];
+        }
+    }
 }
 
 /*
@@ -191,25 +191,25 @@ void	dda_loop(t_mlx *mlx, t_ray *ray)
 	- La distancia perpendicular desde el jugador hasta la pared con la que el 
 	  rayo ha colisionado.
 */
-float	get_ray_distance(t_mlx *mlx, t_ray *ray)
+float	get_ray_distance(t_mlx *mlx, t_ray *ray, unsigned int n_ray)
 {
-	float	dist;
-	float	wall_dist;
-	int		face_compensation;
+    float	dist;
+    float	wall_dist;
+    int		face_compensation;
 
-	if (ray->side_hit == VERTICAL)
-	{
-		wall_dist = ray->map[X] - mlx->player->pos_x;
-		face_compensation = ((1 - ray->step[X]) >> 1);
-		dist = (wall_dist + face_compensation) / ray->raydir[X];
-	}
-	else
-	{
-		wall_dist = ray->map[Y] - mlx->player->pos_y;
-		face_compensation = ((1 - ray->step[Y]) >> 1);
-		dist = (wall_dist + face_compensation) / ray->raydir[Y];
-	}
-	return (dist);
+    if (ray->side_hit[n_ray] == VERTICAL)
+    {
+        wall_dist = ray->map_x[n_ray] - mlx->player->pos_x;
+        face_compensation = ((1 - ray->step_x[n_ray]) >> 1);
+        dist = (wall_dist + face_compensation) / ray->raydir_x[n_ray];
+    }
+    else
+    {
+        wall_dist = ray->map_y[n_ray] - mlx->player->pos_y;
+        face_compensation = ((1 - ray->step_y[n_ray]) >> 1);
+        dist = (wall_dist + face_compensation) / ray->raydir_y[n_ray];
+    }
+    return (dist);
 }
 
 /*
@@ -240,11 +240,11 @@ float	get_ray_distance(t_mlx *mlx, t_ray *ray)
 	- La distancia euclidiana desde el jugador hasta el punto de impacto en la 
 	  pared.
 */
-float	get_ray_distance_euclidean(t_mlx *mlx, t_ray *ray)
+float	get_ray_distance_euclidean(t_mlx *mlx, t_ray *ray, unsigned int n_ray)
 {
-	float	fish_eye_dist;
+    float	fish_eye_dist;
 
-	fish_eye_dist = sqrt(pow(ray->map[X] - mlx->player->pos_x, 2)
-			+ pow(ray->map[Y] - mlx->player->pos_y, 2));
-	return (fish_eye_dist);
+    fish_eye_dist = sqrt(pow(ray->map_x[n_ray] - mlx->player->pos_x, 2)
+            + pow(ray->map_y[n_ray] - mlx->player->pos_y, 2));
+    return (fish_eye_dist);
 }

@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 20:55:10 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/26 12:48:27 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/26 15:42:09 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,25 +52,27 @@
 */
 void	draw_wall_column_tex(t_mlx *mlx, int column, t_wall *wall, t_ray *ray)
 {
-	t_texture		*texture;
-	unsigned int	color;
-	int				i;
-	int				wall_end;
-	int				wall_tex_y;
+    t_texture		*texture;
+    unsigned int	color;
+    int				i;
+    int				wall_end;
+    int				wall_tex_y;
 
-	wall_end = wall->wall_end;
-	texture = select_texture(mlx, ray);
-	wall->wall_x = calculate_wall_x(mlx, ray);
-	calculate_tex(wall, texture, mlx->win_height, mlx->player);
-	i = wall->wall_start;
-	while (i <= wall_end)
-	{
-		wall_tex_y = (int)wall->tex_pos;
-		color = extract_color(texture, wall->tex_x, wall_tex_y);
-		buffering_pixel(column, i, mlx, color);
-		wall->tex_pos += wall->text_v_step;
-		i++;
-	}
+    wall_end = wall->wall_end[column];
+    texture = select_texture(mlx, ray, column);
+    wall->wall_x[column] = calculate_wall_x(mlx, ray, column);
+    calculate_tex(wall, texture, mlx->win_height, mlx->player, column);
+    i = wall->wall_start[column];
+	// printf("las direcciones de la textura son: tex_x: %d , tex_y_start: %f , text_v_step: %f\n", wall->tex_x[column], wall->tex_pos[column], wall->text_v_step[column]);
+    while (i <= wall_end)
+    {
+        wall_tex_y = (int)wall->tex_pos[column];
+		// printf("la direccion de la textura es: %p\n", texture->addr);
+        color = extract_color(texture, wall->tex_x[column], wall_tex_y);
+        buffering_pixel(column, i, mlx, color);
+        wall->tex_pos[column] += wall->text_v_step[column];
+        i++;
+    }
 }
 
 /*
@@ -126,73 +128,73 @@ void	draw_wall_column_tex(t_mlx *mlx, int column, t_wall *wall, t_ray *ray)
 */
 void	drawwallcoltexspeed1(t_mlx *mlx, int column, t_wall *wall, t_ray *ray)
 {
-	t_locals	locals;
-	t_ptrs		ptrs;
-	t_texture	*texture;
+    t_locals	locals;
+    t_ptrs		ptrs;
+    t_texture	*texture;
 
-	texture = select_texture(mlx, ray);
-	wall->wall_x = calculate_wall_x(mlx, ray);
-	calculate_tex(wall, texture, mlx->win_height, mlx->player);
-	locals.wall_end = wall->wall_end;
-	locals.tex_stride = texture->line_length >> 2;
-	ptrs.tex_ptr = (unsigned int *)texture->addr + wall->tex_x;
-	ptrs.fb_ptr = (unsigned int *)mlx->bit_map_address
-		+ column + wall->wall_start * mlx->win_width;
-	locals.i = wall->wall_start;
-	while (locals.i <= locals.wall_end)
-	{
-		locals.tex_y = (int)wall->tex_pos;
-		// if (locals.tex_y < 0)
-		// 	locals.tex_y = 0;
-		// else if (locals.tex_y >= texture->height)
-		// 	locals.tex_y = texture->height - 1;
-		*ptrs.fb_ptr = ptrs.tex_ptr[locals.tex_y * locals.tex_stride];
-		wall->tex_pos += wall->text_v_step;
-		ptrs.fb_ptr += mlx->win_width;
-		locals.i++;
-	}
+    texture = select_texture(mlx, ray, column);
+    wall->wall_x[column] = calculate_wall_x(mlx, ray, column);
+    calculate_tex(wall, texture, mlx->win_height, mlx->player, column);
+    locals.wall_end = wall->wall_end[column];
+    locals.tex_stride = texture->line_length >> 2;
+    ptrs.tex_ptr = (unsigned int *)texture->addr + wall->tex_x[column];
+    ptrs.fb_ptr = (unsigned int *)mlx->bit_map_address
+        + column + wall->wall_start[column] * mlx->win_width;
+    locals.i = wall->wall_start[column];
+    while (locals.i <= locals.wall_end)
+    {
+        locals.tex_y = (int)wall->tex_pos[column];
+        // if (locals.tex_y < 0)
+        // 	locals.tex_y = 0;
+        // else if (locals.tex_y >= texture->height)
+        // 	locals.tex_y = texture->height - 1;
+        *ptrs.fb_ptr = ptrs.tex_ptr[locals.tex_y * locals.tex_stride];
+        wall->tex_pos[column] += wall->text_v_step[column];
+        ptrs.fb_ptr += mlx->win_width;
+        locals.i++;
+    }
 }
 
 
 void drawwallcoltexspeed(t_mlx *mlx, int column, t_wall *wall, t_ray *ray)
 {
-	t_locals   locals;
-	t_ptrs     ptrs;
-	t_texture  *texture;
+    t_locals   locals;
+    t_ptrs     ptrs;
+    t_texture  *texture;
 
-	// Selección de textura y cálculo de coordenadas
-	texture = select_texture(mlx, ray);
-	wall->wall_x = calculate_wall_x(mlx, ray);
-	calculate_tex(wall, texture, mlx->win_height, mlx->player);
+    // Selección de textura y cálculo de coordenadas
+    texture = select_texture(mlx, ray, column);
+    wall->wall_x[column] = calculate_wall_x(mlx, ray, column);
+    calculate_tex(wall, texture, mlx->win_height, mlx->player, column);
 
-	// Copiamos valores a locals para optimizar el bucle
-	locals.wall_end      = wall->wall_end;
-	locals.i             = wall->wall_start;
-	locals.tex_pos       = wall->tex_pos;
-	locals.text_v_step   = wall->text_v_step;
-	locals.tex_stride    = texture->line_length >> 2; // stride en píxeles
-	ptrs.tex_ptr         = (unsigned int *)texture->addr + wall->tex_x;
-	ptrs.fb_ptr          = (unsigned int *)mlx->bit_map_address
-						   + column + wall->wall_start * mlx->win_width;
+    // Copiamos valores a locals para optimizar el bucle
+    locals.wall_end      = wall->wall_end[column];
+    locals.i             = wall->wall_start[column];
+    locals.tex_pos       = wall->tex_pos[column];
+    locals.text_v_step   = wall->text_v_step[column];
+    locals.tex_stride    = texture->line_length >> 2; // stride en píxeles
+    ptrs.tex_ptr         = (unsigned int *)texture->addr + wall->tex_x[column];
+    ptrs.fb_ptr          = (unsigned int *)mlx->bit_map_address
+                           + column + wall->wall_start[column] * mlx->win_width;
 
-	// Bucle de pintado de columna
-	while (locals.i <= locals.wall_end)
-	{
-		locals.tex_y = (int)locals.tex_pos;
+    // Bucle de pintado de columna
+    while (locals.i <= locals.wall_end)
+    {
+        locals.tex_y = (int)locals.tex_pos;
 
-		// // Saturamos tex_y sin if: clamping simple
-		// if (locals.tex_y < 0) locals.tex_y = 0;
-		// else if (locals.tex_y >= texture->height) locals.tex_y = texture->height - 1;
+        // // Saturamos tex_y sin if: clamping simple
+        // if (locals.tex_y < 0) locals.tex_y = 0;
+        // else if (locals.tex_y >= texture->height) locals.tex_y = texture->height - 1;
 
-		*ptrs.fb_ptr = ptrs.tex_ptr[locals.tex_y * locals.tex_stride];
+        *ptrs.fb_ptr = ptrs.tex_ptr[locals.tex_y * locals.tex_stride];
 
-		locals.tex_pos += locals.text_v_step;
-		ptrs.fb_ptr += mlx->win_width;
-		locals.i++;
-	}
+        locals.tex_pos += locals.text_v_step;
+        ptrs.fb_ptr += mlx->win_width;
+        locals.i++;
+    }
 
-	// Guardamos la posición final de la textura
-	wall->tex_pos = locals.tex_pos;
+    // Guardamos la posición final de la textura
+    wall->tex_pos[column] = locals.tex_pos;
 }
 
 
@@ -241,28 +243,29 @@ void drawwallcoltexspeed(t_mlx *mlx, int column, t_wall *wall, t_ray *ray)
 */
 void	drawinglopp_tex_amb(t_mlx *mlx, int column, t_wall *wall, t_ray *ray)
 {
-	unsigned int	color;
-	float			proporcion_dist;
-	int				i;
-	int				wall_end;
-	int				wall_tex_y;
+    unsigned int	color;
+    float			proporcion_dist;
+    int				i;
+    int				wall_end;
+    int				wall_tex_y;
+    t_texture		*texture;
 
-	proporcion_dist = ray->wall_dist * mlx->amb.vinv_max_diatance;
-	wall->texture = select_texture(mlx, ray);
-	wall->wall_x = calculate_wall_x(mlx, ray);
-	calculate_tex(wall, wall->texture, mlx->win_height, mlx->player);
-	wall_end = wall->wall_end;
-	i = wall->wall_start - 1;
-	while (++i <= wall_end)
-	{
-		wall_tex_y = (int)wall->tex_pos;
-		color = extract_color(wall->texture, wall->tex_x, wall_tex_y);
-		color = shade_inverse(color, mlx->amb.k_factor_walls, proporcion_dist
-				* mlx->amb.mult_shader_walls);
-		color = apply_desaturation(color, proporcion_dist * 0.6f);
-		color = apply_fog_pixel(color, mlx->amb.fog_color_walls,
-				proporcion_dist * mlx->amb.mult_fog_walls);
-		buffering_pixel(column, i, mlx, color);
-		wall->tex_pos += wall->text_v_step;
-	}
+    proporcion_dist = ray->wall_dist[column] * mlx->amb.vinv_max_diatance;
+    texture = select_texture(mlx, ray, column);
+    wall->wall_x[column] = calculate_wall_x(mlx, ray, column);
+    calculate_tex(wall, texture, mlx->win_height, mlx->player, column);
+    wall_end = wall->wall_end[column];
+    i = wall->wall_start[column] - 1;
+    while (++i <= wall_end)
+    {
+        wall_tex_y = (int)wall->tex_pos[column];
+        color = extract_color(texture, wall->tex_x[column], wall_tex_y);
+        color = shade_inverse(color, mlx->amb.k_factor_walls, proporcion_dist
+                * mlx->amb.mult_shader_walls);
+        color = apply_desaturation(color, proporcion_dist * 0.6f);
+        color = apply_fog_pixel(color, mlx->amb.fog_color_walls,
+                proporcion_dist * mlx->amb.mult_fog_walls);
+        buffering_pixel(column, i, mlx, color);
+        wall->tex_pos[column] += wall->text_v_step[column];
+    }
 }

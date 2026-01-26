@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 19:04:35 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/26 11:28:35 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/26 15:42:05 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ void	throw_rays(t_mlx *mlx)
 	int				win_width;
 
 	win_width = mlx->win_width;
+	// printf("Ancho de ventana: %d\n", win_width);
 	fov_half = mlx->player->fov_half;
 	rad_dif = mlx->frame->delta_rays;
 	ray_angle = (mlx->player->rad_angle) + fov_half;
@@ -83,27 +84,30 @@ void	throw_rays(t_mlx *mlx)
 */
 void	cast_ray(t_mlx *mlx, unsigned int n_ray, float ray_angle)
 {
-	t_ray	ray;
-	t_wall	wall;
-
-	set_ray(mlx, &ray, ray_angle);
-	ray.proyected_wall_dist = get_distance_to_wall(mlx, &ray, ray_angle);
-	mlx->frame->fov_distances[mlx->win_width - n_ray - 1] = ray.wall_dist;
-	scale_wall_phisics(&wall, ray.proyected_wall_dist, mlx);
-	if (mlx->frame->textures_onoff == ON)
-	{
-		if (mlx->frame->ambiance_onoff == OFF)
-		{
-			if (mlx->frame->boost == OFF)
-				draw_wall_column_tex(mlx, n_ray, &wall, &ray);
-			else
-				drawwallcoltexspeed(mlx, n_ray, &wall, &ray);
-		}
-		else
-			drawinglopp_tex_amb(mlx, n_ray, &wall, &ray);
-	}
-	else
-		draw_wall_column(mlx, n_ray, &wall, &ray);
+    t_ray	*ray;
+    t_wall	*wall;
+    
+    ray = &mlx->frame->rays;
+    wall = &mlx->frame->walls;
+    set_ray(mlx, ray, ray_angle, n_ray);
+    ray->proyected_wall_dist[n_ray] = get_distance_to_wall(mlx, ray, ray_angle, n_ray);
+    mlx->frame->fov_distances[mlx->win_width - n_ray - 1] = ray->wall_dist[n_ray];
+    scale_wall_phisics(wall, ray->proyected_wall_dist[n_ray], mlx, n_ray);
+	// printf("holaaaa\n");
+    if (mlx->frame->textures_onoff == ON)
+    {
+        if (mlx->frame->ambiance_onoff == OFF)
+        {
+            if (mlx->frame->boost == OFF)
+                draw_wall_column_tex(mlx, n_ray, wall, ray);
+            else
+                drawwallcoltexspeed(mlx, n_ray, wall, ray);
+        }
+        else
+            drawinglopp_tex_amb(mlx, n_ray, wall, ray);
+    }
+    else
+        draw_wall_column(mlx, n_ray, wall, ray);
 }
 
 /*
@@ -133,20 +137,20 @@ void	cast_ray(t_mlx *mlx, unsigned int n_ray, float ray_angle)
 	DDA, ya que establece los valores iniciales necesarios para calcular las 
 	intersecciones del rayo con las paredes del mapa.
 */
-void	set_ray(t_mlx *mlx, t_ray *ray, float ray_angle)
+void	set_ray(t_mlx *mlx, t_ray *ray, float ray_angle, unsigned int n_ray)
 {
-	ray->raydir[X] = cos(ray_angle);
-	ray->raydir[Y] = -sin(ray_angle);
-	ray->map[X] = (int)(mlx->player->pos_x);
-	ray->map[Y] = (int)(mlx->player->pos_y);
-	if (ray->raydir[X] == 0)
-		ray->delta[X] = 1e30;
-	else
-		ray->delta[X] = fabs(1 / ray->raydir[X]);
-	if (ray->raydir[Y] == 0)
-		ray->delta[Y] = 1e30;
-	else
-		ray->delta[Y] = fabs(1 / ray->raydir[Y]);
+    ray->raydir_x[n_ray] = cos(ray_angle);
+    ray->raydir_y[n_ray] = -sin(ray_angle);
+    ray->map_x[n_ray] = (int)(mlx->player->pos_x);
+    ray->map_y[n_ray] = (int)(mlx->player->pos_y);
+    if (ray->raydir_x[n_ray] == 0)
+        ray->delta_x[n_ray] = 1e30;
+    else
+        ray->delta_x[n_ray] = fabs(1 / ray->raydir_x[n_ray]);
+    if (ray->raydir_y[n_ray] == 0)
+        ray->delta_y[n_ray] = 1e30;
+    else
+        ray->delta_y[n_ray] = fabs(1 / ray->raydir_y[n_ray]);
 }
 
 /*
@@ -176,31 +180,31 @@ void	set_ray(t_mlx *mlx, t_ray *ray, float ray_angle)
 	- Se usan variables locales para optimizar el acceso a memoria y el uso del
 	  caché.
 */
-void	scale_wall_phisics(t_wall *wall, float perp_dist, t_mlx *mlx)
+void	scale_wall_phisics(t_wall *wall, float perp_dist, t_mlx *mlx, unsigned int n_ray)
 {
-	static int	win_height;
-	int			wallh_half;
-	int			pitch;
-	float		vo;
-	float		camz;
+    static int	win_height;
+    int			wallh_half;
+    int			pitch;
+    float		vo;
+    float		camz;
 
-	if (win_height == 0)
-		win_height = mlx->win_height;
-	pitch = mlx->player->pitch_pix;
-	camz = mlx->player->camz;
-	mlx->player->vertical_offset = (camz * (win_height >> 1) / perp_dist);
-	vo = mlx->player->vertical_offset;
-	if (perp_dist <= 0)
-		wall->wall_height = win_height;
-	else
-		wall->wall_height = (int)(win_height / perp_dist);
-	wallh_half = wall->wall_height >> 1;
-	wall->wall_start = (win_height >> 1) - (wallh_half) + pitch + (int)vo;
-	wall->wall_end = (win_height >> 1) + (wallh_half) + pitch + (int)vo;
-	if (wall->wall_start < 0)
-		wall->wall_start = 0;
-	if (wall->wall_end >= win_height)
-		wall->wall_end = win_height - 1;
+    if (win_height == 0)
+        win_height = mlx->win_height;
+    pitch = mlx->player->pitch_pix;
+    camz = mlx->player->camz;
+    mlx->player->vertical_offset = (camz * (win_height >> 1) / perp_dist);
+    vo = mlx->player->vertical_offset;
+    if (perp_dist <= 0)
+        wall->wall_height[n_ray] = win_height;
+    else
+        wall->wall_height[n_ray] = (int)(win_height / perp_dist);
+    wallh_half = wall->wall_height[n_ray] >> 1;
+    wall->wall_start[n_ray] = (win_height >> 1) - (wallh_half) + pitch + (int)vo;
+    wall->wall_end[n_ray] = (win_height >> 1) + (wallh_half) + pitch + (int)vo;
+    if (wall->wall_start[n_ray] < 0)
+        wall->wall_start[n_ray] = 0;
+    if (wall->wall_end[n_ray] >= win_height)
+        wall->wall_end[n_ray] = win_height - 1;
 }
 
 /*
@@ -220,15 +224,15 @@ void	scale_wall_phisics(t_wall *wall, float perp_dist, t_mlx *mlx)
 */
 void	draw_wall_column(t_mlx *mlx, int column, t_wall *wall, t_ray *ray)
 {
-	int	i;
-	int	wall_end;
+    int	i;
+    int	wall_end;
 
-	(void)ray;
-	wall_end = wall->wall_end;
-	i = wall->wall_start;
-	while (i <= wall_end)
-	{
-		buffering_pixel(column, i, mlx, 0xFF8C00);
-		i++;
-	}
+    (void)ray;
+    wall_end = wall->wall_end[column];
+    i = wall->wall_start[column];
+    while (i <= wall_end)
+    {
+        buffering_pixel(column, i, mlx, 0xFF8C00);
+        i++;
+    }
 }

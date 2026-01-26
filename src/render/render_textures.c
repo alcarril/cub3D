@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 15:44:58 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/24 17:46:10 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/26 15:42:01 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,30 +47,30 @@
 	Retorno:
 	- Puntero a la textura seleccionada.
 */
-t_texture	*select_texture(t_mlx *mlx, t_ray *ray)
+t_texture	*select_texture(t_mlx *mlx, t_ray *ray, unsigned int column)
 {
-	t_texture	*texture;
+    t_texture	*texture;
 
-	if (ray->wall_value == BONUS_WALL)
-	{
-		texture = &(mlx->map->textures)[4];
-		return (texture);
-	}
-	if (ray->side_hit == VERTICAL)
-	{
-		if (ray->raydir[X] > 0)
-			texture = &(mlx->map->textures)[E];
-		else
-			texture = &(mlx->map->textures)[W];
-	}
-	else
-	{
-		if (ray->raydir[Y] > 0)
-			texture = &(mlx->map->textures)[N];
-		else
-			texture = &(mlx->map->textures)[S];
-	}
-	return (texture);
+    if (ray->wall_value[column] == BONUS_WALL)
+    {
+        texture = &(mlx->map->textures)[4];
+        return (texture);
+    }
+    if (ray->side_hit[column] == VERTICAL)
+    {
+        if (ray->raydir_x[column] > 0)
+            texture = &(mlx->map->textures)[E];
+        else
+            texture = &(mlx->map->textures)[W];
+    }
+    else
+    {
+        if (ray->raydir_y[column] > 0)
+            texture = &(mlx->map->textures)[N];
+        else
+            texture = &(mlx->map->textures)[S];
+    }
+    return (texture);
 }
 
 /*
@@ -109,21 +109,23 @@ t_texture	*select_texture(t_mlx *mlx, t_ray *ray)
 	- `wall_x`: Proporción (0-1) de la posición del impacto del rayo en la base 
 	  o eje X de la textura.
 */
-double	calculate_wall_x(t_mlx *mlx, t_ray *ray)
+double	calculate_wall_x(t_mlx *mlx, t_ray *ray, unsigned int column)
 {
-	double	wall_x;
+    double	wall_x;
 
-	if (ray->side_hit == VERTICAL)
-		wall_x = mlx->player->pos_y + ray->wall_dist * ray->raydir[Y];
-	else
-		wall_x = mlx->player->pos_x + ray->wall_dist * ray->raydir[X];
-	wall_x -= (int)(wall_x);
-	if ((ray->side_hit == VERTICAL && ray->raydir[X] < 0)
-		|| (ray->side_hit == HORIZONTAL && ray->raydir[Y] > 0))
-	{
-		wall_x = 1.0 - wall_x;
-	}
-	return (wall_x);
+    if (ray->side_hit[column] == VERTICAL)
+        wall_x = mlx->player->pos_y + ray->wall_dist[column] * ray->raydir_y[column];
+    else
+        wall_x = mlx->player->pos_x + ray->wall_dist[column] * ray->raydir_x[column];
+    wall_x -= (int)(wall_x);
+	if (wall_x < 0.0) wall_x = 0.0;
+	if (wall_x >= 1.0) wall_x = 0.999999;
+    if ((ray->side_hit[column] == VERTICAL && ray->raydir_x[column] < 0)
+        || (ray->side_hit[column] == HORIZONTAL && ray->raydir_y[column] > 0))
+    {
+        wall_x = 1.0 - wall_x;
+    }
+    return (wall_x);
 }
 
 /*
@@ -169,18 +171,18 @@ double	calculate_wall_x(t_mlx *mlx, t_ray *ray)
 	- Se pueden optimizar algunos cálculos precalculando valores constantes 
 	  como el horizonte en eventos de cambio de ventana o ajustes de `pitch`.
 */
-void	calculate_tex(t_wall *wall, t_texture *texture, int winh, t_player *pl)
+void	calculate_tex(t_wall *wall, t_texture *texture, int winh, t_player *pl, unsigned int column)
 {
-	int	horizon;
-	int	ws_offset;
-	int	wall_height_half;
+    int	horizon;
+    int	ws_offset;
+    int	wall_height_half;
 
-	wall->tex_x = (int)(wall->wall_x * (double)texture->width);
-	wall->text_v_step = (float)texture->height / (float)wall->wall_height;
-	horizon = (winh >> 1) + pl->pitch_pix + pl->vertical_offset;
-	ws_offset = wall->wall_start - horizon;
-	wall_height_half = wall->wall_height >> 1;
-	wall->tex_pos = (ws_offset + wall_height_half) * wall->text_v_step;
+    wall->tex_x[column] = (int)(wall->wall_x[column] * (double)texture->width);
+    wall->text_v_step[column] = (float)texture->height / (float)wall->wall_height[column];
+    horizon = (winh >> 1) + pl->pitch_pix + pl->vertical_offset;
+    ws_offset = wall->wall_start[column] - horizon;
+    wall_height_half = wall->wall_height[column] >> 1;
+    wall->tex_pos[column] = (ws_offset + wall_height_half) * wall->text_v_step[column];
 }
 
 /*

@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 03:14:57 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/26 11:46:03 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/26 15:43:59 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -241,28 +241,33 @@ typedef struct s_ambiance
 
 typedef struct s_wall
 {
-	int			wall_height;// Altura de la pared en píxeles
-	int			wall_start;// Inicio de la pared en la pantalla pixeles
-	int			wall_end;// Fin de la pared en la pantalla pixeles
-	int			tex_x;// Coordenada X de la textura en la pared
-	int			tex_y;// Coordenada Y de la textura en la pared
-	float		text_v_step;// Text height to screen height ratio
-	float		tex_pos;// Posición inicial en la textura
-	double		wall_x;// Posición de impacto en la pared (0-1)
-	t_texture	*texture;// Puntero a la textura seleccionada
+	int			wall_height[WIDTH];// Altura de la pared en píxeles
+	int			wall_start[WIDTH];// Inicio de la pared en la pantalla pixeles
+	int			wall_end[WIDTH];// Fin de la pared en la pantalla pixeles
+	int			tex_x[WIDTH];// Coordenada X de la textura en la pared
+	int			tex_y[WIDTH];// Coordenada Y de la textura en la pared
+	float		text_v_step[WIDTH];// Text height to screen height ratio
+	float		tex_pos[WIDTH];// Posición inicial en la textura
+	double		wall_x[WIDTH];// Posición de impacto en la pared (0-1)
+	t_texture	*texture[WIDTH];// Puntero a la textura seleccionada//se quita
 }	t_wall;
 
 typedef struct s_ray
 {
-	float			raydir[2];
-	float			delta[2];
-	float			sidedist[2];
-	float			proyected_wall_dist;
-	float			wall_dist;
-	int				map[2];
-	int				wall_value;
-	unsigned int	step[2];
-	bool			side_hit;
+	float			raydir_x[WIDTH];
+	float			raydir_y[WIDTH];
+	float			delta_x[WIDTH];
+	float			delta_y[WIDTH];
+	float			sidedist_x[WIDTH];
+	float			sidedist_y[WIDTH];
+	float			proyected_wall_dist[WIDTH];
+	float			wall_dist[WIDTH];
+	int				map_x[WIDTH];
+	int				map_y[WIDTH];
+	int				wall_value[WIDTH];
+	int	step_x[WIDTH];
+	int	step_y[WIDTH];
+	bool			side_hit[WIDTH];
 }	t_ray;
 
 typedef struct s_frame_data
@@ -286,6 +291,8 @@ typedef struct s_frame_data
 	bool	ambiance_onoff;
 	bool	phisics_onoff;
 	bool	dukedoom_mode;
+	t_wall	walls;
+	t_ray	rays;
 }	t_frame;
 
 typedef struct s_mouse
@@ -529,16 +536,16 @@ bool			is_wall_tile(char map_value);
 //raycasting
 void			throw_rays(t_mlx *mlx);
 void			cast_ray(t_mlx *mlx, unsigned int n_ray, float ray_angle);
-void			set_ray(t_mlx *mlx, t_ray *ray, float ray_angle);
+void			set_ray(t_mlx *mlx, t_ray *ray, float ray_angle, unsigned int n_ray);
 void			draw_wall_column(t_mlx *mlx, int column, t_wall *wall,
 					t_ray *ray);
-void			scale_wall_phisics(t_wall *wall, float perp_dist, t_mlx *mlx);
+void			scale_wall_phisics(t_wall *wall, float perp_dist, t_mlx *mlx, unsigned int n_ray);
 //dda algorithm
-float			get_distance_to_wall(t_mlx *mlx, t_ray *ray, float ray_angle);
-void			calc_side_dist(t_mlx *mlx, t_ray *ray);
-void			dda_loop(t_mlx *mlx, t_ray *ray);
-float			get_ray_distance(t_mlx *mlx, t_ray *ray);
-float			get_ray_distance_euclidean(t_mlx *mlx, t_ray *ray);
+float			get_distance_to_wall(t_mlx *mlx, t_ray *ray, float ray_angle, unsigned int n_ray);
+void			calc_side_dist(t_mlx *mlx, t_ray *ray, unsigned int n_ray);
+void			dda_loop(t_mlx *mlx, t_ray *ray, unsigned int n_ray);
+float			get_ray_distance(t_mlx *mlx, t_ray *ray, unsigned int n_ray);
+float			get_ray_distance_euclidean(t_mlx *mlx, t_ray *ray, unsigned int n_ray);
 //floor and ceiling
 void			render_floor_and_ceiling(t_mlx *mlx);
 void			render_floor_and_ceiling_speed(t_mlx *mlx);
@@ -547,10 +554,10 @@ void			draw_wall_column_tex(t_mlx *mlx, int column, t_wall *wall,
 					t_ray *ray);
 void			drawwallcoltexspeed(t_mlx *mlx, int column, t_wall *wall,
 					t_ray *ray);
-t_texture		*select_texture(t_mlx *mlx, t_ray *ray);
-double			calculate_wall_x(t_mlx *mlx, t_ray *ray);
+t_texture		*select_texture(t_mlx *mlx, t_ray *ray, unsigned int n_ray);
+double			calculate_wall_x(t_mlx *mlx, t_ray *ray, unsigned int n_ray);
 void			calculate_tex(t_wall *wall, t_texture *texture, int win_height,
-					t_player *player);
+					t_player *player, unsigned int n_ray);
 
 unsigned int	extract_color(t_texture *texture, int tex_x, int tex_y);
 //floor_and_ceiling amiances
