@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   bridge.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: carbon-m <carbon-m@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/17 00:00:00 by carbon-m          #+#    #+#             */
-/*   Updated: 2026/01/26 01:21:00 by carbon-m         ###   ########.fr       */
+/*   Updated: 2026/01/27 20:31:52 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,10 +59,20 @@ int	pop_structs(t_parse_bridge *bridge,
 			alca_map->texture_paths[i] = ft_strdup(bridge->texture_paths[i]);
 			if (!alca_map->texture_paths[i])
 				return (0);
+			bridge->n_textures++;
 		}
 		else
 			alca_map->texture_paths[i] = NULL;
 	}
+	alca_map->n_textures = bridge->n_textures;
+	if (!pop_structs2(bridge, alca_map, alcarril_player))
+		return (0);
+	return (1);
+}
+
+int	pop_structs2(t_parse_bridge *bridge,
+		t_map *alca_map, t_player *alcarril_player)
+{
 	populate_colors(bridge, alca_map);
 	alca_map->max_columns = bridge->width;
 	alca_map->max_rows = bridge->height;

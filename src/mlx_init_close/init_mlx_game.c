@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 20:07:49 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/24 00:53:00 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/27 21:01:07 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,16 +113,12 @@ bool	load_textures(t_mlx *mlx)
 	i = 0;
 	while (i < mlx->map->n_textures)
 	{
-		//Esto se va a quitar cuand este hecho el mergero
-		if (mlx->map->texture_paths[i] == NULL)
-			break ;
 		if (load_single_texture(mlx, &mlx->map->textures[i],
 				mlx->map->texture_paths[i]) == false)
 		{
-			free_loaded_textures(mlx, i + 1, mlx->map->n_textures);
+			free_loaded_textures(mlx, i + 1, mlx->map->n_textures, 1);
 			return (false);
 		}
-		printf("Cargando textura desde la ruta: %s\n", mlx->map->texture_paths[i]);
 		i++;
 	}
 	return (true);

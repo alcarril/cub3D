@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cube3D.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: carbon-m <carbon-m@student.42madrid.com    +#+  +:+       +#+        */
+/*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/19 00:00:00 by carbon-m          #+#    #+#             */
-/*   Updated: 2026/01/26 01:21:43 by carbon-m         ###   ########.fr       */
+/*   Updated: 2026/01/27 20:30:09 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@
 typedef struct s_parse_bridge
 {
 	char	texture_paths[5][256];
+	int		n_textures;
 	int		floor_rgb[3];
 	int		ceiling_rgb[3];
 	char	**grid;
@@ -60,6 +61,8 @@ int		extract_parse_data(t_carbon_map *cmap, t_parse_bridge *bridge);
 
 // Convierte estructura puente a t_map y t_player de alcarril
 int		pop_structs(t_parse_bridge *bridge,
+			t_map *alca_map, t_player *alcarril_player);
+int		pop_structs2(t_parse_bridge *bridge,
 			t_map *alca_map, t_player *alcarril_player);
 
 // Función principal de integración

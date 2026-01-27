@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 11:42:33 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/27 19:28:30 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/27 21:02:57 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,11 @@
 */
 bool	setup_game(t_mlx *mlx, t_player *player, t_map *map, t_frame *frame)
 {
-	mlx->map->n_textures = 5;
 	if (load_textures(mlx) == false)
 	{
 		destroy_mlx_componets(mlx_destroy_image, mlx_destroy_window,
 			mlx_destroy_display, mlx);
+		free_map_data(mlx);
 		return (false);
 	}
 	map->max_distance = sqrtf((mlx->map->max_columns * mlx->map->max_columns)

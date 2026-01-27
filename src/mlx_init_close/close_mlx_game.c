@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/21 19:53:10 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/24 00:50:14 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/27 20:59:39 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,12 +73,12 @@ void	destroy_mlx_componets(int (*f)(), int (*g)(), int (*t)(),
 	Esta función es útil para manejar errores durante la carga de texturas,
 	asegurando que solo se liberen las texturas que ya han sido cargadas.
 */
-void	free_loaded_textures(t_mlx *mlx, int loaded, int max_textures)
+void	free_loaded_textures(t_mlx *mlx, int loaded, int max_textures, bool f)
 {
 	int	i;
 	int	max;
 
-	if (loaded < max_textures)
+	if (f)
 		max = loaded;
 	else
 		max = max_textures;
@@ -112,14 +112,11 @@ void	free_loaded_textures(t_mlx *mlx, int loaded, int max_textures)
 
 	Esta función se utiliza cuando el loop de renderización de la `mlx` está en
 	marcha y se desea cerrar el juego de manera limpia.
-	Nota:
-	 Actualmente, la liberación de los datos del mapa está comentada.
-	 Si se desea liberar esa memoria, se debe descomentar la línea.
 */
 int	close_game_manager(t_mlx *mlx)
 {
 	mlx_mouse_show(mlx->mlx_var, mlx->mlx_window);
-	free_loaded_textures(mlx, 5, mlx->map->n_textures);
+	free_loaded_textures(mlx, 0, mlx->map->n_textures, 0);
 	mlx_destroy_image(mlx->mlx_var,
 		mlx->mlx_img);
 	mlx_destroy_window(mlx->mlx_var,
@@ -129,7 +126,7 @@ int	close_game_manager(t_mlx *mlx)
 	if (mlx->frame->fov_distances != NULL)
 		free(mlx->frame->fov_distances);
 	close(mlx->log_fd);
-	// free_map_data(mlx);//
+	free_map_data(mlx);
 	exit(1);
 }
 
@@ -159,7 +156,7 @@ int	close_game_manager(t_mlx *mlx)
 void	free_game(t_mlx *mlx)
 {
 	mlx_mouse_show(mlx->mlx_var, mlx->mlx_window);
-	free_loaded_textures(mlx, 5, mlx->map->n_textures);
+	free_loaded_textures(mlx, 0, mlx->map->n_textures, 0);
 	mlx_destroy_image(mlx->mlx_var,
 		mlx->mlx_img);
 	mlx_destroy_window(mlx->mlx_var,
@@ -180,32 +177,25 @@ void	free_game(t_mlx *mlx)
 	  `texture_paths`. Estas rutas son cadenas de texto alocadas dinámicamente.
 	- Libera la matriz del mapa (`map_grids`), que es un puntero doble que 
 	  contiene las celdas del mapa.
-	- Libera las estructuras de las imágenes de las texturas si están 
-	  alocadas dinámicamente.
 
 	Parámetros:
 	- mlx: Puntero a la estructura principal del motor gráfico.
-
-	Notas:
-	- Actualmente, la liberación de `map->textures` está comentada porque no 
-	  es un puntero dinámico y el compilador podría generar advertencias. Esto 
-	  debe revisarse si en el futuro se cambia la implementación.
 */
 void	free_map_data(t_mlx *mlx)
 {
 	unsigned int	i;
 
 	i = 0;
-	while (mlx->map->texture_paths[i] == NULL)
+	while (i < (unsigned int)mlx->map->n_textures)
 	{
 		free(mlx->map->texture_paths[i]);
 		i++;
 	}
-	// free(mlx->map->textures);
 	i = 0;
 	while (i < mlx->map->max_rows)
 	{
 		free(mlx->map->map_grids[i]);
 		i++;
 	}
+	free(mlx->map->map_grids);
 }

@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 03:14:57 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/27 06:16:33 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/27 20:37:53 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -377,25 +377,17 @@ typedef struct s_player_data
 
 typedef struct s_map
 {
-	char			**map_grids; //esto va a ser un puntero doble a liberar pero la mmera de accader a el es igual
-	unsigned int	max_columns; //x lo rellena carbon con los valores del mapa y con esto se reserva memeria
-	unsigned int	max_rows; //y lo rrelena carbon cunado copie los valores del maap y con esto se reserva memeria
-	//textures (estos se van a tener que liberar)
-		//ahora es un array de texturas en memeria local de 5 posiciones tu vas a tenern que reservar memoria para n texturas se ocvnerita en un puntero simple //t_texture	*textures
-	t_texture	textures[5]; 
-		//esta variable es la que dice cunatas texturas hay en el mapa con ella reservamos memeria paa los paths y las texturas
-		//ahora esta por defecto en 5 y lo uso para reservar memeria pero la necesito
-	int		n_textures;
-		//ahora esta en 5 en memria local pero tu vas a tener que reservar memeria para n texturas se convertira en un puntero doble char **teexture_paths
-	char *texture_paths[5];//Esto va a ser un puntero a linerar con los nombre que reserva carbon
-	//TODAS MEM ENCARGO DE LIBERARLAS YO NO TE PREOCUPES TU SOLO LIBERALA MEMRIA DE TUS STRCUTURSA DESOUES DE HACER LE EMPAALME¡
-	//floor ceilling colors (estos no se tiene que liberar)
-	int		floor_color[3];		// R, G, B
-	int		ceiling_color[3];	// R, G, B
-	int		floor_color_hex;	// Hexadecimal
-	int		ceiling_color_hex;	// Hexadecimal
-	//Max distance for shading and for (diagonal)
-	float	max_distance;
+	char			**map_grids;
+	unsigned int	max_columns; 
+	unsigned int	max_rows;
+	t_texture		textures[5]; 
+	int				n_textures;
+	char 			*texture_paths[5];
+	int				floor_color[3];
+	int				ceiling_color[3];
+	int				floor_color_hex;
+	int				ceiling_color_hex;
+	float			max_distance;
 }	t_map;
 
 typedef struct s_mlx_api_components
@@ -449,8 +441,9 @@ void			setup_default_phisics(t_phisics *phisics);
 //Close and free
 void			destroy_mlx_componets(int (*f)(), int (*g)(), int (*t)(),
 					t_mlx *mlx);
-void			free_loaded_textures(t_mlx *mlx, int loaded, int max_textures);
-void			free_map_data(t_mlx *mlx);//
+void			free_loaded_textures(t_mlx *mlx, int loaded, int max_textures,
+					bool f);
+void			free_map_data(t_mlx *mlx);
 void			free_game(t_mlx *mlx);
 int				close_game_manager(t_mlx *mlx);
 //quizas desaparezcan
