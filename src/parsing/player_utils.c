@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../../inc/carbon.h"
+#include "../../inc/carbon.h"
 
 int	check_multiple_players(t_carbon_map *map)
 {
@@ -19,42 +19,6 @@ int	check_multiple_players(t_carbon_map *map)
 		printf("Error: Multiple players found\n");
 		return (0);
 	}
-	return (1);
-}
-
-int	validate_player_space(t_carbon_map *map, int x, int y)
-{
-	int	open_spaces;
-
-	open_spaces = 0;
-	
-	// Check all adjacent positions (up, down, left, right)
-	if (y > 0 && (map->map_grids[y-1][x] == '0' || 
-		map->map_grids[y-1][x] == 'N' || map->map_grids[y-1][x] == 'S' ||
-		map->map_grids[y-1][x] == 'E' || map->map_grids[y-1][x] == 'W'))
-		open_spaces++;
-		
-	if (y < map->height - 1 && (map->map_grids[y+1][x] == '0' ||
-		map->map_grids[y+1][x] == 'N' || map->map_grids[y+1][x] == 'S' ||
-		map->map_grids[y+1][x] == 'E' || map->map_grids[y+1][x] == 'W'))
-		open_spaces++;
-		
-	if (x > 0 && (map->map_grids[y][x-1] == '0' ||
-		map->map_grids[y][x-1] == 'N' || map->map_grids[y][x-1] == 'S' ||
-		map->map_grids[y][x-1] == 'E' || map->map_grids[y][x-1] == 'W'))
-		open_spaces++;
-		
-	if (x < map->width - 1 && (map->map_grids[y][x+1] == '0' ||
-		map->map_grids[y][x+1] == 'N' || map->map_grids[y][x+1] == 'S' ||
-		map->map_grids[y][x+1] == 'E' || map->map_grids[y][x+1] == 'W'))
-		open_spaces++;
-	
-	if (open_spaces == 0)
-	{
-		printf("Error: Player is isolated in a 1x1 space at (%d, %d)\n", x, y);
-		return (0);
-	}
-	
 	return (1);
 }
 

@@ -6,7 +6,7 @@
 /*   By: carbon-m <carbon-m@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/19 00:00:00 by carbon-m          #+#    #+#             */
-/*   Updated: 2026/01/22 13:53:14 by carbon-m         ###   ########.fr       */
+/*   Updated: 2026/01/26 01:21:43 by carbon-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,10 +40,10 @@
 
 typedef struct s_parse_bridge
 {
-	char	texture_paths[4][256];
+	char	texture_paths[5][256];
 	int		floor_rgb[3];
 	int		ceiling_rgb[3];
-	char	grid[CARBON_MAX_ROWS][CARBON_MAX_COLUMS];
+	char	**grid;
 	float	player_x;
 	float	player_y;
 	float	player_angle;
@@ -59,18 +59,21 @@ typedef struct s_parse_bridge
 int		extract_parse_data(t_carbon_map *cmap, t_parse_bridge *bridge);
 
 // Convierte estructura puente a t_map y t_player de alcarril
-int		populate_game_structures(t_parse_bridge *bridge,
-			t_map *alcarril_map, t_player *alcarril_player);
+int		pop_structs(t_parse_bridge *bridge,
+			t_map *alca_map, t_player *alcarril_player);
 
 // Función principal de integración
 int		integrate_parsing_to_game(char *map_file,
-			t_map *alcarril_map, t_player *alcarril_player);
+			t_map *alca_map, t_player *alcarril_player);
 
 // Bridge utility functions
 void	copy_textures(t_carbon_map *cmap, t_parse_bridge *bridge);
 void	copy_colors_and_player(t_carbon_map *cmap, t_parse_bridge *bridge);
 void	copy_map_grid(t_carbon_map *cmap, t_parse_bridge *bridge);
 int		is_floor_char(char c);
-void	populate_colors(t_parse_bridge *bridge, t_map *alcarril_map);
+void	populate_colors(t_parse_bridge *bridge, t_map *alca_map);
+char	**alloc_alca(int height, int width);
+void	free_alcarril_grid(char **grid, int height);
+void	cleanup_bridge(t_parse_bridge *bridge);
 
 #endif

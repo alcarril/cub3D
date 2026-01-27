@@ -6,11 +6,11 @@
 /*   By: carbon-m <carbon-m@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/24 00:00:00 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/25 08:54:12 by carbon-m         ###   ########.fr       */
+/*   Updated: 2026/01/26 00:45:45 by carbon-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../../inc/carbon.h"
+#include "../../inc/carbon.h"
 
 void	free_split(char **split)
 {
@@ -54,6 +54,7 @@ int	init_map(t_carbon_map *map)
 	map->textures.south = NULL;
 	map->textures.west = NULL;
 	map->textures.east = NULL;
+	map->textures.bonus = NULL;
 	map->floor.r = 0;
 	map->floor.g = 0;
 	map->floor.b = 0;
@@ -66,24 +67,7 @@ int	init_map(t_carbon_map *map)
 	map->player.y = 0;
 	map->player.direction = '\0';
 	map->player.angle = 0;
-	map->player_found = 0;
 	return (1);
-}
-
-void	cleanup_map(t_carbon_map *map)
-{
-	if (!map)
-		return ;
-	if (map->textures.north)
-		free(map->textures.north);
-	if (map->textures.south)
-		free(map->textures.south);
-	if (map->textures.west)
-		free(map->textures.west);
-	if (map->textures.east)
-		free(map->textures.east);
-	if (map->map_grids)
-		free_map_grid(map->map_grids, map->height);
 }
 
 char	**allocate_map_grid(int height, int width)
@@ -109,20 +93,4 @@ char	**allocate_map_grid(int height, int width)
 		i++;
 	}
 	return (grid);
-}
-
-void	free_map_grid(char **grid, int height)
-{
-	int	i;
-
-	if (!grid)
-		return ;
-	i = 0;
-	while (i < height)
-	{
-		if (grid[i])
-			free(grid[i]);
-		i++;
-	}
-	free(grid);
 }

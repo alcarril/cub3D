@@ -6,7 +6,7 @@
 /*   By: carbon-m <carbon-m@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 03:15:03 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/22 13:57:55 by carbon-m         ###   ########.fr       */
+/*   Updated: 2026/01/25 21:52:37 by carbon-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ typedef struct s_texture
 	char	*south;
 	char	*west;
 	char	*east;
+	char	*bonus;
 }	t_carbon_texture;
 
 typedef struct s_color
@@ -61,7 +62,7 @@ typedef struct s_player
 
 typedef struct s_carbon_map
 {
-	char				map_grids[CARBON_MAX_ROWS][CARBON_MAX_COLUMS];
+	char				**map_grids;
 	int					width;
 	int					height;
 	int					player_found;
@@ -138,6 +139,8 @@ int		check_floor_spaces(t_carbon_map *map, int i, int j);
 void	free_split(char **split);
 int		init_map(t_carbon_map *map);
 void	cleanup_map(t_carbon_map *map);
+char	**allocate_map_grid(int height, int width);
+void	free_map_grid(char **grid, int height);
 
 // Debug functions (debug_utils.c)
 void	print_map_info(t_carbon_map *map);

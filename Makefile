@@ -6,7 +6,7 @@
 #    By: carbon-m <carbon-m@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/01/19 00:00:00 by carbon-m          #+#    #+#              #
-#    Updated: 2026/01/22 13:53:14 by carbon-m         ###   ########.fr        #
+#    Updated: 2026/01/26 01:09:32 by carbon-m         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,48 +27,68 @@ LOG_DIR = log/
 MKDIR = mkdir -p
 
 # Archivos de carbon (parsing)
-CARBON_FILES = carbon/parsing/parse_map.c \
-			carbon/parsing/parse_elements.c \
-			carbon/parsing/parse_textures.c \
-			carbon/parsing/parse_colors.c \
-			carbon/parsing/parse_map_grid.c \
-			carbon/parsing/read_file.c \
-			carbon/parsing/validate_map.c \
-			carbon/parsing/validate_map_borders.c \
-			carbon/parsing/parse_utils.c \
-			carbon/parsing/player_utils.c \
-			carbon/parsing/debug_utils.c \
-			carbon/parsing/debug_utils2.c
+CARBON_FILES = parsing/parse_map.c \
+			parsing/parse_elements.c \
+			parsing/parse_textures.c \
+			parsing/parse_colors.c \
+			parsing/parse_map_grid.c \
+			parsing/read_file.c \
+			parsing/validate_map.c \
+			parsing/validate_map_borders.c \
+			parsing/parse_utils.c \
+			parsing/player_utils.c \
+			parsing/debug_utils.c \
+			parsing/debug_utils2.c \
+			parsing/cleanup_utils.c
 
 # Archivos de alcarril (motor gráfico)
-ALCARRIL_FILES = alcarril/mlx_init_close/init_mlx_game.c \
-			alcarril/mlx_init_close/setup_game.c \
-			alcarril/mlx_init_close/init_setup_utils.c \
-			alcarril/mlx_init_close/close_mlx_game.c \
-			alcarril/mlx_init_close/colors.c \
-			alcarril/events/keys.c \
-			alcarril/events/graphic_engine_keys.c \
-			alcarril/events/ambiance_keys.c \
-			alcarril/events/minimap_keys.c \
-			alcarril/events/player_keys.c \
-			alcarril/events/mouse_keys_buttons.c \
-			alcarril/moves/move_player.c \
-			alcarril/moves/mouse.c \
-			alcarril/render/render.c \
-			alcarril/render/raycasting.c \
-			alcarril/render/dda_algorith.c \
-			alcarril/render/floor_celling.c \
-			alcarril/render/render_textures.c \
-			alcarril/render/render_minimap.c \
-			alcarril/render/rays_2d.c \
-			alcarril/ambiances/ambiance_configs.c \
-			alcarril/ambiances/shaders_fog_blur.c \
-			alcarril/ambiances/shaders.c
+ALCARRIL_FILES = mlx_init_close/init_mlx_game.c \
+			mlx_init_close/setup_game.c \
+			mlx_init_close/setup_game2.c \
+			mlx_init_close/init_setup_utils.c \
+			mlx_init_close/close_mlx_game.c \
+			mlx_init_close/colors.c \
+			events/keys.c \
+			events/graphic_engine_keys.c \
+			events/ambiance_keys.c \
+			events/minimap_keys.c \
+			events/player_keys.c \
+			events/player_keys2.c \
+			events/player_keys3.c \
+			events/mouse_keys_buttons.c \
+			events/gravity_keys.c \
+			events/phisics_keys.c \
+			moves/move_player.c \
+			moves/mouse.c \
+			moves/mouse2.c \
+			moves/axisz_phisics.c \
+			moves/decelerate_air.c \
+			moves/difspeed_vecmove_phisics.c \
+			moves/phisics_utils.c \
+			moves/speed_aceleration.c \
+			moves/vectorization_moves.c \
+			render/render.c \
+			render/raycasting.c \
+			render/dda_algorith.c \
+			render/floor_celling.c \
+			render/render_textures.c \
+			render/render_minimap.c \
+			render/rays_2d.c \
+			render/drawing_textures.c \
+			render/utils.c \
+			ambiances/ambiance_configs.c \
+			ambiances/ambiance_configs1.c \
+			ambiances/fog_desaturation.c \
+			ambiances/shaders.c \
+			mem_utils/ft_bzero_boost.c \
+			mem_utils/ft_memfillboost.c \
+			mem_utils/ft_memset_boost.c
 
 # Archivos puente (integración)
 PUENTE_FILES = puente/bridge.c \
-			puente/bridge_utils.c \
-			puente/main.c
+			puente/bridge_copy.c \
+			puente/bridge_memory.c \
+			mains/main.c
 
 # Todos los archivos fuente
 SRC_FILES = $(CARBON_FILES) $(ALCARRIL_FILES) $(PUENTE_FILES)
