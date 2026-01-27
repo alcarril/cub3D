@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 03:14:57 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/27 20:37:53 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/27 21:10:35 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -378,16 +378,16 @@ typedef struct s_player_data
 typedef struct s_map
 {
 	char			**map_grids;
-	unsigned int	max_columns; 
+	char			*texture_paths[5];
+	unsigned int	max_columns;
 	unsigned int	max_rows;
-	t_texture		textures[5]; 
 	int				n_textures;
-	char 			*texture_paths[5];
 	int				floor_color[3];
 	int				ceiling_color[3];
 	int				floor_color_hex;
 	int				ceiling_color_hex;
 	float			max_distance;
+	t_texture		textures[5];
 }	t_map;
 
 typedef struct s_mlx_api_components
