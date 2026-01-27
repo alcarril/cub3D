@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/17 00:00:00 by carbon-m          #+#    #+#             */
-/*   Updated: 2026/01/27 05:07:14 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/27 05:20:54 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,15 @@ int	main(int argc, char **argv)
 		return (error_message("Error loading map"));
 	mlx.map = &map;
 	if (init_mlx_components(&mlx) == false)
+	{
+		
 		return (1);
+	}
 	if (setup_game(&mlx, &player, &map, &frame) == false)
+	{
+		
 		return (1);
+	}
 	start_hooks_and_game(&mlx);
 	mlx_loop(mlx.mlx_var);
 	return (0);
