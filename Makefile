@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: carbon-m <carbon-m@student.42madrid.com    +#+  +:+       +#+         #
+#    By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/01/19 00:00:00 by carbon-m          #+#    #+#              #
-#    Updated: 2026/01/26 01:09:32 by carbon-m         ###   ########.fr        #
+#    Updated: 2026/01/27 06:23:35 by alejandro        ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME = cub3D
 
 CC = cc
 CC_FLAGS = -Wall -Wextra -Werror 
-MLX_FLAGS = -L$(LIB_DIR)/minilibx-linux -lmlx_Linux -lXext -lX11 -lm -lz -O3
+MLX_FLAGS = -L$(LIB_DIR)/minilibx-linux -lmlx_Linux -lXext -lX11 -lm -lz -O3 -flto -funroll-loops -march=native
 LIBFT_FLAGS = -L$(LIB_DIR)/libft -lft
 DEBUG_FLAGS = -g3 -fsanitize=address
 HEADERS = -I$(INC_DIR)
@@ -47,42 +47,43 @@ ALCARRIL_FILES = mlx_init_close/init_mlx_game.c \
 			mlx_init_close/setup_game2.c \
 			mlx_init_close/init_setup_utils.c \
 			mlx_init_close/close_mlx_game.c \
-			mlx_init_close/colors.c \
 			events/keys.c \
 			events/graphic_engine_keys.c \
+			events/phisics_keys.c \
+			events/gravity_keys.c \
 			events/ambiance_keys.c \
 			events/minimap_keys.c \
 			events/player_keys.c \
 			events/player_keys2.c \
 			events/player_keys3.c \
 			events/mouse_keys_buttons.c \
-			events/gravity_keys.c \
-			events/phisics_keys.c \
 			moves/move_player.c \
-			moves/mouse.c \
-			moves/mouse2.c \
+			moves/vectorization_moves.c \
+			moves/difspeed_vecmove_phisics.c \
+			moves/speed_aceleration.c \
 			moves/axisz_phisics.c \
 			moves/decelerate_air.c \
-			moves/difspeed_vecmove_phisics.c \
 			moves/phisics_utils.c \
-			moves/speed_aceleration.c \
-			moves/vectorization_moves.c \
+			moves/mouse.c \
+			moves/mouse2.c \
 			render/render.c \
 			render/raycasting.c \
 			render/dda_algorith.c \
 			render/floor_celling.c \
+			render/render_walls.c \
 			render/render_textures.c \
-			render/render_minimap.c \
-			render/rays_2d.c \
 			render/drawing_textures.c \
+			render/render_minimap.c \
 			render/utils.c \
+			render/rays_2d.c \
 			ambiances/ambiance_configs.c \
 			ambiances/ambiance_configs1.c \
 			ambiances/fog_desaturation.c \
 			ambiances/shaders.c \
-			mem_utils/ft_bzero_boost.c \
+			mem_utils/ft_memset_boost.c \
 			mem_utils/ft_memfillboost.c \
-			mem_utils/ft_memset_boost.c
+			mem_utils/ft_bzero_boost.c \
+			testing/prueba.c
 
 # Archivos puente (integración)
 PUENTE_FILES = puente/bridge.c \
@@ -97,6 +98,8 @@ SRCS = $(addprefix $(SRC_DIR), $(SRC_FILES))
 
 OBJ_FILES = $(SRC_FILES:.c=.o)
 OBJS = $(addprefix $(OBJ_DIR), $(OBJ_FILES))
+
+HEADERS_FILES = inc/cube3D.h inc/alcarril.h inc/carbon.h
 
 LIBFT = $(LIB_DIR)/libft/libft.a
 MINI_LIBX = $(LIB_DIR)/minilibx-linux/libmlx.a
@@ -118,7 +121,7 @@ $(LOG_DIR):
 $(NAME): $(OBJS) $(LIBFT) $(MINI_LIBX)
 	$(CC) $(CC_FLAGS) $(OBJS) $(LIBFT_FLAGS) $(MLX_FLAGS) -o $(NAME)
 
-$(OBJ_DIR)%.o: $(SRC_DIR)%.c
+$(OBJ_DIR)%.o: $(SRC_DIR)%.c $(HEADERS_FILES)
 	$(MKDIR) $(dir $@)
 	$(CC) $(CC_FLAGS) $(HEADERS) -c $< -o $@
 
