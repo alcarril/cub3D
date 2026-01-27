@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 03:14:57 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/26 11:46:03 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/27 04:09:10 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,6 +155,9 @@
 //hud color
 # define COLOR_HUD 0x47704CFF
 
+//Fisxed shift
+# define FP_SHIFT 16
+
 //messages
 # define CONTROLS_INFO "Press \"z\" on your keyboard to show \
 player controls and engine config Keys\n"
@@ -167,7 +170,7 @@ player controls and engine config Keys\n"
 */
 
 /*
-	Declarations:
+	Forward declarations of structs to avoid circular dependencies.
 */
 typedef struct s_mlx_api_components	t_mlx;
 typedef struct s_texture_img		t_texture;
@@ -181,6 +184,9 @@ typedef struct s_frame_data			t_frame;
 typedef struct s_ray				t_ray;
 typedef struct s_phisics			t_phisics;
 typedef struct s_player_phisics		t_plphisics;
+typedef struct s_locals				t_locals;
+typedef struct s_rf					t_rf;
+typedef unsigned int				t_u;
 
 typedef struct s_phisics
 {
@@ -194,21 +200,33 @@ typedef struct s_player_phisics
 	float	jump_force;
 }	t_plphisics;
 
+typedef struct s_rf
+{
+	int				y;
+	int				width;
+	int				height;
+	int				horizon;
+	char			*bitmap;
+	int				line_len;
+	int				bpp;
+	int				line_bytes;
+	unsigned int	ceiling_color;
+	unsigned int	floor_color;
+	unsigned int	offset;
+}	t_rf;
+
 typedef struct s_locals
 {
-	float	text_v_step;
-	float	tex_pos;
-	int		i;
-	int		wall_end;
-	int		tex_y;
-	int		tex_stride;
-}	t_locals;
-
-typedef struct s_ptrs
-{
+	float			text_v_step;
+	float			tex_pos;
 	unsigned int	*tex_ptr;
 	unsigned int	*fb_ptr;
-}	t_ptrs;
+	int				i;
+	int				wall_end;
+	int				tex_y;
+	int				tex_stride;
+	int				win_width;
+}	t_locals;
 
 typedef struct s_texture_img
 {
@@ -248,6 +266,7 @@ typedef struct s_wall
 	int			tex_y;// Coordenada Y de la textura en la pared
 	float		text_v_step;// Text height to screen height ratio
 	float		tex_pos;// Posición inicial en la textura
+	float		vertical_offset; // Desplazamiento vertical de la pared
 	double		wall_x;// Posición de impacto en la pared (0-1)
 	t_texture	*texture;// Puntero a la textura seleccionada
 }	t_wall;
@@ -261,8 +280,9 @@ typedef struct s_ray
 	float			wall_dist;
 	int				map[2];
 	int				wall_value;
-	unsigned int	step[2];
+	int				step[2];
 	bool			side_hit;
+	char			padding[3];
 }	t_ray;
 
 typedef struct s_frame_data
@@ -274,8 +294,8 @@ typedef struct s_frame_data
 	float	mm_scale[2];
 	float	mm_offset[2];
 	float	mm_zoom_factor;
-	int		ceiling_limit;
-	int		floor_limit;
+	int		wall_start_min;
+	int		wall_end_max;
 	bool	minimap_onoff;
 	bool	minimap_showrays;
 	bool	raycasting_onoff;
@@ -286,6 +306,8 @@ typedef struct s_frame_data
 	bool	ambiance_onoff;
 	bool	phisics_onoff;
 	bool	dukedoom_mode;
+	t_wall	walls[BASE_WIDTH];
+	t_ray	rays[BASE_WIDTH];
 }	t_frame;
 
 typedef struct s_mouse
@@ -331,7 +353,6 @@ typedef struct s_player_data
 	float		pitch_pix;
 	int			max_pitch_pix;
 	float		camz;
-	float		vertical_offset;
 	float		aceleration_z;
 	float		aceleration_zcp;
 	float		speed_z;
@@ -517,11 +538,12 @@ void			move_player_with_mouse(t_mlx *mlx, int *pix_dif,
 bool			clamp_mouse_deltax(int *pix_dif);
 bool			clamp_mouse_deltay(int *pix_dif);
 void			reset_mouse_position(t_mlx *mlx, bool *is_move);
-//render
+//engine loop
 int				game_engine(t_mlx *mlx);
-//render utils
+//buffering pixels and lines
 void			buffering_pixel(int x, int y, t_mlx *mlx, int color);
 void			buffering_line(int y, int color, t_mlx *mlx, int width);
+//render utils
 void			fps_counter_average(t_mlx *mlx);
 void			fps_counter_realtime(t_mlx *mlx);
 void			ft_memset_int(void *s, int c, size_t n);
@@ -539,9 +561,19 @@ void			calc_side_dist(t_mlx *mlx, t_ray *ray);
 void			dda_loop(t_mlx *mlx, t_ray *ray);
 float			get_ray_distance(t_mlx *mlx, t_ray *ray);
 float			get_ray_distance_euclidean(t_mlx *mlx, t_ray *ray);
+//render 3d
+void			render_frame3d(t_mlx *mlx);
 //floor and ceiling
 void			render_floor_and_ceiling(t_mlx *mlx);
 void			render_floor_and_ceiling_speed(t_mlx *mlx);
+void			load_locals(t_rf *s, t_mlx *mlx, int *ceiling_limit,
+					int *floor_limit);
+//render walls
+void			render_walls(t_mlx *mlx);
+void			render_walls_tex(t_mlx *mlx);
+void			render_walls_no_textures(t_mlx *mlx);
+void			render_walls_tex_speed(t_mlx *mlx);
+void			render_walls_ambiance(t_mlx *mlx);
 //textured walls
 void			draw_wall_column_tex(t_mlx *mlx, int column, t_wall *wall,
 					t_ray *ray);

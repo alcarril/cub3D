@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 11:42:33 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/23 22:57:01 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/27 01:36:13 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,8 +98,8 @@ void	setup_player_mouse(t_mlx *mlx)
 	int			middle[2];//esto se va a borrar
 	// middle[X] = mlx->map->max_columns / 2; //esto se va a borrar
 	// middle[Y] = mlx->map->max_rows / 2; //esto se va a borrar
-	middle[X] = 1; //esto se va a borrar
-	middle[Y] = 1; //esto se va a borra
+	middle[X] = 2; //esto se va a borrar
+	middle[Y] = 2; //esto se va a borra
 	pl = mlx->player;
 	init_player_orientation_pos(mlx->player, 'N', middle);//esta quizas se quita
 	pl->speed = SPEED_DIGITAL;

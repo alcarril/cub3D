@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 15:44:58 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/24 17:46:10 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/27 02:34:29 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,7 +177,7 @@ void	calculate_tex(t_wall *wall, t_texture *texture, int winh, t_player *pl)
 
 	wall->tex_x = (int)(wall->wall_x * (double)texture->width);
 	wall->text_v_step = (float)texture->height / (float)wall->wall_height;
-	horizon = (winh >> 1) + pl->pitch_pix + pl->vertical_offset;
+	horizon = (winh >> 1) + pl->pitch_pix + (int)wall->vertical_offset;
 	ws_offset = wall->wall_start - horizon;
 	wall_height_half = wall->wall_height >> 1;
 	wall->tex_pos = (ws_offset + wall_height_half) * wall->text_v_step;

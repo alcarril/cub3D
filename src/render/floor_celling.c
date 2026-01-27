@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/09 16:45:21 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/26 06:24:00 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/27 03:51:13 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,107 +68,128 @@ void	render_floor_and_ceiling(t_mlx *mlx)
 }
 
 /*
-	Función para renderizar el suelo y el techo de manera más rápida.
+	Función para renderizar el suelo y el techo de forma rápida usando
+	escritura por líneas completas en el framebuffer.
 
 	Detalles:
-	- En lugar de pintar píxel a píxel, esta función pinta línea por línea 
-	  utilizando la función `buffering_line`. Esto reduce la cantidad de 
-	  llamadas a la función de bufferización y mejora el rendimiento.
-	- Divide la ventana en dos partes: techo y suelo. Calcula la línea del 
-	  horizonte (centro de la ventana) basada en la altura de la ventana y el 
-	  desplazamiento vertical del jugador (`pitch_pix`).
-	- Pinta todas las líneas por encima del horizonte con el color del techo y 
-	  todas las líneas por debajo del horizonte con el color del suelo.
+	- En lugar de pintar píxel a píxel, la función rellena líneas completas
+	  de memoria con `ft_memfillboost`, lo que reduce drásticamente el número
+	  de operaciones y mejora el rendimiento.
+	- Calcula la línea del horizonte en función de la altura de la ventana y
+	  del desplazamiento vertical del jugador (`pitch_pix`).
+	- Todas las líneas por encima del horizonte se rellenan con el color del
+	  techo y todas las líneas por debajo con el color del suelo.
+	- La escritura en el bitmap se realiza de forma secuencial, favoreciendo
+	  el prefetch automático de caché y reduciendo fallos de caché.
+	- Evita renderizar las líneas que están dentro de los límites de las 
+	  paredes (entre `ceiling_limit` y `floor_limit`), previniendo la 
+	  sobreescritura de píxeles que serán dibujados posteriormente por el 
+	  renderizado de paredes. Esta optimización proporciona mejoras de 
+	  rendimiento notables en mapas cerrados donde el horizonte apenas es 
+	  visible, y será especialmente beneficiosa en futuras implementaciones 
+	  de suelo y techo texturizados donde evitar cálculos redundantes será 
+	  crítico para mantener un buen rendimiento.
+
+	Organización de datos:
+	- Las variables usadas dentro del bucle se agrupan en una estructura local
+	  para mejorar la localidad de referencia y permitir al compilador mantener
+	  valores en registros.
+	- Se usan referencias locales a los datos de `mlx` para evitar accesos
+	  repetidos a estructuras anidadas dentro del bucle crítico.
 
 	Limitaciones:
-	- Esta función solo puede usarse cuando el renderizado del suelo y el techo
-	  no están texturizados, ya que no se realizan cálculos por píxel.
+	- Esta función solo es válida cuando el suelo y el techo no están
+	  texturizados, ya que no se realizan cálculos por píxel ni muestreo de
+	  texturas.
 
 	Mejoras de rendimiento:
-	- Reduce la sobrecarga de llamadas a funciones al pintar líneas completas 
-	  en lugar de píxeles individuales.
-	- Minimiza las indirecciones dentro del bucle, permitiendo un acceso más 
-	  eficiente a las variables (usando registros en lugar de registro -> 
-	  caché -> RAM).
-	- Utiliza referencias locales para evitar accesos repetidos a estructuras 
-	  anidadas, mejorando el rendimiento dentro de las restricciones de la 
-	  norma de 42.
+	- Reduce el coste por iteración al operar por líneas en lugar de píxeles.
+	- Minimiza accesos a memoria dentro del bucle caliente (hot loop).
+	- Accesos contiguos en memoria que maximizan el aprovechamiento de caché.
+	- Evita renderizar píxeles que serán sobrescritos por las paredes.
 
 	Parámetros:
-	- mlx: Puntero a la estructura principal del motor gráfico que contiene 
-	  toda la información del juego.
+	- mlx: Puntero a la estructura principal del motor gráfico que contiene
+	  el estado del frame, el framebuffer y la información del jugador.
 
-	Esta función es ideal para mejorar el rendimiento en escenas donde el 
-	renderizado del suelo y el techo no requieren texturas ni efectos avanzados
+	Uso recomendado:
+	- Activar cuando no se usan texturas de suelo/techo y se prioriza el
+	  rendimiento del renderizado
 */
-void	render_floor_and_ceiling_speed1(t_mlx *mlx)
-{
-	int	y;
-	int	ceiling_color;
-	int	floor_color;
-	int	refs[3];
-
-	refs[HEIG] = mlx->win_height;
-	refs[WIDTH] = mlx->win_width;
-	refs[HOR] = (refs[0] >> 1) + mlx->player->pitch_pix;
-	ceiling_color = mlx->map->ceiling_color_hex;
-	floor_color = mlx->map->floor_color_hex;
-	y = 0;
-	while (y < refs[HOR] && y < refs[HEIG])
-	{
-		buffering_line(y, ceiling_color, mlx, refs[WIDTH]);
-		y++;
-	}
-	while (y < refs[HEIG])
-	{
-		buffering_line(y, floor_color, mlx, refs[WIDTH]);
-		y++;
-	}
-}
-
-
 void	render_floor_and_ceiling_speed(t_mlx *mlx)
 {
-	int			y;
-	int			width;
-	int			height;
-	int			horizon;
-	char		*bitmap;
-	int			line_len;
-	int			bpp;
-	unsigned int	ceiling_color;
-	unsigned int	floor_color;
-	unsigned int	offset;
-	int			line_bytes; // <<<<< precálculo
+	t_rf	s;
+	int		ceiling_limit;
+	int		floor_limit;
 
-	width  = mlx->win_width;
-	height = mlx->win_height;
-	horizon = (height >> 1) + mlx->player->pitch_pix;
-	bitmap = mlx->bit_map_address;
-	line_len = mlx->line_length;
-	bpp = mlx->bits_per_pixel >> 3;
-	ceiling_color = mlx->map->ceiling_color_hex;
-	floor_color   = mlx->map->floor_color_hex;
-
-	line_bytes = width * bpp; // <<< precalculado
-
-	offset = 0;
-
-	// Dibujamos el techo
-	for (y = 0; y < horizon && y < height; y++)
+	load_locals(&s, mlx, &ceiling_limit, &floor_limit);
+	s.offset = 0;
+	s.y = 0;
+	while (s.y < ceiling_limit && s.y < s.height)
 	{
-		ft_memfillboost(bitmap + offset, ceiling_color, line_bytes);
-		offset += line_len;
+		ft_memfillboost(s.bitmap + s.offset, s.ceiling_color, s.line_bytes);
+		s.offset += s.line_len;
+		s.y++;
 	}
-
-	// Dibujamos el suelo
-	for (; y < height; y++)
+	while (s.y <= floor_limit && s.y < s.height)
 	{
-		ft_memfillboost(bitmap + offset, floor_color, line_bytes);
-		offset += line_len;
+		s.offset += s.line_len;
+		s.y++;
+	}
+	while (s.y < s.height)
+	{
+		ft_memfillboost(s.bitmap + s.offset, s.floor_color, s.line_bytes);
+		s.offset += s.line_len;
+		s.y++;
 	}
 }
 
+/*
+	Función auxiliar para cargar variables locales necesarias para el
+	renderizado rápido del suelo y el techo.
+
+	Parámetros:
+	- s: Puntero a la estructura local `t_rf` donde se almacenarán las
+	  variables.
+	- mlx: Puntero a la estructura principal del motor gráfico que contiene
+	  toda la información del juego.
+	- ceiling_limit: Puntero a un entero donde se almacenará el límite
+	  inferior del techo.
+	- floor_limit: Puntero a un entero donde se almacenará el límite
+	  superior del suelo.
+
+	Funcionalidad:
+	- Extrae y almacena en `s` las dimensiones de la ventana, la dirección
+	  del bitmap, la longitud de línea, los bytes por píxel y los colores
+	  del techo y el suelo.
+	- Calcula los límites de dibujo para el techo y el suelo basándose en
+	  los datos del frame actual.
+	- Asegura que los límites no excedan las dimensiones de la ventana.
+
+	Esta función prepara todas las variables necesarias para optimizar el
+	renderizado rápido del suelo y el techo.
+*/
+void	load_locals(t_rf *s, t_mlx *mlx, int *ceiling_limit, int *floor_limit)
+{
+	s->width = mlx->win_width;
+	s->height = mlx->win_height;
+	s->bitmap = mlx->bit_map_address;
+	s->line_len = mlx->line_length;
+	s->bpp = mlx->bits_per_pixel >> 3;
+	s->ceiling_color = mlx->map->ceiling_color_hex;
+	s->floor_color = mlx->map->floor_color_hex;
+	s->line_bytes = s->width * s->bpp;
+	*ceiling_limit = mlx->frame->wall_start_min;
+	*floor_limit = mlx->frame->wall_end_max;
+	if (*ceiling_limit < 0)
+		*ceiling_limit = 0;
+	if (*ceiling_limit >= s->height)
+		*ceiling_limit = s->height - 1;
+	if (*floor_limit < 0)
+		*floor_limit = 0;
+	if (*floor_limit >= s->height)
+		*floor_limit = s->height - 1;
+}
 
 /*
 	Función para renderizar el suelo y el techo con efectos de ambiente.

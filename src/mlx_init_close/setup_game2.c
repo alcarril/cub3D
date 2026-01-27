@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 16:54:24 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/23 23:00:09 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/27 02:44:36 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,6 @@ void	init_player_phisics(t_player *pl, t_phisics *ph)
 	pl->max_speed_a[X] = MAX_PLAYER_SPEED;
 	pl->max_speed_a[Y] = MAX_PLAYER_SPEED;
 	pl->camz = MIDDLE_Z;
-	pl->vertical_offset = 0.0f;
 	pl->aceleration_z = 0.0f;
 	pl->aceleration_zcp = ph->gravity * ACCELERATION_K_EARTH;
 	pl->speed_z = 0.0f;

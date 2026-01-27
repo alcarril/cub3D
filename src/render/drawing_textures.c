@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/21 20:55:10 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/26 12:48:27 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/27 03:53:46 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,77 +124,34 @@ void	draw_wall_column_tex(t_mlx *mlx, int column, t_wall *wall, t_ray *ray)
 	  hace con punteros y operaciones simples (suma de punteros), lo que permit
 	  a la CPU pipelinear las instrucciones y reducir latencia.
 */
-void	drawwallcoltexspeed1(t_mlx *mlx, int column, t_wall *wall, t_ray *ray)
+void	drawwallcoltexspeed(t_mlx *m, int col, t_wall *w, t_ray *ray)
 {
-	t_locals	locals;
-	t_ptrs		ptrs;
+	t_locals	l;
 	t_texture	*texture;
 
-	texture = select_texture(mlx, ray);
-	wall->wall_x = calculate_wall_x(mlx, ray);
-	calculate_tex(wall, texture, mlx->win_height, mlx->player);
-	locals.wall_end = wall->wall_end;
-	locals.tex_stride = texture->line_length >> 2;
-	ptrs.tex_ptr = (unsigned int *)texture->addr + wall->tex_x;
-	ptrs.fb_ptr = (unsigned int *)mlx->bit_map_address
-		+ column + wall->wall_start * mlx->win_width;
-	locals.i = wall->wall_start;
-	while (locals.i <= locals.wall_end)
+	texture = select_texture(m, ray);
+	w->wall_x = calculate_wall_x(m, ray);
+	calculate_tex(w, texture, m->win_height, m->player);
+	l.win_width = m->win_width;
+	l.wall_end = w->wall_end;
+	l.i = w->wall_start - 1;
+	l.tex_pos = w->tex_pos;
+	l.text_v_step = w->text_v_step;
+	l.tex_stride = texture->line_length >> 2;
+	l.tex_ptr = (t_u *)texture->addr + w->tex_x;
+	l.fb_ptr = (t_u *)m->bit_map_address + col + w->wall_start * m->win_width;
+	while (++l.i <= l.wall_end)
 	{
-		locals.tex_y = (int)wall->tex_pos;
-		// if (locals.tex_y < 0)
-		// 	locals.tex_y = 0;
-		// else if (locals.tex_y >= texture->height)
-		// 	locals.tex_y = texture->height - 1;
-		*ptrs.fb_ptr = ptrs.tex_ptr[locals.tex_y * locals.tex_stride];
-		wall->tex_pos += wall->text_v_step;
-		ptrs.fb_ptr += mlx->win_width;
-		locals.i++;
+		l.tex_y = (int)l.tex_pos;
+		if (l.tex_y < 0)
+			l.tex_y = 0;
+		else if (l.tex_y >= texture->height)
+			l.tex_y = texture->height - 1;
+		*l.fb_ptr = l.tex_ptr[l.tex_y * l.tex_stride];
+		l.tex_pos += l.text_v_step;
+		l.fb_ptr += l.win_width;
 	}
 }
-
-
-void drawwallcoltexspeed(t_mlx *mlx, int column, t_wall *wall, t_ray *ray)
-{
-	t_locals   locals;
-	t_ptrs     ptrs;
-	t_texture  *texture;
-
-	// Selección de textura y cálculo de coordenadas
-	texture = select_texture(mlx, ray);
-	wall->wall_x = calculate_wall_x(mlx, ray);
-	calculate_tex(wall, texture, mlx->win_height, mlx->player);
-
-	// Copiamos valores a locals para optimizar el bucle
-	locals.wall_end      = wall->wall_end;
-	locals.i             = wall->wall_start;
-	locals.tex_pos       = wall->tex_pos;
-	locals.text_v_step   = wall->text_v_step;
-	locals.tex_stride    = texture->line_length >> 2; // stride en píxeles
-	ptrs.tex_ptr         = (unsigned int *)texture->addr + wall->tex_x;
-	ptrs.fb_ptr          = (unsigned int *)mlx->bit_map_address
-						   + column + wall->wall_start * mlx->win_width;
-
-	// Bucle de pintado de columna
-	while (locals.i <= locals.wall_end)
-	{
-		locals.tex_y = (int)locals.tex_pos;
-
-		// // Saturamos tex_y sin if: clamping simple
-		// if (locals.tex_y < 0) locals.tex_y = 0;
-		// else if (locals.tex_y >= texture->height) locals.tex_y = texture->height - 1;
-
-		*ptrs.fb_ptr = ptrs.tex_ptr[locals.tex_y * locals.tex_stride];
-
-		locals.tex_pos += locals.text_v_step;
-		ptrs.fb_ptr += mlx->win_width;
-		locals.i++;
-	}
-
-	// Guardamos la posición final de la textura
-	wall->tex_pos = locals.tex_pos;
-}
-
 
 /*
 	Dibuja una columna de pared texturizada en la pantalla con efectos de 

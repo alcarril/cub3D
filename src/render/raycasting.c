@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/08 19:04:35 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/26 11:28:35 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/27 03:45:31 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,8 @@ void	throw_rays(t_mlx *mlx)
 	int				n_ray;
 	int				win_width;
 
+	mlx->frame->wall_start_min = mlx->win_height;
+	mlx->frame->wall_end_max = 0;
 	win_width = mlx->win_width;
 	fov_half = mlx->player->fov_half;
 	rad_dif = mlx->frame->delta_rays;
@@ -66,12 +68,11 @@ void	throw_rays(t_mlx *mlx)
 	  del frame actual.
 	- Escala la altura de la pared en función de la distancia perpendicular 
 	  utilizando la función `scale_wall_phisics`.
-	- Dibuja la columna de la pared en la posición correspondiente de la 
-	  pantalla. Esto puede hacerse en dos modos:
-	  - **Modo simple:** Dibuja la pared con un color fijo.
-	  - **Modo texturizado:** Aplica una textura a la pared. Si el modo de 
-		iluminación ambiental está activado, se ajusta la textura para simular 
-		efectos de luz y sombra.
+	- Actualiza los límites de inicio y fin de la pared para optimizar el
+	  proceso de dibujo, asegurándose de que solo se dibujen las partes
+	  visibles de las paredes y que en el renderizado no haya sobreposiciones
+	  innecesarias, lo mejora mucho el rendimiento del motor sobretodo en 
+	  mapas centrados en pasillos estrechos.
 
 	Mejoras de rendimiento:
 	- El rayo (`ray`) y la pared (`wall`) se declaran en la memoria stack para 
@@ -83,27 +84,27 @@ void	throw_rays(t_mlx *mlx)
 */
 void	cast_ray(t_mlx *mlx, unsigned int n_ray, float ray_angle)
 {
-	t_ray	ray;
-	t_wall	wall;
+	t_ray	*ray;
+	t_wall	*wall;
 
-	set_ray(mlx, &ray, ray_angle);
-	ray.proyected_wall_dist = get_distance_to_wall(mlx, &ray, ray_angle);
-	mlx->frame->fov_distances[mlx->win_width - n_ray - 1] = ray.wall_dist;
-	scale_wall_phisics(&wall, ray.proyected_wall_dist, mlx);
-	if (mlx->frame->textures_onoff == ON)
+	ray = &mlx->frame->rays[n_ray];
+	wall = &mlx->frame->walls[n_ray];
+	set_ray(mlx, ray, ray_angle);
+	ray->proyected_wall_dist = get_distance_to_wall(mlx, ray, ray_angle);
+	mlx->frame->fov_distances[mlx->win_width - n_ray - 1] = ray->wall_dist;
+	scale_wall_phisics(wall, ray->proyected_wall_dist, mlx);
+	if (n_ray == 0)
 	{
-		if (mlx->frame->ambiance_onoff == OFF)
-		{
-			if (mlx->frame->boost == OFF)
-				draw_wall_column_tex(mlx, n_ray, &wall, &ray);
-			else
-				drawwallcoltexspeed(mlx, n_ray, &wall, &ray);
-		}
-		else
-			drawinglopp_tex_amb(mlx, n_ray, &wall, &ray);
+		mlx->frame->wall_start_min = wall->wall_start;
+		mlx->frame->wall_end_max = wall->wall_end;
 	}
 	else
-		draw_wall_column(mlx, n_ray, &wall, &ray);
+	{
+		if (wall->wall_start > mlx->frame->wall_start_min)
+			mlx->frame->wall_start_min = wall->wall_start;
+		if (wall->wall_end < mlx->frame->wall_end_max)
+			mlx->frame->wall_end_max = wall->wall_end;
+	}
 }
 
 /*
@@ -188,8 +189,8 @@ void	scale_wall_phisics(t_wall *wall, float perp_dist, t_mlx *mlx)
 		win_height = mlx->win_height;
 	pitch = mlx->player->pitch_pix;
 	camz = mlx->player->camz;
-	mlx->player->vertical_offset = (camz * (win_height >> 1) / perp_dist);
-	vo = mlx->player->vertical_offset;
+	wall->vertical_offset = (camz * (win_height >> 1) / perp_dist);
+	vo = wall->vertical_offset;
 	if (perp_dist <= 0)
 		wall->wall_height = win_height;
 	else
