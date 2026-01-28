@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/16 00:11:37 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/27 19:10:32 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/01/28 08:36:25 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,15 +96,16 @@ void	fps_counter_realtime(t_mlx *mlx)
 	}
 	frames++;
 	now_timestamp = time.tv_sec * 1000 + (time.tv_usec * 0.001);
+	mlx->del_timestamp = now_timestamp - mlx->bef_timestamp;
 	delta_time = now_timestamp - init_timestamp;
 	if (delta_time >= 500)
 	{
 		write(mlx->log_fd, "[Realtime] FPS: ", 16);
-		ft_putnbr_fd((int)(frames * 1000 / delta_time), mlx->log_fd);
-		write(mlx->log_fd, "\n", 1);
+		ft_putnbrlend_fd((int)(frames * 1000 / delta_time), mlx->log_fd);
 		init_timestamp = now_timestamp;
 		frames = 0;
 	}
+	mlx->bef_timestamp = now_timestamp;
 }
 
 /*

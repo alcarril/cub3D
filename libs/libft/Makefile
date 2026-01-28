@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: alex <alex@student.42.fr>                  +#+  +:+       +#+         #
+#    By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/08 13:25:46 by alex              #+#    #+#              #
-#    Updated: 2025/03/17 03:15:50 by alex             ###   ########.fr        #
+#    Updated: 2026/01/28 08:35:29 by alejandro        ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,7 @@ SRCS = ft_isalpha.c ft_isdigit.c ft_isalnum.c ft_isascii.c \
 		ft_itoa.c ft_strmapi.c ft_striteri.c ft_putchar_fd.c \
 		ft_putstr_fd.c ft_putendl_fd.c ft_putnbr_fd.c \
 		get_next_line_bonus.c get_next_line_utils_bonus.c \
-		ft_strlen_c.c
+		ft_strlen_c.c ft_putnbrlend_fd.c
 OBJS = $(SRCS:.c=.o)
 
 HEADERS = libft.h get_next_line_bonus.h

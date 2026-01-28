@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_putnbr_fd.c                                     :+:      :+:    :+:   */
+/*   ft_putnbrlend_fd.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/02 17:33:05 by alex              #+#    #+#             */
-/*   Updated: 2026/01/28 08:33:51 by alejandro        ###   ########.fr       */
+/*   Created: 2026/01/28 08:33:27 by alejandro         #+#    #+#             */
+/*   Updated: 2026/01/28 08:37:47 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ static unsigned int	ft_uint_len(int num)
 	return (i + 1);
 }
 
-void	ft_putnbr_fd(int n, int fd)
+void	ft_putnbrlend_fd(int n, int fd)
 {
 	unsigned int	len;
 	unsigned int	mult;
@@ -61,6 +61,7 @@ void	ft_putnbr_fd(int n, int fd)
 	}
 	n = (n % 10) + '0';
 	write(fd, &n, 1);
+	write(fd, "\n", 1);
 }
 /*
 #include <limits.h>
