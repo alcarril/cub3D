@@ -28,7 +28,7 @@ int	main(int argc, char **argv)
 	ft_memset(&map, 0, sizeof(t_map));
 	ft_memset(&player, 0, sizeof(t_player));
 	if (argc != 2)
-		return (error_message("Usage: ./cub3d <map.cub>"));
+		return (error_message("Usage: ./cub3D <map.cub>"));
 	if (integrate_parsing_to_game(argv[1], &map, &player) != 1)
 		return (error_message("Error loading map"));
 	mlx.map = &map;

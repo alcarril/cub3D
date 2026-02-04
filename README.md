@@ -27,7 +27,7 @@ make
 Si no se pasa un mapa válido, el programa mostrará el mensaje de uso:
 
 ```
-Usage: ./cub3d <map.cub>
+Usage: ./cub3D <map.cub>
 ```
 
 ## Mapas de ejemplo
