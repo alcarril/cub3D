@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/30 14:45:15 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/23 21:50:44 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/02/04 19:03:19 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,7 +174,8 @@ bool	is_wall(t_mlx *mlx, float *map)
 
 	map_x = (unsigned int)map[X];
 	map_y = (unsigned int)map[Y];
-	if (mlx->map->map_grids[map_y][map_x] == WALL)
+	if (mlx->map->map_grids[map_y][map_x] == WALL
+			|| mlx->map->map_grids[map_y][map_x] == BONUS_WALL)
 		return (true);
 	return (false);
 }
