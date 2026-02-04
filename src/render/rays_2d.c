@@ -6,7 +6,7 @@
 /*   By: alejandro <alejandro@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/07 13:26:17 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/23 21:56:46 by alejandro        ###   ########.fr       */
+/*   Updated: 2026/02/04 19:35:08 by alejandro        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,8 @@ bool	touch_wall(t_mlx *mlx, float x, float y)
 {
 	if (x < 0 || y < 0 || x >= mlx->map->max_columns || y >= mlx->map->max_rows)
 		return (1);
-	if (mlx->map->map_grids[(unsigned int)y][(unsigned int)x] == WALL)
+	if (mlx->map->map_grids[(unsigned int)y][(unsigned int)x] == WALL
+		|| mlx->map->map_grids[(unsigned int)y][(unsigned int)x] == BONUS_WALL)
 		return (1);
 	return (0);
 }
