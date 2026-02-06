@@ -7,7 +7,7 @@ cub3D is a 3D graphics engine inspired by classic shooters like Wolfenstein 3D. 
 
 ## 🎮Demo
 
-<video src="docs/video/output.mp4" controls width="800"></video>
+<img src="docs/video/output.gif" alt="Demo" width="800" />
 
 ## ✨ Our implementation
 
