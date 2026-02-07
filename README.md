@@ -184,11 +184,11 @@ When textures are disabled, the engine can switch between **Euclidean distance**
 
 > **Note:** 📝 More on raycasting, DDA, and fish-eye correction: [ Our Notion article](https://broken-snowdrop-f03.notion.site/Raycasting-y-DDA-algorithm-2f9b80eb3d8880f4b86ae04ee0229cde).
 
-## 🔥 Boost mode implementation
+## 🔥 Boost mode implementation 🔥
 
 When boost mode is enabled, low-level optimizations are applied to critical render loops and buffer filling operations, achieving **performance improvements of up to 2.5x in frame rate**. 
 
-### What are hot loops and low-level optimizations?
+### ♻️What are hot loops and low-level optimizations?
 
 When rendering an image, there are certain functions that are called **once per pixel**. For example, in a window of **1280 × 720 pixels**, a function would be called around **900,000 times per frame**. These highly-repeated loops are called **hot loops**.
 
@@ -228,10 +228,10 @@ Hot loops are loops that execute millions of times per second in performance-cri
 > **Note:** 📝 More on processor optimizations: [Our Notion article](https://broken-snowdrop-f03.notion.site/Pr-cticas-para-optimizar-el-uso-de-procesador-en-hoot-lopps-2fdb80eb3d888095948ee1b523863e2d).
 
 
-### Memory Fill Optimizations
+### 💾 Memory Fill Optimizations
 Instead of writing memory byte-by-byte, this implementation fills memory using **larger aligned blocks** that match cache lines and pages, allowing modern CPUs to write much faster. By **aligning the destination pointer**, **expanding the fill value** into larger patterns, and writing progressively smaller blocks only when needed, this approach reduces write operations and improves CPU and cache efficiency.
 
-> **Note:** 📝 More on Memory Fill: [Our Notion article](https://broken-snowdrop-f03.notion.site/Mejoras-de-bufferizacion-2fdb80eb3d8880d08f50d5f284dd28c8?pvs=74).
+
 
 | Optimization | Description |
 | --- | --- |
@@ -243,40 +243,34 @@ Instead of writing memory byte-by-byte, this implementation fills memory using *
 | **Linear control flow** | Uses a single iterative flow to minimize function calls and branch mispredictions. |
 | **Tail handling** | Handles remaining bytes with progressively smaller writes to ensure correctness. |
 
-
+> **Note:** 📝 More on Memory Fill: [Our Notion article](https://broken-snowdrop-f03.notion.site/Mejoras-de-bufferizacion-2fdb80eb3d8880d08f50d5f284dd28c8?pvs=74).
 
 ## 🏗️ Game Engine Architecture
 
-![Render Pipeline](docs/image/render_pipeline.png)
-### Simulation vs Rendering Separation
-- **Simulation**: Updates world state (positions, collisions, physics, timing)
-- **Renderer**: Represents resolved state without decision-making
-- **Result**: Coherent, predictable, independent logic
+The architecture of our game engine is designed to be **modular, efficient, and scalable**, with a clear separation between the **simulation** (game logic, physics, world state) and the **renderer** (visual representation). This separation allows for **independent development and optimization** of each component, enabling us to maintain a clean codebase and easily add new features without disrupting existing functionality.
 
-### Determinism and Stability
-- **Fixed timestep**: Consistent timing for reproducibility
-- **Framerate independence**: Identical results regardless of hardware
-- **Critical for**: Physics, replays, networking
-
-### Parallelism and Scalability
-- **Independent tasks**: Logic, physics, AI, rendering run separately
-- **Multicore support**: Renderer on separate thread, simulation scales
-- **Benefits**: Reduced blocking, better resource distribution
-
-### Modularity and Graphics API Abstraction
-- **Decoupled rendering**: Backend-agnostic renderer interface
-- **Swappable implementations**: Works with MiniLibX, SDL2, OpenGL, Vulkan, etc.
-- **Example**: `renderer_t` abstraction allows switching from MiniLibX to SDL2 by implementing same interface
-- **Feature addition**: New systems integrate without disruption
-- **Maintainability**: Organized, scalable codebase
 
 > **Note:** 📝 More on Architecture: [Our Notion article](https://broken-snowdrop-f03.notion.site/Arquitectura-de-motor-grafico-2fdb80eb3d8880b28a51eca96da33a10).
+### Architecture Principles
+
+| Principle | Description |
+|---|---|
+| **Simulation vs Rendering** | Simulation updates world state; renderer displays resolved state independently |
+| **Determinism** | Fixed timestep ensures reproducible behavior across hardware |
+| **Parallelism** | Logic, physics, and rendering run separately for better resource distribution |
+| **Modularity** | `renderer_t` abstraction allows swapping MiniLibX, SDL2, OpenGL, or Vulkan without disruption |
 
 
+![Render Pipeline](docs/image/render_pipeline.png)
 
-## Minimap
 
-To render the minimap, a **2D scaling relationship** is established between the window's pixel matrix dimensions and the map's grid dimensions. This scaling is then applied to each point drawn on the minimap, leveraging **2D set rendering logic** to efficiently map world coordinates to screen space. This approach involves:
+## 🗺️ Minimap
+
+To render the minimap, a **2D scaling relationship** is established between the window's pixel matrix dimensions and the map's grid dimensions. This scaling is then applied to each point drawn on the minimap, leveraging **2D set rendering logic** to efficiently map world coordinates to screen space.
+
+> **Note:** 📝 More on 2D rendering sets and minimap: [Our Notion article](https://broken-snowdrop-f03.notion.site/Renderizado-de-imagenes-2D-y-minimapa-2fab80eb3d8880f88e56f189f2cde9e7?pvs=74).
+
+### Key Concepts
 
 - **Grid-to-screen transformation**: Converting map grid positions to minimap screen coordinates using the scaling factor
 - **Set-based filtering**: Efficiently filtering map cells to determine visibility within the minimap bounds
@@ -292,32 +286,32 @@ To render the minimap, a **2D scaling relationship** is established between the 
 - **Adaptive rendering**: The minimap adjusts dynamically to window size and map dimensions while maintaining spatial accuracy and visual clarity
 
 
-> **Note:** 📝 More on 2D rendering sets and minimap: [Our Notion article](https://broken-snowdrop-f03.notion.site/Renderizado-de-imagenes-2D-y-minimapa-2fab80eb3d8880f88e56f189f2cde9e7?pvs=74).
 
 
+## 🖱️ Mouse
 
-## Mouse
+Mouse control is implemented by capturing mouse movement and translating it into camera rotation. The system prioritizes **low-latency, consistent input handling** through polling rather than event-based callbacks.
 
-Mouse control is implemented by capturing mouse movement events and translating them into camera rotation. The system prioritizes **low-latency, consistent input handling** independent of window size:
-
-- **Pixel clamping**: Mouse movement is clamped to a maximum pixel delta per frame, ensuring consistent rotation speed regardless of window dimensions. This approach mirrors modern shooter games, providing predictable camera control.
-
-- **Center reset**: The mouse cursor is repositioned to the screen center after each frame, preventing the player's wrist from leaving the mousepad and improving user comfort during extended play sessions.
-
-- **Configurable sensitivity**: Mouse sensitivity is fully adjustable to suit individual player preferences, allowing fine-tuning of rotation responsiveness.
-
-- **Toggle control**: Mouse look can be enabled or disabled with **J**, allowing players to switch between mouse and keyboard control as needed.
-
-- **Polling-based tracking**: Mouse position is polled every frame rather than handled through MiniLibX event hooks. This approach reduces input latency, as event queue latency can exceed frame rate timing, preventing jitter and stutter. Clamping mouse delta per frame ensures smooth, consistent rotation.
+**Why polling instead of event queues?** 
+Event-based systems process input through MiniLibX's event queue, which introduces latency that can exceed frame time, causing inconsistent camera responsiveness. Polling the mouse position every frame ensures input is processed synchronously with the render loop, delivering predictable, low-latency control that matches modern shooter games.
 
 > **Note:** 📝 First MLX API usage and event handling example: [Fractol repo](https://github.com/alcarril/Fractol).
 
+**Key features:**
+- **Polling-based tracking**: Mouse position is queried each frame rather than handled through event hooks, reducing input latency and jitter
+- **Frame-synchronized input**: Direct synchronization with the render loop eliminates queue-based delays
+- **Pixel clamping**: Mouse movement is clamped to a maximum pixel delta per frame, ensuring consistent rotation speed regardless of window dimensions
+- **Center reset**: The mouse cursor is repositioned to the screen center after each frame, preventing the player's wrist from leaving the mousepad
+- **Configurable sensitivity**: Mouse sensitivity is fully adjustable to suit individual player preferences
+- **Toggle control**: Mouse look can be enabled or disabled with **J**, allowing players to switch between mouse and keyboard control as needed
 
-## Physics System
 
-## Physics System
+
+
+## ⚛️ Physics System
 
 The physics system manages movement and interactions through discrete real-time simulation, ensuring **deterministic, framerate-independent behavior**.
+> **Note:** 📝 More on physics and movement: [Our Notion article](https://broken-snowdrop-f03.notion.site/Fisicas-de-motor-de-videojuegos-2f9b80eb3d8880f89899f356d1396a84?pvs=74).
 
 **Core Features:**
 - **2D Acceleration/Deceleration** – Responsive movement with configurable forces
@@ -329,18 +323,17 @@ The physics system manages movement and interactions through discrete real-time 
 
 ### Gravity Modes
 
-| Key | Mode | Description |
-|-----|------|-------------|
+| Key | Gravity Mode | Description |
+|---|---|---|
 | `6` | Ground | Standard Earth gravity |
 | `7` | Moon | Reduced gravity (1/6 of Earth) |
 | `8` | Jupiter | Increased gravity (2.5x Earth) |
 | `9` | Spectre | Zero gravity |
 | `0` | Jetpack | Upward thrust |
 
-Activate physics with **P**, per-axis control with **K**.
 
 
-## Atmospheric Effects
+## 🌁 Atmospheric Effects
 
 The engine includes configurable atmospheric effects that can be toggled on/off with **U** and switched between different modes using keys **1** to **4**. These effects enhance visual immersion by simulating various environmental conditions:
 
@@ -351,8 +344,10 @@ The engine includes configurable atmospheric effects that can be toggled on/off 
 | `3` | OPEN | Outdoor with sunlight | Dark medium gray (walls) and light (floor/ceiling), light fog | 0.9x map |
 | `4` | MATRIX | Digital environments | Green, moderate fog | 0.7x map |
 
-> **Note:** Atmospheric effects require active textures; if textures are disabled, atmospheres cannot be enabled or changed.
 
+
+
+> **Warning:** Atmospheric effects significantly reduce engine performance due to required mathematical calculations. Modern engines typically use **lookup tables** and/or **parallelize these calculations across threads**.
 
 
 
@@ -375,11 +370,39 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-  A[frame start] --> B[raycast columns]
-  C --> D[draw floor/ceiling]
-  B --> C[draw walls]
-  D --> E[draw minimap]
-  E --> F[swap buffer]
+  A[frame start] --> B[mouse input]
+  B --> C[player movement]
+  C --> D{raycasting on?}
+  D -- yes --> E[throw rays]
+  D -- no --> K[skip 3D]
+
+  E --> F{textures + ambiance?}
+  F -- yes --> G[render floor/ceiling amb]
+  F -- no --> H{boost + mouse seen?}
+  H -- yes --> I[render floor/ceiling speed]
+  H -- no --> J[render floor/ceiling]
+
+  G --> L[render walls]
+  I --> L
+  J --> L
+
+  L --> M{textures on?}
+  M -- yes --> N{ambiance on?}
+  N -- yes --> O[render walls ambiance]
+  N -- no --> P{boost on?}
+  P -- yes --> Q[render walls tex speed]
+  P -- no --> R[render walls tex]
+  M -- no --> S[render walls no textures]
+
+  O --> T
+  Q --> T
+  R --> T
+  S --> T
+  K --> T
+
+  T{minimap on?} -- yes --> U[render minimap]
+  T -- no --> V[swap buffer]
+  U --> V
 ```
 
 ## Galeria de disenos
