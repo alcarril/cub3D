@@ -68,6 +68,32 @@ Our implementation prioritizes a **solid, highly configurable graphics engine** 
 - 🎨 **Custom Maps and Textures** with personalized visual configurations and styling options
 
 
+## 📂 Project Structure
+
+```
+cub3D/
+├── inc/                 # Main headers
+├── src/                 # Source code
+│   ├── ambiances/        # Fog, shaders, and atmosphere presets
+│   ├── bridge/           # Data transfer between parsing and runtime
+│   ├── events/           # Keyboard/mouse input handlers
+│   ├── mains/            # Program entry point
+│   ├── mem_utils/        # Memory-optimized helpers
+│   ├── mlx_init_close/   # MLX init/teardown and setup
+│   ├── moves/            # Player movement and physics updates
+│   ├── parsing/          # .cub file parsing and validation
+│   └── render/           # Raycasting and 2D/3D rendering
+├── libs/                # Third-party libs
+│   ├── libft/            # Utility library
+│   └── minilibx-linux/   # MiniLibX (graphics library)
+├── assets/              # Game assets
+│   ├── maps/             # Sample maps
+│   └── textures/         # Project textures
+├── textures/            # Linked textures for parsing
+├── docs/                # Documentation and media
+└── Makefile             # Build rules
+```
+
 <br><br>
 
 ---
@@ -415,22 +441,6 @@ The engine includes configurable atmospheric effects that can be toggled on/off 
 
 > <span style="background-color: rgba(255, 77, 77, 0.45); color: #000; padding: 0 4px;">**Warning:** Atmospheric effects significantly reduce engine performance due to required mathematical calculations. Modern engines typically use **lookup tables** and/or **parallelize these calculations across threads**.</span>
 
-
-
-## Arquitectura y diagramas de flujo de codigo
-
-### Flujo general
-
-```mermaid
-flowchart TD
-  A[main] --> B[parse .cub]
-  B --> C[bridge de parsing]
-  C --> D[init MLX]
-  D --> E[game loop]
-  E --> F[input]
-  E --> G[update player/physics]
-  E --> H[raycasting/render]
-```
 
 
 ## Galeria de disenos
