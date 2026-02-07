@@ -99,7 +99,10 @@ cub3D/
 └── Makefile             # Build rules
 ```
 
-Puedes ver la arquitectura completa del proyecto y preguntar a una IA sobre el codigo aqui: https://deepwiki.com/alcarril/cub3D/1-overview
+## 🔍 Project Overview
+
+You can view the complete project architecture and ask an AI about the code here: https://deepwiki.com/alcarril/cub3D/1-overview
+
 
 ## 📋Requirements
 
@@ -553,7 +556,6 @@ The engine includes configurable atmospheric effects that can be toggled on/off 
 - https://harm-smits.github.io/42docs/libs/minilibx
 - https://tronche.com/gui/x/xlib/
 
-<br>
 
 ---
 # 👥 Authors
@@ -561,13 +563,10 @@ The engine includes configurable atmospheric effects that can be toggled on/off 
 - 🧑‍💻 Alejandro Carrillo (alcarril) - https://github.com/alcarril
 - 🧑‍💻 Carlos Arbon (carbon-m) - https://github.com/GranCAM
 
-- Alejandro Carrillo (alcarril) - https://github.com/alcarril
-- Carlos Arbon (carbon-m) - https://github.com/GranCAM
 
 
 ---
 
-<br>
 
 # 📜 License
 
