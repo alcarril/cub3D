@@ -4,7 +4,16 @@ cub3D is a 3D graphics engine inspired by classic shooters like Wolfenstein 3D. 
 
 ## 🎮Demo
 
-<!-- <img src="docs/video/output.gif" alt="Demo" width="800" /> -->
+<table>
+  <tr>
+    <td><img src="docs/video/FUTURISTIC_DEMO_trimmed.gif" alt="Futuristic Demo" width="400" /></td>
+    <td><img src="docs/video/lego_demo.gif" alt="Lego Demo" width="400" /></td>
+  </tr>
+  <tr>
+    <td><img src="docs/video/ambianze_mazmorra.gif" alt="Mazmorra Demo" width="400" /></td>
+    <td><img src="docs/video/moon_jumps.gif" alt="Moon Jumps Demo" width="400" /></td>
+  </tr>
+</table>
 
 ## ✨ Our implementation
 
@@ -32,7 +41,7 @@ Our implementation prioritizes a **solid, highly configurable graphics engine** 
 - 🎥 **Pitch control** with up/down arrow keys and mouse vertical movement
 
 ### Graphics Engine and display features
-- 🔄 **Toggle raycasting, textures, fish-eye correction, and distance mode**
+- 🔄 **Toggle raycasting, textures, fish-eye correction, distance mode and FOV**
 - 🗺️ **Minimap with zoom and optional ray display** for better spatial awareness
 - 🖱️ **Mouse control with sensitivity adjustment and toggle** for personalized experience
 - 🎚️ **Adjust player volume**, enhancing immersion
@@ -106,7 +115,6 @@ make
 ./cub3D assets/maps/good/self/performance.cub
 ```
 
-<br>
 <br>
 
 ---
@@ -375,9 +383,9 @@ The physics system manages movement and interactions through discrete real-time 
 - **2D Acceleration/Deceleration** – Responsive movement with configurable forces
 - **Per-Axis Control** – Independent forces for strafing and external interactions
 - **Z-Axis Movement** – Jump and gravity with multiple profiles
-- **Jump Preservation** – Initial direction maintained with parabolic motion
+- **Jump Preservation** – Initial direction maintained with parabolic motion an air deceleration
 - **Flight Mode** – Free 3D movement
-- **Crouch/Prone** – Camera height adjustment
+- **Crouch/Prone** – Camera height adjustment and speed reduction for stealth mechanics
 
 ### Gravity Modes
 
