@@ -60,7 +60,7 @@ Our implementation prioritizes a **solid, highly configurable graphics engine** 
 
 
 <br><br>
-
+---
 # Getting Started
 
 ## 📋Requirements
@@ -105,7 +105,7 @@ make
 ./cub3D assets/maps/good/self/performance.cub
 ```
 <br><br>
-
+---
 # Game
 
 ## 🎮 Controls and Graphics Engine Configuration
@@ -173,6 +173,7 @@ C 225,30,0
 
 
 <br><br>
+---
 
 # Features
 
@@ -194,7 +195,9 @@ When textures are disabled, the engine can switch between **Euclidean distance**
 
 > **Note:** 📝 More on raycasting, DDA, and fish-eye correction: [ Our Notion article](https://broken-snowdrop-f03.notion.site/Raycasting-y-DDA-algorithm-2f9b80eb3d8880f4b86ae04ee0229cde).
 
-## 🔥 Boost mode implementation 🔥
+<br>
+
+## 🔥 Boost mode implementation
 
 When boost mode is enabled, low-level optimizations are applied to critical render loops and buffer filling operations, achieving **performance improvements of up to 2.5x in frame rate**. 
 
@@ -255,6 +258,8 @@ Instead of writing memory byte-by-byte, this implementation fills memory using *
 
 > **Note:** 📝 More on Memory Fill: [Our Notion article](https://broken-snowdrop-f03.notion.site/Mejoras-de-bufferizacion-2fdb80eb3d8880d08f50d5f284dd28c8?pvs=74).
 
+<br>
+
 ## 🏗️ Game Engine Architecture
 
 The architecture of our game engine is designed to be **modular, efficient, and scalable**, with a clear separation between the **simulation** (game logic, physics, world state) and the **renderer** (visual representation). This separation allows for **independent development and optimization** of each component, enabling us to maintain a clean codebase and easily add new features without disrupting existing functionality.
@@ -310,7 +315,7 @@ flowchart LR
   T -- no --> V[swap buffer]
   U --> V
 ```
-
+<br>
 
 ## 🗺️ Minimap
 
@@ -334,7 +339,7 @@ To render the minimap, a **2D scaling relationship** is established between the 
 - **Adaptive rendering**: The minimap adjusts dynamically to window size and map dimensions while maintaining spatial accuracy and visual clarity
 
 
-
+<br>
 
 ## 🖱️ Mouse
 
@@ -354,7 +359,7 @@ Event-based systems process input through MiniLibX's event queue, which introduc
 - **Toggle control**: Mouse look can be enabled or disabled with **J**, allowing players to switch between mouse and keyboard control as needed
 
 
-
+<br>
 
 ## ⚛️ Physics System
 
@@ -379,7 +384,7 @@ The physics system manages movement and interactions through discrete real-time 
 | `9` | Spectre | Zero gravity |
 | `0` | Jetpack | Upward thrust |
 
-
+<br>
 
 ## 🌁 Atmospheric Effects
 
@@ -395,7 +400,7 @@ The engine includes configurable atmospheric effects that can be toggled on/off 
 
 
 
-> **Warning:** Atmospheric effects significantly reduce engine performance due to required mathematical calculations. Modern engines typically use **lookup tables** and/or **parallelize these calculations across threads**.
+> <span style="background-color: rgba(255, 77, 77, 0.45); color: #000; padding: 0 4px;">**Warning:** Atmospheric effects significantly reduce engine performance due to required mathematical calculations. Modern engines typically use **lookup tables** and/or **parallelize these calculations across threads**.</span>
 
 
 
