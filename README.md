@@ -53,7 +53,7 @@ Our implementation prioritizes a **solid, highly configurable graphics engine** 
 - 📍 **Jump direction preservation** and flight mode
 - 🧍 **Crouch and prone position** support
 
-#### Visual Effects
+### Visual Effects
 - 🌫️ **Configurable Atmospheric effects** with fog and desaturation shaders featuring multiple modes
 - 🧱 **Bonus textures for walls**
 - 🎨 **Custom Maps and Textures** with personalized visual configurations and styling options
@@ -104,7 +104,8 @@ make
 ```bash
 ./cub3D assets/maps/good/self/performance.cub
 ```
-<br><br>
+<br>
+
 ---
 # Game
 
@@ -172,16 +173,17 @@ C 225,30,0
   - `N/S/E/W`: Player starting position and orientation
 
 
-<br><br>
+<br> <br>
+
 ---
 
 # Features
 
-## 👁️​​🧱 ​​Raycasting and DDA
+## ​​🧱 ​​Raycasting and DDA
 
 **Raycasting** is the **core rendering technique** used in this project, allowing us to create a **3D perspective from a 2D map** by casting rays from the player's position and calculating their intersections with walls. This method is **efficient for rendering simple 3D environments** and is the basis for many classic games like **Wolfenstein 3D** and **Doom**. It uses **mathematical concepts** such as **trigonometry and geometry** to determine how rays interact with the environment, enabling the engine to render **walls, floors, ceilings, and textures in real time**.
 
-### ​DDA Algorithm
+### 💥 ​DDA Algorithm
 
 The **Digital Differential Analyzer (DDA)** algorithm is a method for calculating the intersection of rays with a grid-based map, which is **essential for raycasting**.This allows the engine to efficiently determine where rays hit walls and how to render them on screen, making it a **fundamental part of the raycasting process**.
 
@@ -189,7 +191,7 @@ The **Digital Differential Analyzer (DDA)** algorithm is a method for calculatin
 - **Efficient complexity**: Reduces complexity to **O(1) per step**, though total steps can be high for large maps or long walls—**without precision loss**.
 - **Multi-step process**: Consists of several sequential steps to trace the ray through the grid.
 
-### Fish-eye correction and distance calculations
+### 👁️ Fish-eye correction and distance calculations
 
 When textures are disabled, the engine can switch between **Euclidean distance** (straight-line distance from player to wall) and **perpendicular distance** (distance along the ray's path). The latter is used for **fish-eye correction**, which eliminates distortion by ensuring that walls appear straight regardless of the viewing angle, providing a more realistic perspective.
 
@@ -197,7 +199,50 @@ When textures are disabled, the engine can switch between **Euclidean distance**
 
 <br>
 
-## 🔥 Boost mode implementation
+## 🗺️ Minimap
+
+To render the minimap, a **2D scaling relationship** is established between the window's pixel matrix dimensions and the map's grid dimensions. This scaling is then applied to each point drawn on the minimap, leveraging **2D set rendering logic** to efficiently map world coordinates to screen space.
+
+> **Note:** 📝 More on 2D rendering sets and minimap: [Our Notion article](https://broken-snowdrop-f03.notion.site/Renderizado-de-imagenes-2D-y-minimapa-2fab80eb3d8880f88e56f189f2cde9e7?pvs=74).
+
+### Key Concepts
+
+- **Grid-to-screen transformation**: Converting map grid positions to minimap screen coordinates using the scaling factor
+- **Set-based filtering**: Efficiently filtering map cells to determine visibility within the minimap bounds
+- **Coordinate clamping**: Ensuring all rendered points remain within valid screen boundaries
+
+
+### Implementation Details
+
+- **Cell type detection**: Each scaled point is checked to determine if it belongs to a wall or floor cell
+- **Color assignment**: Walls and floors are rendered with distinct colors for clarity
+- **Dynamic translation**: Points are translated based on zoom level and player position to keep the player centered
+- **Ray visualization**: Rays are drawn using the same scale and translation as the map, with a distinctive color for differentiation
+- **Adaptive rendering**: The minimap adjusts dynamically to window size and map dimensions while maintaining spatial accuracy and visual clarity
+
+
+<br>
+
+## 🖱️ Mouse
+
+Mouse control is implemented by capturing mouse movement and translating it into camera rotation. The system prioritizes **low-latency, consistent input handling** through polling rather than event-based callbacks.
+
+**Why polling instead of event queues?** 
+Event-based systems process input through MiniLibX's event queue, which introduces latency that can exceed frame time, causing inconsistent camera responsiveness. Polling the mouse position every frame ensures input is processed synchronously with the render loop, delivering predictable, low-latency control that matches modern shooter games.
+
+> **Note:** 📝 First MLX API usage and event handling example: [Fractol repo](https://github.com/alcarril/Fractol).
+
+**Key features:**
+- **Polling-based tracking**: Mouse position is queried each frame rather than handled through event hooks, reducing input latency and jitter
+- **Frame-synchronized input**: Direct synchronization with the render loop eliminates queue-based delays
+- **Pixel clamping**: Mouse movement is clamped to a maximum pixel delta per frame, ensuring consistent rotation speed regardless of window dimensions
+- **Center reset**: The mouse cursor is repositioned to the screen center after each frame, preventing the player's wrist from leaving the mousepad
+- **Configurable sensitivity**: Mouse sensitivity is fully adjustable to suit individual player preferences
+- **Toggle control**: Mouse look can be enabled or disabled with **J**, allowing players to switch between mouse and keyboard control as needed
+
+<br>
+
+## 🔥 Boost mode implementation 🔥
 
 When boost mode is enabled, low-level optimizations are applied to critical render loops and buffer filling operations, achieving **performance improvements of up to 2.5x in frame rate**. 
 
@@ -260,7 +305,7 @@ Instead of writing memory byte-by-byte, this implementation fills memory using *
 
 <br>
 
-## 🏗️ Game Engine Architecture
+## 🏗️ Game Engine Architecture 🏗️
 
 The architecture of our game engine is designed to be **modular, efficient, and scalable**, with a clear separation between the **simulation** (game logic, physics, world state) and the **renderer** (visual representation). This separation allows for **independent development and optimization** of each component, enabling us to maintain a clean codebase and easily add new features without disrupting existing functionality.
 
@@ -315,50 +360,6 @@ flowchart LR
   T -- no --> V[swap buffer]
   U --> V
 ```
-<br>
-
-## 🗺️ Minimap
-
-To render the minimap, a **2D scaling relationship** is established between the window's pixel matrix dimensions and the map's grid dimensions. This scaling is then applied to each point drawn on the minimap, leveraging **2D set rendering logic** to efficiently map world coordinates to screen space.
-
-> **Note:** 📝 More on 2D rendering sets and minimap: [Our Notion article](https://broken-snowdrop-f03.notion.site/Renderizado-de-imagenes-2D-y-minimapa-2fab80eb3d8880f88e56f189f2cde9e7?pvs=74).
-
-### Key Concepts
-
-- **Grid-to-screen transformation**: Converting map grid positions to minimap screen coordinates using the scaling factor
-- **Set-based filtering**: Efficiently filtering map cells to determine visibility within the minimap bounds
-- **Coordinate clamping**: Ensuring all rendered points remain within valid screen boundaries
-
-
-### Implementation Details
-
-- **Cell type detection**: Each scaled point is checked to determine if it belongs to a wall or floor cell
-- **Color assignment**: Walls and floors are rendered with distinct colors for clarity
-- **Dynamic translation**: Points are translated based on zoom level and player position to keep the player centered
-- **Ray visualization**: Rays are drawn using the same scale and translation as the map, with a distinctive color for differentiation
-- **Adaptive rendering**: The minimap adjusts dynamically to window size and map dimensions while maintaining spatial accuracy and visual clarity
-
-
-<br>
-
-## 🖱️ Mouse
-
-Mouse control is implemented by capturing mouse movement and translating it into camera rotation. The system prioritizes **low-latency, consistent input handling** through polling rather than event-based callbacks.
-
-**Why polling instead of event queues?** 
-Event-based systems process input through MiniLibX's event queue, which introduces latency that can exceed frame time, causing inconsistent camera responsiveness. Polling the mouse position every frame ensures input is processed synchronously with the render loop, delivering predictable, low-latency control that matches modern shooter games.
-
-> **Note:** 📝 First MLX API usage and event handling example: [Fractol repo](https://github.com/alcarril/Fractol).
-
-**Key features:**
-- **Polling-based tracking**: Mouse position is queried each frame rather than handled through event hooks, reducing input latency and jitter
-- **Frame-synchronized input**: Direct synchronization with the render loop eliminates queue-based delays
-- **Pixel clamping**: Mouse movement is clamped to a maximum pixel delta per frame, ensuring consistent rotation speed regardless of window dimensions
-- **Center reset**: The mouse cursor is repositioned to the screen center after each frame, preventing the player's wrist from leaving the mousepad
-- **Configurable sensitivity**: Mouse sensitivity is fully adjustable to suit individual player preferences
-- **Toggle control**: Mouse look can be enabled or disabled with **J**, allowing players to switch between mouse and keyboard control as needed
-
-
 <br>
 
 ## ⚛️ Physics System
