@@ -99,6 +99,8 @@ cub3D/
 └── Makefile             # Build rules
 ```
 
+Puedes ver la arquitectura completa del proyecto y preguntar a una IA sobre el codigo aqui: https://deepwiki.com/alcarril/cub3D/1-overview
+
 ## 📋Requirements
 
 - Linux with X11 (Xlib, Xext, Xfixes) and zlib.
@@ -221,6 +223,8 @@ C 225,30,0
 
 **Raycasting** is the **core rendering technique** used in this project, allowing us to create a **3D perspective from a 2D map** by casting rays from the player's position and calculating their intersections with walls. This method is **efficient for rendering simple 3D environments** and is the basis for many classic games like **Wolfenstein 3D** and **Doom**. It uses **mathematical concepts** such as **trigonometry and geometry** to determine how rays interact with the environment, enabling the engine to render **walls, floors, ceilings, and textures in real time**.
 
+> **Note:** 📝 More on raycasting, DDA, and fish-eye correction: [ Our Notion article](https://broken-snowdrop-f03.notion.site/Raycasting-y-DDA-algorithm-2f9b80eb3d8880f4b86ae04ee0229cde).
+
 ### 💥 ​DDA Algorithm
 
 The **Digital Differential Analyzer (DDA)** algorithm is a method for calculating the intersection of rays with a grid-based map, which is **essential for raycasting**.This allows the engine to efficiently determine where rays hit walls and how to render them on screen, making it a **fundamental part of the raycasting process**.
@@ -233,7 +237,6 @@ The **Digital Differential Analyzer (DDA)** algorithm is a method for calculatin
 
 When textures are disabled, the engine can switch between **Euclidean distance** (straight-line distance from player to wall) and **perpendicular distance** (distance along the ray's path). The latter is used for **fish-eye correction**, which eliminates distortion by ensuring that walls appear straight regardless of the viewing angle, providing a more realistic perspective.
 
-> **Note:** 📝 More on raycasting, DDA, and fish-eye correction: [ Our Notion article](https://broken-snowdrop-f03.notion.site/Raycasting-y-DDA-algorithm-2f9b80eb3d8880f4b86ae04ee0229cde).
 
 <br>
 
@@ -242,6 +245,7 @@ When textures are disabled, the engine can switch between **Euclidean distance**
 To render the minimap, a **2D scaling relationship** is established between the window's pixel matrix dimensions and the map's grid dimensions. This scaling is then applied to each point drawn on the minimap, leveraging **2D set rendering logic** to efficiently map world coordinates to screen space.
 
 > **Note:** 📝 More on 2D rendering sets and minimap: [Our Notion article](https://broken-snowdrop-f03.notion.site/Renderizado-de-imagenes-2D-y-minimapa-2fab80eb3d8880f88e56f189f2cde9e7?pvs=74).
+
 
 ### Key Concepts
 
@@ -290,7 +294,9 @@ When rendering an image, there are certain functions that are called **once per 
 
 Hot loops are loops that execute millions of times per second in performance-critical code across **graphics engines**, **real-time simulations**, **physics**, **machine learning**, and **data processing systems**. Because they run so frequently, every CPU cycle counts, small inefficiencies drastically reduce performance and optimizing hot loops is essential for achieving high FPS rates in realtime applications.
 
+> **Note:** 📝 More on CPU: [Our Notion article](https://broken-snowdrop-f03.notion.site/Microprocesador-CPU-2fbb80eb3d8880768146c87d1607167d?pvs=74).
 
+> **Note:** 📝 More on processor optimizations: [Our Notion article](https://broken-snowdrop-f03.notion.site/Pr-cticas-para-optimizar-el-uso-de-procesador-en-hoot-lopps-2fdb80eb3d888095948ee1b523863e2d).
 
 ### ❌ Things to Avoid in hot loops
 
@@ -319,15 +325,12 @@ Hot loops are loops that execute millions of times per second in performance-cri
 | **Use of registers and local variables** | Reduces memory accesses, keeps data close to the CPU, accelerates hot loops and vectorization |
 | **Microprocessor performance improvements** | Takes advantage of modern CPU enhancements like larger caches, better branch prediction, higher clock speeds, and SIMD/vector units |
 
-> **Note:** 📝 More on CPU: [Our Notion article](https://broken-snowdrop-f03.notion.site/Microprocesador-CPU-2fbb80eb3d8880768146c87d1607167d?pvs=74).
-
-> **Note:** 📝 More on processor optimizations: [Our Notion article](https://broken-snowdrop-f03.notion.site/Pr-cticas-para-optimizar-el-uso-de-procesador-en-hoot-lopps-2fdb80eb3d888095948ee1b523863e2d).
 
 
 ### 💾 Memory Fill Optimizations
 Instead of writing memory byte-by-byte, this implementation fills memory using **larger aligned blocks** that match cache lines and pages, allowing modern CPUs to write much faster. By **aligning the destination pointer**, **expanding the fill value** into larger patterns, and writing progressively smaller blocks only when needed, this approach reduces write operations and improves CPU and cache efficiency.
 
-
+> **Note:** 📝 More on Memory Fill: [Our Notion article](https://broken-snowdrop-f03.notion.site/Mejoras-de-bufferizacion-2fdb80eb3d8880d08f50d5f284dd28c8?pvs=74).
 
 | Optimization | Description |
 | --- | --- |
@@ -339,7 +342,6 @@ Instead of writing memory byte-by-byte, this implementation fills memory using *
 | **Linear control flow** | Uses a single iterative flow to minimize function calls and branch mispredictions. |
 | **Tail handling** | Handles remaining bytes with progressively smaller writes to ensure correctness. |
 
-> **Note:** 📝 More on Memory Fill: [Our Notion article](https://broken-snowdrop-f03.notion.site/Mejoras-de-bufferizacion-2fdb80eb3d8880d08f50d5f284dd28c8?pvs=74).
 
 <br>
 
@@ -442,22 +444,134 @@ The engine includes configurable atmospheric effects that can be toggled on/off 
 > <span style="background-color: rgba(255, 77, 77, 0.45); color: #000; padding: 0 4px;">**Warning:** Atmospheric effects significantly reduce engine performance due to required mathematical calculations. Modern engines typically use **lookup tables** and/or **parallelize these calculations across threads**.</span>
 
 
+<br>
 
-## Galeria de disenos
+---
 
-Agrega imagenes en `docs/image/` y enlazalas aqui.
+# 🚀 Future Improvements and Implementations
 
-## Futuras mejoras e implementaciones
+- 🖼️ Textured floor and ceiling rendering
+- 🪟 Render mode for narrow corridors
+- 🎭 Sprite system and animations
+- 🤖 Basic enemy and NPC AI
+- 📊 HUD with health, ammunition, and status information
+- 💥 Damage system, weapons, and interactive objects
+- 💨 Wind system, collision interactions, and external environmental factors affecting the player
 
-- Sistema de sprites y animaciones.
-- Iluminacion dinamica por distancia.
-- IA basica y entidades interactivas.
-- Exportador/validador de mapas.
 
-## Resources
 
+<br>
+
+---
+
+# 🖼️ Gallery
+
+<table>
+  <tr><th colspan="2">Futuristic</th></tr>
+  <tr>
+    <td><img src="docs/image/futuristic.png" alt="Futuristic" width="340" /></td>
+    <td><img src="docs/image/futuristic1.png" alt="Futuristic 2" width="340" /></td>
+  </tr>
+  <tr><th colspan="2">Lego</th></tr>
+  <tr>
+    <td><img src="docs/image/lego.png" alt="Lego" width="340" /></td>
+    <td><img src="docs/image/lego2.png" alt="Lego 2" width="340" /></td>
+  </tr>
+  <tr><th colspan="2">Matrix</th></tr>
+  <tr>
+    <td><img src="docs/image/matrix.png" alt="Matrix" width="340" /></td>
+    <td><img src="docs/image/matrix1.png" alt="Matrix 2" width="340" /></td>
+  </tr>
+  <tr><th colspan="2">Moon</th></tr>
+  <tr>
+    <td><img src="docs/image/moon.png" alt="Moon" width="340" /></td>
+    <td><img src="docs/image/moon2.png" alt="Moon 2" width="340" /></td>
+  </tr>
+  <tr><th colspan="2">Iglu</th></tr>
+  <tr>
+    <td><img src="docs/image/iglu.png" alt="Iglu" width="340" /></td>
+    <td><img src="docs/image/iglu2.png" alt="Iglu 2" width="340" /></td>
+  </tr>
+  <tr><th colspan="2">Mazmorra</th></tr>
+  <tr>
+    <td><img src="docs/image/mazmorra.png" alt="Mazmorra" width="340" /></td>
+    <td><img src="docs/image/mazmorra1.png" alt="Mazmorra 2" width="340" /></td>
+  </tr>
+  <tr><th colspan="2">Find Translator</th></tr>
+  <tr>
+    <td><img src="docs/image/find_traslator.png" alt="Find Translator" width="340" /></td>
+    <td><img src="docs/image/find_traslator1.png" alt="Find Translator 2" width="340" /></td>
+  </tr>
+  <tr><th colspan="2">CPU</th></tr>
+  <tr>
+    <td><img src="docs/image/CPU.png" alt="CPU" width="340" /></td>
+    <td><img src="docs/image/CPU1.png" alt="CPU 2" width="340" /></td>
+  </tr>
+  <tr><th colspan="2">Bonus Texture</th></tr>
+  <tr>
+    <td><img src="docs/image/bonus_texture.png" alt="Bonus Texture" width="340" /></td>
+    <td><img src="docs/image/bonus_texture1.png" alt="Bonus Texture 2" width="340" /></td>
+  </tr>
+  <tr><th colspan="2">Wolf Bunker</th></tr>
+  <tr>
+    <td><img src="docs/image/wolfbunker2extra.png" alt="Wolf Bunker Extra" width="340" /></td>
+    <td><img src="docs/image/wolfbunker2.png" alt="Wolf Bunker 2" width="340" /></td>
+  </tr>
+</table>
+.
+
+<br>
+
+---
+# ℹ️ Resources
+
+## Mathematics
+
+### Vectors
+- https://www.dmae.upct.es/~plgomez/archivos%20docencia/teoria16-17/tema4-euclideo-a.pdf
+- https://www.3blue1brown.com/lessons/vectors
+
+### Trigonometry
+- https://www.universoformulas.com/matematicas/trigonometria/razones-trigonometricas/
+- https://www.superprof.es/apuntes/escolar/matematicas/trigonometria/razones-trigonometricas-3.html
+- https://www.geogebra.org/m/pyPGsGVc
+- https://www.superprof.es/diccionario/matematicas/geometria/triangulos-semejantes.html
+
+## Raycasting and DDA Algorithm
 - https://lodev.org/cgtutor/raycasting.html
-- https://en.wikipedia.org/wiki/Digital_differential_analyzer_(graphics_algorithm)
-- https://harm-smits.github.io/42docs/libs/minilibx
+- https://alotroladodeltelefonoblog.wordpress.com/2022/08/27/la-matematica-tras-el-raycasting-parte-1/
+- https://alotroladodeltelefonoblog.wordpress.com/2022/09/09/la-matematica-tras-el-raycasting-parte-2/
+- https://splashkit.io/guides/physics/8-3d-projection-raycasting/
+- https://www.youtube.com/watch?v=ebzlMOw79Yw
+- https://www.youtube.com/watch?v=NbSee-XM7WA&t=1400s
+- https://www.youtube.com/watch?v=gYRrGTC7GtA
+- https://www.youtube.com/watch?v=g8p7nAbDz6Y
+- https://www.youtube.com/watch?v=Yt0Ovv2-5cI&si=gIG8nU31eDPryYO7
+- https://www.youtube.com/shorts/TEbIfbmJSwo
 
+## MiniLibX and X11
+- https://harm-smits.github.io/42docs/libs/minilibx
+- https://tronche.com/gui/x/xlib/
+
+<br>
+
+---
+# 👥 Authors
+
+- 🧑‍💻 Alejandro Carrillo (alcarril) - https://github.com/alcarril
+- 🧑‍💻 Carlos Arbon (carbon-m) - https://github.com/GranCAM
+
+- Alejandro Carrillo (alcarril) - https://github.com/alcarril
+- Carlos Arbon (carbon-m) - https://github.com/GranCAM
+
+
+---
+
+<br>
+
+# 📜 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+MIT
 
