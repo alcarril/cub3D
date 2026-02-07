@@ -13,7 +13,8 @@
 </div>
 
 
-## Table of Contents
+---
+
 
 [Demo](#demo) | [Technical details](#core-features-and-technical-highlights) | [Getting Started](#getting-started) | [Game](#game) | [Features](#features) | [Boost](#-boost-mode-implementation-) | [Architecture](#-game-engine-architecture-) | [Physics](#-physics-system) | [Atmosphere](#-atmospheric-effects) | [Gallery](#-gallery) | [Resources](#-resources) | [Authors](#authors) | [License](#license)
 
