@@ -110,6 +110,7 @@ make
 <br>
 
 ---
+
 # Game
 
 ## 🎮 Controls and Graphics Engine Configuration
