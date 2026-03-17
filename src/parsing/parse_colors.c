@@ -6,7 +6,7 @@
 /*   By: carbon-m <carbon-m@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/24 00:00:00 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/22 13:58:59 by carbon-m         ###   ########.fr       */
+/*   Updated: 2026/03/17 11:39:56 by carbon-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,28 +45,77 @@ int	get_color_pointer(char *identifier, t_carbon_map *map,
 	return (1);
 }
 
+static char	*skip_to_rgb(char *line)
+{
+	while (*line == ' ')
+		line++;
+	while (*line && *line != ' ')
+		line++;
+	while (*line == ' ')
+		line++;
+	return (line);
+}
+
+static char	*build_compact_str(char *start)
+{
+	char	*result;
+	int		i;
+	int		j;
+
+	i = -1;
+	j = 0;
+	while (start[++i])
+		if (start[i] != ' ')
+			j++;
+	result = malloc(j + 1);
+	if (!result)
+		return (NULL);
+	i = -1;
+	j = 0;
+	while (start[++i])
+		if (start[i] != ' ')
+			result[j++] = start[i];
+	result[j] = '\0';
+	return (result);
+}
+
+static int	get_color_from_line(char *line, t_carbon_map *map,
+	t_carbon_color **color)
+{
+	char	**split;
+	char	*trimmed;
+
+	trimmed = line;
+	while (*trimmed == ' ')
+		trimmed++;
+	split = ft_split(trimmed, ' ');
+	if (!split || !split[0])
+		return (free_split(split), 0);
+	if (!get_color_pointer(split[0], map, color))
+		return (free_split(split), 0);
+	free_split(split);
+	return (1);
+}
+
 int	parse_color(char *line, t_carbon_map *map)
 {
-	char				**split;
-	char				**rgb_split;
-	t_carbon_color		*color;
-	int					result;
+	char			**rgb_split;
+	char			*rgb_str;
+	t_carbon_color	*color;
+	int				result;
 
 	if (!line || !map)
 		return (0);
-	split = ft_split(line, ' ');
-	if (!split || !split[0] || !split[1] || split[2])
-		return (free_split(split), 0);
-	if (!get_color_pointer(split[0], map, &color))
-		return (free_split(split), 0);
-	rgb_split = ft_split(split[1], ',');
+	if (!get_color_from_line(line, map, &color))
+		return (0);
+	rgb_str = build_compact_str(skip_to_rgb(line));
+	if (!rgb_str)
+		return (0);
+	rgb_split = ft_split(rgb_str, ',');
+	free(rgb_str);
 	if (!rgb_split)
-	{
-		printf("Error: Invalid RGB format: %s\n", split[1]);
-		return (free_split(split), 0);
-	}
+		return (printf("Error: Invalid RGB format\n"), 0);
 	result = parse_rgb_values(rgb_split, color);
-	free_split(split);
 	free_split(rgb_split);
 	return (result);
 }
@@ -75,6 +124,8 @@ int	is_color_line(char *line)
 {
 	if (!line)
 		return (0);
+	while (*line == ' ')
+		line++;
 	if ((ft_strncmp(line, "F ", 2) == 0)
 		|| (ft_strncmp(line, "C ", 2) == 0))
 		return (1);

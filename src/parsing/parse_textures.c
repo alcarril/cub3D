@@ -6,7 +6,7 @@
 /*   By: carbon-m <carbon-m@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/24 00:00:00 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/26 00:21:47 by carbon-m         ###   ########.fr       */
+/*   Updated: 2026/03/17 11:26:16 by carbon-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,8 @@ int	is_texture_line(char *line)
 {
 	if (!line)
 		return (0);
+	while (*line == ' ')
+		line++;
 	if ((ft_strncmp(line, "NO ", 3) == 0)
 		|| (ft_strncmp(line, "SO ", 3) == 0)
 		|| (ft_strncmp(line, "WE ", 3) == 0)
