@@ -6,7 +6,7 @@
 /*   By: carbon-m <carbon-m@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/15 03:15:03 by alejandro         #+#    #+#             */
-/*   Updated: 2026/03/11 18:57:04 by carbon-m         ###   ########.fr       */
+/*   Updated: 2026/03/19 18:38:01 by carbon-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,9 +128,13 @@ void	set_player_data(t_carbon_map *map, int i, int y, char direction);
 
 // Color parsing functions
 int		is_numeric_string(char *str);
+int		parse_color_values(char *rgb_clean, t_carbon_color *color);
+char	*remove_inner_spaces(char *str);
 int		parse_rgb_values(char **rgb_split, t_carbon_color *color);
 int		get_color_pointer(char *identifier, t_carbon_map *map,
 			t_carbon_color **color);
+int		parse_color_header(char *line, t_carbon_map *map,
+			char **rgb_start, t_carbon_color **color);
 
 // Map validation functions
 int		check_floor_borders(t_carbon_map *map, int i, int j);

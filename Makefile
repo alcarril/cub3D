@@ -6,7 +6,7 @@
 #    By: carbon-m <carbon-m@student.42madrid.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/01/19 00:00:00 by carbon-m          #+#    #+#              #
-#    Updated: 2026/01/30 16:22:41 by carbon-m         ###   ########.fr        #
+#    Updated: 2026/03/19 18:38:01 by carbon-m         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,6 +29,7 @@ MKDIR = mkdir -p
 BONUS_FILES = parsing/parse_map.c \
 			parsing/parse_elements.c \
 			parsing/parse_colors.c \
+			parsing/parse_colors_utils.c \
 			parsing/parse_map_grid.c \
 			parsing/read_file.c \
 			parsing/validate_map.c \
@@ -45,6 +46,7 @@ CARBON_FILES = parsing/parse_map.c \
 			parsing/parse_elements.c \
 			parsing/parse_textures.c \
 			parsing/parse_colors.c \
+			parsing/parse_colors_utils.c \
 			parsing/parse_map_grid.c \
 			parsing/read_file.c \
 			parsing/validate_map.c \

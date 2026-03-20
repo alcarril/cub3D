@@ -6,11 +6,32 @@
 /*   By: carbon-m <carbon-m@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/24 00:00:00 by alejandro         #+#    #+#             */
-/*   Updated: 2026/01/30 15:40:56 by carbon-m         ###   ########.fr       */
+/*   Updated: 2026/03/19 16:17:50 by carbon-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/carbon.h"
+
+static char	*skip_spaces(char *str)
+{
+	while (*str == ' ' || *str == '\t')
+		str++;
+	return (str);
+}
+
+static int	contains_space(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (str[i] == ' ' || str[i] == '\t')
+			return (1);
+		i++;
+	}
+	return (0);
+}
 
 static int	assign_texture_to_map(char *identifier, char *path,
 	t_carbon_map *map)
@@ -36,31 +57,42 @@ static int	assign_texture_to_map(char *identifier, char *path,
 
 int	parse_texture(char *line, t_carbon_map *map)
 {
-	char	**split;
+	char	identifier[3];
+	char	*cursor;
 	char	*path;
 
 	if (!line || !map)
 		return (0);
-	split = ft_split(line, ' ');
-	if (!split || !split[0] || !split[1] || split[2])
-		return (free_split(split), 0);
-	path = ft_strdup(split[1]);
-	if (!path)
-		return (free_split(split), 0);
-	if (!assign_texture_to_map(split[0], path, map))
-		return (free(path), free_split(split), 0);
-	return (free_split(split), 1);
+	cursor = skip_spaces(line);
+	if ((cursor[0] == '\0' || cursor[1] == '\0')
+		|| (cursor[2] != ' ' && cursor[2] != '\t'))
+		return (0);
+	identifier[0] = cursor[0];
+	identifier[1] = cursor[1];
+	identifier[2] = '\0';
+	cursor = skip_spaces(cursor + 2);
+	path = ft_strtrim(cursor, " \t");
+	if (!path || path[0] == '\0' || contains_space(path))
+		return (free(path), 0);
+	if (!assign_texture_to_map(identifier, path, map))
+		return (free(path), 0);
+	return (1);
 }
 
 int	is_texture_line(char *line)
 {
+	int	i;
+
+	i = 0;
 	if (!line)
 		return (0);
-	if ((ft_strncmp(line, "NO ", 3) == 0)
-		|| (ft_strncmp(line, "SO ", 3) == 0)
-		|| (ft_strncmp(line, "WE ", 3) == 0)
-		|| (ft_strncmp(line, "EA ", 3) == 0)
-		|| (ft_strncmp(line, "BO ", 3) == 0))
+	while (line[i] == ' ')
+		i++;
+	if ((ft_strncmp(&line[i], "NO ", 3) == 0)
+		|| (ft_strncmp(&line[i], "SO ", 3) == 0)
+		|| (ft_strncmp(&line[i], "WE ", 3) == 0)
+		|| (ft_strncmp(&line[i], "EA ", 3) == 0)
+		|| (ft_strncmp(&line[i], "BO ", 3) == 0))
 		return (1);
 	return (0);
 }
